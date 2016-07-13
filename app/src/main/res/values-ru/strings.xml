@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="search">Поиск…</string>
+    <string name="filter_hint">Фильтр…</string>
+    <string name="error_network">Проврьте соединение с\nинтернетом…</string>
+    <string name="error">Произошла ошибка!</string>
+    <string name="loading">Загрузка…</string>
+</resources>

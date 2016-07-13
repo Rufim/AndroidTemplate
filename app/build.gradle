@@ -1,0 +1,112 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'me.tatarka.retrolambda'
+
+ext {
+    compileSdkProjectVersion = 23
+    buildToolsProjectVersion = '23.0.3'
+    supportLibraryVersion = '23.1.1'
+    requeryVersion = '1.0.0-rc1'
+    retrofitVersion = '2.1.0'
+    butterknifeVersion = '8.1.0'
+    versionProjectCode = 1
+    versionProjectName = "0.0.1"
+}
+
+android {
+    compileSdkVersion compileSdkProjectVersion
+    buildToolsVersion buildToolsProjectVersion
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode versionProjectCode
+        versionName versionProjectName
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        encoding = 'UTF-8'
+    }
+
+
+    lintOptions {
+        abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+
+
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+        }
+    }
+
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java', '.apt_generated']
+            aidl.srcDirs = ['src/main/aidl', '.apt_generated']
+            assets.srcDirs = ['/src/main/assets']
+            res.srcDirs = ['src/main/res']
+        }
+    }
+
+}
+retrolambda {
+    jdk System.getenv("JAVA8_HOME")
+    oldJdk System.getenv("JAVA7_HOME")
+    defaultMethods true
+}
+dependencies {
+    //   compile "com.github.User:Repo:Tag"  for github repos
+    compile fileTree(include: ["*.jar"], dir: "libs")
+    apt "com.jakewharton:butterknife:$butterknifeVersion"
+    apt "io.requery:requery-processor:$requeryVersion"
+    // use an APT plugin
+    provided "javax.annotation:jsr250-api:1.0"
+    //UI
+    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    compile "com.android.support:gridlayout-v7:$supportLibraryVersion"
+    compile "com.android.support:cardview-v7:$supportLibraryVersion"
+    compile "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    compile "com.android.support:design:$supportLibraryVersion"
+    compile "com.android.support:support-annotations:$supportLibraryVersion"
+    compile "xyz.danoz:recyclerviewfastscroller:0.1.3"
+    compile "uk.co.chrisjenx:calligraphy:2.1.0"
+    // Code sugar and annotations
+    compile "com.annimon:stream:1.1.0"
+    compile "com.jakewharton:butterknife:$butterknifeVersion"
+    compile "org.jetbrains:annotations-java5:15.0"
+    // functional libs
+    compile "com.google.code.gson:gson:2.4"
+    compile "com.squareup.picasso:picasso:2.5.2"
+    compile "org.greenrobot:eventbus:3.0.0"
+    compile "com.snappydb:snappydb-lib:0.5.2"
+    compile "com.squareup.retrofit2:retrofit:2.1.0"
+    compile "io.requery:requery:$requeryVersion"
+    compile "io.requery:requery-android:$requeryVersion"
+    // for android
+    compile "net.vrallev.android:cat:1.0.3"
+}

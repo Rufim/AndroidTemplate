@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- android base fonts -->
+    <string name="font_sans_serif">sans-serif</string>
+    <!-- roboto regular              -->
+    <string name="font_sans_serif_light">sans-serif-light</string>
+    <!-- roboto light                -->
+    <string name="font_sans_serif_condensed">sans-serif-condensed</string>
+    <!-- roboto condensed            -->
+    <string name="font_sans_serif_thin">sans-serif-thin</string>
+    <!-- roboto thin (android 4.2)   -->
+    <string name="font_sans_serif_medium">sans-serif-medium</string>
+    <!-- roboto medium (android 5.0) -->
+
+    <!-- Dreawer -->
+
+    <string name="search">Search…</string>
+    <string name="filter_hint">Filter…</string>
+    <string name="loading">Loading…</string>
+    <string name="error">Error occurred!</string>
+    <string name="error_network">Please check\nconnection…</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+</resources>
