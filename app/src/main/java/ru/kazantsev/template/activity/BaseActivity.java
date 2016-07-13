@@ -276,13 +276,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
             boolean canback = getSupportFragmentManager().getBackStackEntryCount() > 0;
             if (canback) {
                 actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
-                actionBar.setDisplayHomeAsUpEnabled(true);
             } else {
                 actionBar.setHomeAsUpIndicator(null);
-                actionBar.setDisplayHomeAsUpEnabled(false);
                 actionBarDrawerToggle.syncState();
             }
-
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
