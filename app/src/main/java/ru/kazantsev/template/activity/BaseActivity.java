@@ -43,6 +43,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected ActionBar actionBar;
     protected ActionBarDrawerToggle actionBarDrawerToggle;
 
+    protected boolean disableNavigationBar = false;
+
     public interface BackCallback {
         boolean allowBackPress();
     }
@@ -87,6 +89,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         //Handle when activity is recreated like on orientation Change
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        if(disableNavigationBar) {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        }
         shouldDisplayHomeUp();
     }
 
@@ -276,11 +281,19 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
             boolean canback = getSupportFragmentManager().getBackStackEntryCount() > 0;
             if (canback) {
                 actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
+                if(disableNavigationBar) {
+                    actionBar.setDisplayHomeAsUpEnabled(true);
+                }
             } else {
                 actionBar.setHomeAsUpIndicator(null);
+                if(disableNavigationBar) {
+                    actionBar.setDisplayHomeAsUpEnabled(false);
+                }
                 actionBarDrawerToggle.syncState();
             }
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            if(!disableNavigationBar) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
     }
 
