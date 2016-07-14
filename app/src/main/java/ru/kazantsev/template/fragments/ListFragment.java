@@ -395,9 +395,9 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     public class DataTask extends AsyncTask<Void, Void, List<I>> {
 
-        private int count = 0;
-        private AsyncTask onElementsLoadedTask;
-        private Object[] LoadedTaskParams;
+        protected int count = 0;
+        protected AsyncTask onElementsLoadedTask;
+        protected Object[] LoadedTaskParams;
 
         public DataTask(int count) {
             this.count = count;
@@ -455,8 +455,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     }
 
     public class MoveTask extends AsyncTask<Object, Void, Void> {
-        int index = 0;
-        int offsetLines = 0;
+        protected int index = 0;
+        protected int offsetLines = 0;
 
         @Override
         protected Void doInBackground(Object... params) {
@@ -475,7 +475,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     public class FilterTask implements Runnable {
 
-        private final ItemListAdapter.FilterEvent query;
+        protected final ItemListAdapter.FilterEvent query;
 
         public FilterTask(ItemListAdapter.FilterEvent query) {
             this.query = query;
