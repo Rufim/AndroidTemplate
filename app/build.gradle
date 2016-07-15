@@ -105,7 +105,8 @@ dependencies {
     compile "com.squareup.picasso:picasso:2.5.2"
     compile "org.greenrobot:eventbus:3.0.0"
     compile "com.snappydb:snappydb-lib:0.5.2"
-    compile "com.squareup.retrofit2:retrofit:2.1.0"
+    compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    compile "com.squareup.retrofit:converter-gson:$retrofitVersion"
     compile "io.requery:requery:$requeryVersion"
     compile "io.requery:requery-android:$requeryVersion"
     // for android
