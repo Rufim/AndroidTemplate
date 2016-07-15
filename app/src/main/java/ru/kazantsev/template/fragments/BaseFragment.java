@@ -70,7 +70,6 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
 
     protected boolean retainInstance = true;
     private Unbinder unbinder;
-    private TextView messageView;
 
 
     public BaseFragment() {
@@ -125,6 +124,10 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
 
     public void unbind() {
         unbinder.unbind();
+    }
+
+    protected BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
     }
 
     @Override

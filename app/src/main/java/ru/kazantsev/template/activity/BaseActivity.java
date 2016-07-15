@@ -227,7 +227,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public NavigationView getNavigationView() {
-        return null; // navigationView;
+        return navigationView;
     }
 
     public Toolbar getToolbar() {
