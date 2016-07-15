@@ -79,6 +79,7 @@ retrolambda {
     oldJdk System.getenv("JAVA7_HOME")
     defaultMethods true
 }
+
 dependencies {
     //   compile "com.github.User:Repo:Tag"  for github repos
     compile fileTree(include: ["*.jar"], dir: "libs")
@@ -108,5 +109,5 @@ dependencies {
     compile "io.requery:requery:$requeryVersion"
     compile "io.requery:requery-android:$requeryVersion"
     // for android
-    compile "net.vrallev.android:cat:1.0.3"
+    compile "net.vrallev.android:cat:1.0.4"
 }
