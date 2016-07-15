@@ -12,6 +12,14 @@ import java.io.IOException;
  * Created by 0shad on 03.03.2016.
  */
 public class UriTypeAdapter extends TypeAdapter<Uri> {
+
+    final String baseDomain;
+
+    public UriTypeAdapter(String baseDomain) {
+        this.baseDomain = baseDomain;
+    }
+
+
     @Override
     public void write(JsonWriter out, Uri value) throws IOException {
         if (value == null) {
@@ -27,6 +35,6 @@ public class UriTypeAdapter extends TypeAdapter<Uri> {
             in.nextNull();
             return null;
         }
-        return Uri.parse(in.nextString());
+        return Uri.parse(baseDomain + in.nextString());
     }
 }
