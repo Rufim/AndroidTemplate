@@ -44,6 +44,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected ActionBarDrawerToggle actionBarDrawerToggle;
 
     protected boolean disableNavigationBar = false;
+    protected boolean toolbarClassic = false;
 
     public interface BackCallback {
         boolean allowBackPress();
@@ -52,7 +53,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if(toolbarClassic) {
+            setContentView(R.layout.activity_main_classic);
+        } else {
+            setContentView(R.layout.activity_main);
+        }
         container = GuiUtils.getView(this, R.id.container);
         containerDetails = GuiUtils.getView(this, R.id.container_details);
         drawerLayout = GuiUtils.getView(this, R.id.drawer_layout);
