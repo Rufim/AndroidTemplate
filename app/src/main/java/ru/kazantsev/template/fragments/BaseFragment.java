@@ -123,7 +123,9 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
     }
 
     public void unbind() {
-        unbinder.unbind();
+        if(unbinder != null) {
+            unbinder.unbind();
+        }
     }
 
     protected BaseActivity getBaseActivity() {
