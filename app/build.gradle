@@ -83,10 +83,6 @@ retrolambda {
 dependencies {
     //   compile "com.github.User:Repo:Tag"  for github repos
     compile fileTree(include: ["*.jar"], dir: "libs")
-    apt "com.jakewharton:butterknife:$butterknifeVersion"
-    apt "io.requery:requery-processor:$requeryVersion"
-    // use an APT plugin
-    provided "javax.annotation:jsr250-api:1.0"
     //UI
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:gridlayout-v7:$supportLibraryVersion"
