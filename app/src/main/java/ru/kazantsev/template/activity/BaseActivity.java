@@ -66,7 +66,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         drawerLayout = GuiUtils.getView(this, R.id.drawer_layout);
         navigationView = GuiUtils.getView(this, R.id.navigation_drawer);
         toolbar = GuiUtils.getView(this, R.id.toolbar);
-        mainBorder = GuiUtils.getView(this, R.id.main_border);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
         actionBar = getSupportActionBar();
