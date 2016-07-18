@@ -37,7 +37,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected LinearLayout contentLayout;
 
     protected FrameLayout container;
-    protected FrameLayout containerDetails;
     protected DrawerLayout drawerLayout;
     protected NavigationView navigationView;
     protected Toolbar toolbar;
@@ -64,7 +63,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         rootLayout = GuiUtils.getView(this, R.id.root_layout);
         contentLayout = GuiUtils.getView(this, R.id.content_layout);
         container = GuiUtils.getView(this, R.id.container);
-        containerDetails = GuiUtils.getView(this, R.id.container_details);
         drawerLayout = GuiUtils.getView(this, R.id.drawer_layout);
         navigationView = GuiUtils.getView(this, R.id.navigation_drawer);
         toolbar = GuiUtils.getView(this, R.id.toolbar);
@@ -171,18 +169,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected abstract void onDrawerClosed(View drawerView);
 
     protected abstract void onDrawerOpened(View drawerView);
-
-    protected void setContainerWeight(float weight) {
-        LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) container.getLayoutParams();
-        p.weight = weight;
-        container.setLayoutParams(p);
-    }
-
-    protected void setDetailsWeight(float weight) {
-        LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) containerDetails.getLayoutParams();
-        p.weight = weight;
-        containerDetails.setLayoutParams(p);
-    }
 
     @Subscribe
     public abstract void onEvent(FragmentAttachedEvent fragmentAttached);
