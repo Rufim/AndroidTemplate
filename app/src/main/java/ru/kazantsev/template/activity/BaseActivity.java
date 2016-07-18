@@ -33,6 +33,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  */
 public abstract class BaseActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
+    protected LinearLayout rootLayout;
+
     protected FrameLayout container;
     protected FrameLayout containerDetails;
     protected DrawerLayout drawerLayout;
@@ -58,6 +60,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         } else {
             setContentView(R.layout.activity_main);
         }
+        rootLayout = GuiUtils.getView(this, R.id.root_layout);
         container = GuiUtils.getView(this, R.id.container);
         containerDetails = GuiUtils.getView(this, R.id.container_details);
         drawerLayout = GuiUtils.getView(this, R.id.drawer_layout);
@@ -244,6 +247,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return actionBar;
     }
 
+    public LinearLayout getRootLayout() {
+        return rootLayout;
+    }
 
     // Использовать при изменении ориентации экрана.
     public <F extends Fragment> void replaceFragment(Class<F> fragmentClass) {
