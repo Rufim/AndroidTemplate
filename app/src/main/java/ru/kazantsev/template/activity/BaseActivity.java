@@ -242,6 +242,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return contentLayout;
     }
 
+    public ActionBarDrawerToggle getActionBarDrawerToggle() {
+        return actionBarDrawerToggle;
+    }
+
+    public DrawerLayout getDrawerLayout() {
+        return drawerLayout;
+    }
+
     // Использовать при изменении ориентации экрана.
     public <F extends Fragment> void replaceFragment(Class<F> fragmentClass) {
         replaceFragment(fragmentClass, new FragmentBuilder(getSupportFragmentManager()));
@@ -304,9 +312,5 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         //This method is called when the up button is pressed. Just the pop back stack.
         getSupportFragmentManager().popBackStack();
         return true;
-    }
-
-    public DrawerLayout getDrawerLayout() {
-        return drawerLayout;
     }
 }
