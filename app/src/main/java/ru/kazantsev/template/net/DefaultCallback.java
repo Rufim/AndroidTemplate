@@ -2,6 +2,7 @@ package ru.kazantsev.template.net;
 
 import android.util.Log;
 import com.google.gson.Gson;
+import net.vrallev.android.cat.Cat;
 import org.greenrobot.eventbus.EventBus;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,7 +49,7 @@ public class DefaultCallback<T> implements Callback<T> {
 
     @Override
     public void onFailure(Call<T> call, Throwable throwable) {
-        System.out.println(errorMsg + ": " + throwable.getLocalizedMessage());
+        Cat.e(throwable);
         if (onSuccess != null) onFailure.response(throwable, this);
         else postErrorEvent(throwable, null);
     }
