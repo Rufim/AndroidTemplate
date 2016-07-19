@@ -33,13 +33,13 @@ public class DefaultCallback<T> implements Callback<T> {
                 }
                 postErrorEvent(error, response.raw().request());
             } catch (IOException e) {
-                Log.e(TAG, "Cant read error", e);
+                Cat.e(e, "Cant read error");
             }
         } else if (response.code() == HttpURLConnection.HTTP_FORBIDDEN) {
-            System.out.println("Forbidden!");
+            Cat.e("Forbidden!");
             postErrorEvent(response, response.raw().request());
         } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
-            System.out.println("Not found :(");
+            Cat.e("Not found :(");
             postErrorEvent(response, response.raw().request());
             // TODO: think about adding other stuff here
         } else {
