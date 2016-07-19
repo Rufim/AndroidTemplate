@@ -142,11 +142,15 @@ public class TextUtils {
     }
 
     public static Integer extractInt(String string) {
+        return extractInt(string, -1);
+    }
+
+    public static Integer extractInt(String string, int defaultValue) {
         Matcher matcher = Pattern.compile("\\d+").matcher(string);
         if (matcher.find()) {
             return TextUtils.parseInt(string.substring(matcher.start(), matcher.end()));
         }
-        return -1;
+        return defaultValue;
     }
 
     public static boolean contains(String str, boolean in, String... strs) {
