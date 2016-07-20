@@ -34,9 +34,9 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public abstract class BaseActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
     protected LinearLayout rootLayout;
+    protected LinearLayout contentLayout;
 
     protected FrameLayout container;
-    protected FrameLayout containerDetails;
     protected DrawerLayout drawerLayout;
     protected NavigationView navigationView;
     protected Toolbar toolbar;
@@ -61,12 +61,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
             setContentView(R.layout.activity_main);
         }
         rootLayout = GuiUtils.getView(this, R.id.root_layout);
+        contentLayout = GuiUtils.getView(this, R.id.content_layout);
         container = GuiUtils.getView(this, R.id.container);
-        containerDetails = GuiUtils.getView(this, R.id.container_details);
         drawerLayout = GuiUtils.getView(this, R.id.drawer_layout);
         navigationView = GuiUtils.getView(this, R.id.navigation_drawer);
         toolbar = GuiUtils.getView(this, R.id.toolbar);
-        mainBorder = GuiUtils.getView(this, R.id.main_border);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
         actionBar = getSupportActionBar();
@@ -170,18 +169,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     protected  void onDrawerOpened(View drawerView){}
 
-    protected void setContainerWeight(float weight) {
-        LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) container.getLayoutParams();
-        p.weight = weight;
-        container.setLayoutParams(p);
-    }
-
-    protected void setDetailsWeight(float weight) {
-        LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) containerDetails.getLayoutParams();
-        p.weight = weight;
-        containerDetails.setLayoutParams(p);
-    }
-
     @Subscribe
     public abstract void onEvent(FragmentAttachedEvent fragmentAttached);
 
@@ -251,6 +238,18 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return rootLayout;
     }
 
+    public LinearLayout getContentLayout() {
+        return contentLayout;
+    }
+
+    public ActionBarDrawerToggle getActionBarDrawerToggle() {
+        return actionBarDrawerToggle;
+    }
+
+    public DrawerLayout getDrawerLayout() {
+        return drawerLayout;
+    }
+
     // Использовать при изменении ориентации экрана.
     public <F extends Fragment> void replaceFragment(Class<F> fragmentClass) {
         replaceFragment(fragmentClass, new FragmentBuilder(getSupportFragmentManager()));
@@ -313,9 +312,5 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         //This method is called when the up button is pressed. Just the pop back stack.
         getSupportFragmentManager().popBackStack();
         return true;
-    }
-
-    public DrawerLayout getDrawerLayout() {
-        return drawerLayout;
     }
 }

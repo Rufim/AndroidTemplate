@@ -15,9 +15,10 @@
 
         <!-- The main content view -->
         <LinearLayout
+                android:id="@+id/content_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:weightSum="1">
 
             <!-- Toolbar instead of ActionBar so the drawer can slide on top -->
@@ -26,22 +27,9 @@
             <!-- Real content goes here -->
             <FrameLayout
                     android:id="@+id/container"
-                    android:layout_weight="0"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
-            <View  android:id="@+id/main_border"
-                   style="@style/vertical_border"
-                   android:layout_marginLeft="2dp"
-                   android:layout_marginRight="2dp"
-                    android:visibility="invisible"/>
-
-            <FrameLayout
-                    android:id="@+id/container_details"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    />
-
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
         </LinearLayout>
 
         <android.support.design.widget.NavigationView
