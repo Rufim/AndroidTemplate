@@ -163,11 +163,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return savedInstanceState != null && savedInstanceState.getBoolean(Constants.ArgsName.CONFIG_CHANGE, false);
     }
 
-    protected abstract boolean onNavigationItemSelected(MenuItem item);
+    protected  boolean onNavigationItemSelected(MenuItem item){return false;}
 
-    protected abstract void onDrawerClosed(View drawerView);
+    protected void onDrawerClosed(View drawerView){}
 
-    protected abstract void onDrawerOpened(View drawerView);
+    protected  void onDrawerOpened(View drawerView){}
 
     @Subscribe
     public abstract void onEvent(FragmentAttachedEvent fragmentAttached);
