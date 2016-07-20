@@ -251,6 +251,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     // Использовать при изменении ориентации экрана.
+    public <F extends Fragment> void restoreFragment(F fragment) {
+        new FragmentBuilder(getSupportFragmentManager()).replaceFragment(R.id.container, fragment);
+    }
+
     public <F extends Fragment> void replaceFragment(Class<F> fragmentClass) {
         replaceFragment(fragmentClass, new FragmentBuilder(getSupportFragmentManager()));
     }
