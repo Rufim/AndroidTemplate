@@ -4,8 +4,8 @@ apply plugin: 'me.tatarka.retrolambda'
 
 ext {
     compileSdkProjectVersion = 23
-    buildToolsProjectVersion = '23.0.3'
-    supportLibraryVersion = '23.1.1'
+    buildToolsProjectVersion = '24.0.1'
+    supportLibraryVersion = '24.0.0'
     requeryVersion = '1.0.0-rc1'
     retrofitVersion = '2.1.0'
     butterknifeVersion = '8.1.0'
@@ -75,9 +75,9 @@ android {
 
 }
 retrolambda {
-    jdk System.getenv("JAVA8_HOME")
-    oldJdk System.getenv("JAVA7_HOME")
-    defaultMethods true
+    jdk = System.getenv("JAVA8_HOME")
+    oldJdk = System.getenv("JAVA7_HOME")
+    defaultMethods = true
 }
 
 dependencies {
