@@ -74,7 +74,7 @@ public class FragmentBuilder {
         }
 
         public static ClassType cast(Object obj) {
-            if (null == obj) cast(Void.class);
+            if (null == obj) return cast(Void.class);
             return cast(obj.getClass());
         }
 
@@ -182,6 +182,9 @@ public class FragmentBuilder {
             case DOUBLE:
                 if (arrayFlag) bundle.putDoubleArray(key, (double[]) value);
                 else bundle.putDouble(key, (double) value);
+                return this;
+            case UNSUPPORTED:
+                Log.e(TAG, "Try to send unsupported type value=" + value);
                 return this;
         }
         if (Serializable.class.isAssignableFrom(value.getClass())) {
