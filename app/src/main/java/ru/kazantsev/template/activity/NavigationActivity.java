@@ -68,14 +68,12 @@ public abstract class NavigationActivity extends BaseActivity {
         return -1;
     }
 
-    protected View addTab (@LayoutRes int tabId, @LayoutRes int border, Class<? extends Fragment> fragmentClass, Bundle bundle) {
+   protected abstract void onTabClick(View tab);
+
+    protected View addTab (@LayoutRes int tabId, @LayoutRes int border) {
         LinearLayout tab = GuiUtils.inflate(tabBar, tabId);
-        tab.setTag(fragmentClass);
         tab.setOnClickListener(v -> {
-            FragmentBuilder builder = new FragmentBuilder(getSupportFragmentManager());
-            builder.putArgs(bundle);
-            builder.newFragment();
-            replaceFragment((Class<Fragment>) v.getTag(), builder);
+            onTabClick(v);
         });
         if (tabBar.getChildCount() > 0) {
             tabBar.addView(GuiUtils.inflate(tabBar, border));
