@@ -259,6 +259,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         new FragmentBuilder(getSupportFragmentManager()).replaceFragment(R.id.container, fragment);
     }
 
+    public <F extends Fragment> void restoreFragment(Class<F> fragmentClass) {
+        new FragmentBuilder(getSupportFragmentManager()).replaceFragment(R.id.container, fragmentClass);
+    }
+
     public <F extends Fragment> void replaceFragment(Class<F> fragmentClass) {
         replaceFragment(fragmentClass, new FragmentBuilder(getSupportFragmentManager()));
     }
