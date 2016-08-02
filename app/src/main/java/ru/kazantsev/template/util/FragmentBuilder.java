@@ -232,7 +232,7 @@ public class FragmentBuilder {
         return this;
     }
 
-    public FragmentBuilder clearBackStack(Class<Fragment> fragmentClass) {
+    public FragmentBuilder clearBackStack(Class<? extends Fragment> fragmentClass) {
         return clearBackStack(fragmentClass.getSimpleName());
     }
 

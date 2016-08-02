@@ -242,6 +242,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return contentLayout;
     }
 
+    public FrameLayout getContainer() {
+        return container;
+    }
+
     public ActionBarDrawerToggle getActionBarDrawerToggle() {
         return actionBarDrawerToggle;
     }
