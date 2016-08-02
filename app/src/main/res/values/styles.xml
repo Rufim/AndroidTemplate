@@ -1,9 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="toolbar_popup" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:background">?android:attr/colorAccent</item>
-    </style>
-
     <style name="AppSearchViewStyle" parent="Widget.AppCompat.SearchView">
         <item name="queryBackground">@android:color/transparent</item>
         <item name="searchIcon">@drawable/ic_action_search</item>
