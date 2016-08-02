@@ -4,5 +4,4 @@
     <attr name="colorPrimaryDrawable" format="reference"/>
     <attr name="colorPrimaryDarkDrawable" format="reference"/>
     <attr name="colorAccentDrawable" format="reference"/>
-    <attr name="popupToolbarBackground" format="reference|color"/>
 </resources>
