@@ -2,6 +2,7 @@ package ru.kazantsev.template.util;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.AnimatorRes;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -88,8 +89,8 @@ public class FragmentBuilder {
     private boolean newFragment = false;
     private boolean removeIfExists = false;
     private boolean clearBackStack = false;
-    private int inAnimationId = R.anim.slide_in_left;
-    private int outAnimationId = R.anim.slide_out_right;
+    private int inAnimationId = -1;
+    private int outAnimationId = -1;
     private String clearBackStackUpToName = null;
     private Fragment fragmentInvoker;
 
@@ -242,7 +243,7 @@ public class FragmentBuilder {
         return this;
     }
 
-    public void setAnimation(int inAnimationId, int outAnimationId) {
+    public void setAnimation(@AnimatorRes  int inAnimationId, @AnimatorRes int outAnimationId) {
         this.inAnimationId = inAnimationId;
         this.outAnimationId = outAnimationId;
     }
@@ -259,8 +260,12 @@ public class FragmentBuilder {
         if(clearBackStack) {
             manager.popBackStack(clearBackStackUpToName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
+
         Fragment fragment = manager.findFragmentByTag(name);
         FragmentTransaction transaction = manager.beginTransaction();
+        if (inAnimationId > 0 && outAnimationId > 0) {
+            transaction.setCustomAnimations(inAnimationId, outAnimationId);
+        }
         if (fragment == null || newFragment) {
             if (fragmentClass == null) {
                 try {
@@ -282,9 +287,6 @@ public class FragmentBuilder {
         }
         if (toBackStack) {
             transaction.addToBackStack(null);
-        }
-        if(inAnimationId > 0 && outAnimationId > 0){
-            transaction.setCustomAnimations(inAnimationId, outAnimationId);
         }
         transaction.commitAllowingStateLoss();
         return (F) fragment;
