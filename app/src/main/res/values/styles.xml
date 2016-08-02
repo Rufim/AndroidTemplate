@@ -1,6 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:colorBackground">?android:attr/colorPrimary</item>
+        <item name="android:textColor">?android:attr/textColor</item>
+    </style>
+
+    <style name="toolbar_popup" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:colorBackground">?android:attr/colorAccent</item>
         <item name="android:textColor">?android:attr/textColor</item>
     </style>
