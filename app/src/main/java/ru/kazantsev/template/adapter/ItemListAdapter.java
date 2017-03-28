@@ -194,18 +194,25 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         if (query == null) return items;
         final List<I> filteredList = new ArrayList<>();
         for (I item : items) {
-            if (item instanceof Findable) {
-                if (((Findable) item).find(query)) {
-                    filteredList.add(item);
-                }
-            } else {
-                final String text = item.toString().toLowerCase();
-                if (text.contains(query.toString().toLowerCase())) {
-                    filteredList.add(item);
-                }
+            if(find(query, item)) {
+                filteredList.add(item);
             }
         }
         return filteredList;
+    }
+
+    public boolean find(FilterEvent query, I item) {
+        if (item instanceof Findable) {
+            if (((Findable) item).find(query)) {
+                return true;
+            }
+        } else {
+            final String text = item.toString().toLowerCase();
+            if (text.contains(query.toString().toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public synchronized void changeTo(List<I> items) {
