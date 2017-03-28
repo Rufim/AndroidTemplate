@@ -3,10 +3,10 @@ apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 
 ext {
-    compileSdkProjectVersion = 23
-    buildToolsProjectVersion = '23.0.3'
-    supportLibraryVersion = '23.1.1'
-    requeryVersion = '1.0.0-rc1'
+    compileSdkProjectVersion = 25
+    buildToolsProjectVersion = '25.0.2'
+    supportLibraryVersion = '25.2.0'
+    requeryVersion = '1.2.1'
     retrofitVersion = '2.1.0'
     butterknifeVersion = '8.1.0'
     versionProjectCode = 1
@@ -52,10 +52,6 @@ android {
 
 
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
 
         debug {
             minifyEnabled false

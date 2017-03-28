@@ -293,7 +293,11 @@ public class FragmentBuilder {
             manager.popBackStack(clearBackStackUpToName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
         FragmentTransaction transaction = manager.beginTransaction();
-        fragment.getArguments().putAll(bundle);
+        if(fragment.getArguments() != null) {
+            fragment.getArguments().putAll(bundle);
+        } else {
+            fragment.setArguments(bundle);
+        }
         if (manager.findFragmentById(container) == fragment && removeIfExists) {
             transaction.remove(fragment);
             transaction.add(container, fragment, name);

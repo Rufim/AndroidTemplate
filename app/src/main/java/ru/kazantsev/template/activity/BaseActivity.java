@@ -154,7 +154,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         } else {
             super.onBackPressed();
         }
-
     }
 
     protected abstract void handleIntent(Intent intent);
