@@ -11,19 +11,19 @@ import ru.kazantsev.template.R;
  */
 public class LoadFragment<Params, Progress, Result> extends AsyncTaskFragment<Params, Progress, Result> {
 
-    interface OnDoBackground<Result,Params> {
+    public interface OnDoBackground<Result,Params> {
         Result doBackground(Params[] params);
     }
 
-    interface OnPostExecute<Result> {
+    public interface OnPostExecute<Result> {
         void onPostExecute(Result result);
     }
 
-    interface OnCancelled<Result> {
+    public interface OnCancelled<Result> {
         void onCancelled(Result result);
     }
 
-    interface OnPreExecute {
+    public interface OnPreExecute {
         void onPreExecute();
     }
 
