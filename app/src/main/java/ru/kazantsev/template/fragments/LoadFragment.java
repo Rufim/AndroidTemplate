@@ -9,7 +9,7 @@ import ru.kazantsev.template.R;
 /**
  * Created by 0shad on 13.07.2015.
  */
-public  abstract class LoadFragment<Params, Progress, Result> extends AsyncTaskFragment<Params, Progress, Result> {
+public class LoadFragment<Params, Progress, Result> extends AsyncTaskFragment<Params, Progress, Result> {
 
     interface OnDoBackground<Result,Params> {
         Result doBackground(Params[] params);
