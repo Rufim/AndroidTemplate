@@ -2,6 +2,7 @@ package ru.kazantsev.template.fragments;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -41,27 +42,27 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     public LoadFragment() {
     }
 
-    private  OnDoBackground<Result,Params> onDoBackground;
-    private  OnPostExecute<Result> onPostExecute;
-    private  OnCancelled<Result> onCancelled;
-    private  OnPreExecute onPreExecute;
+    private LoadFragment.OnDoBackground<Result,Params> onDoBackground;
+    private LoadFragment.OnPostExecute<Result> onPostExecute;
+    private LoadFragment.OnCancelled<Result> onCancelled;
+    private LoadFragment.OnPreExecute onPreExecute;
 
-    public LoadFragment<Params, Progress, Result> setOnDoBackground(OnDoBackground<Result, Params> onDoBackground) {
+    public LoadFragment<Params, Progress, Result> setOnDoBackground(LoadFragment.OnDoBackground<Result, Params> onDoBackground) {
         this.onDoBackground = onDoBackground;
         return this;
     }
 
-    public LoadFragment<Params, Progress, Result> setOnPostExecute(OnPostExecute<Result> onPostExecute) {
+    public LoadFragment<Params, Progress, Result> setOnPostExecute(LoadFragment.OnPostExecute<Result> onPostExecute) {
         this.onPostExecute = onPostExecute;
         return this;
     }
 
-    public LoadFragment<Params, Progress, Result> setOnCancelled(OnCancelled<Result> onCancelled) {
+    public LoadFragment<Params, Progress, Result> setOnCancelled(LoadFragment.OnCancelled<Result> onCancelled) {
         this.onCancelled = onCancelled;
         return this;
     }
 
-    public LoadFragment<Params, Progress, Result> setOnPreExecute(OnPreExecute onPreExecute) {
+    public LoadFragment<Params, Progress, Result> setOnPreExecute(LoadFragment.OnPreExecute onPreExecute) {
         this.onPreExecute = onPreExecute;
         return this;
     }
@@ -74,6 +75,9 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final LoadFragment<Params, Progress, Result> current = this;
+        if (!task.isCancelled()) {
+            task.cancel(true);
+        }
         this.task = new AsyncTask<Params, Progress, Result>() {
 
             @Override
@@ -83,8 +87,8 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
 
             @Override
             protected void onPostExecute(Result result) {
+                //cancelTask();
                 current.onPostExecute(result);
-                cancelTask();
             }
 
             @Override
@@ -94,8 +98,8 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
 
             @Override
             protected void onCancelled(Result result) {
+                // cancelTask();
                 current.onCancelled(result);
-                cancelTask();
             }
 
             @Override
@@ -136,12 +140,16 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     protected void onCancelled(Result result) {
         if(onCancelled != null) {
             onCancelled.onCancelled(result);
+        } else {
+            cancelTask();
         }
     }
 
     protected void onCancelled() {
         if(onCancelled != null) {
             onCancelled.onCancelled(null);
+        } else {
+            cancelTask();
         }
     }
 
@@ -154,8 +162,18 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     }
 
     public void execute(BaseFragment baseFragment) {
-        new FragmentBuilder(baseFragment.getFragmentManager()).newFragment().replaceFragment(baseFragment, this);
+        new FragmentBuilder(baseFragment.getFragmentManager()).replaceFragment(baseFragment, this);
     }
+
+    public void error(BaseFragment fragment, @StringRes int id) {
+        (new FragmentBuilder(getFragmentManager()))
+                .putArg("message", getString(id))
+                .putArg("fragment_class", fragment.getClass())
+                .putArg("fragment_args", fragment.getArguments())
+                .replaceFragment(fragment, ErrorFragment.class);
+    }
+
+
 
     private void cancelTask() {
         if (manager == null) {
@@ -165,7 +183,7 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
             if (!task.isCancelled()) {
                 task.cancel(true);
             }
-            manager.beginTransaction().remove(this).commit();
+            manager.beginTransaction().remove(this).commitAllowingStateLoss();
         }
     }
 }
