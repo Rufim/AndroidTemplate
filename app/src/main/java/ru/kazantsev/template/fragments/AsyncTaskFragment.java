@@ -115,7 +115,7 @@ public abstract class AsyncTaskFragment<Params, Progress, Result> extends Fragme
             if (!oldAsync.eq(this)) {
                 oldAsync.cancelTask();
             }
-        } else {
+        } else if(fragment != null) {
             throw new IllegalThreadStateException("Tag already used");
         }
     }
