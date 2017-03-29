@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.jakewharton.butterknife'
 
 ext {
     compileSdkProjectVersion = 25
@@ -8,7 +9,7 @@ ext {
     supportLibraryVersion = '25.2.0'
     requeryVersion = '1.2.1'
     retrofitVersion = '2.1.0'
-    butterknifeVersion = '8.1.0'
+    butterknifeVersion = '8.5.1'
     versionProjectCode = 1
     versionProjectName = "0.0.1"
 }
