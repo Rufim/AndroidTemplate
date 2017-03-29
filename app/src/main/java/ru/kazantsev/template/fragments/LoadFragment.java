@@ -1,22 +1,33 @@
 package ru.kazantsev.template.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import ru.kazantsev.template.R;
+import ru.kazantsev.template.util.FragmentBuilder;
+
+import java.util.Arrays;
 
 /**
  * Created by 0shad on 13.07.2015.
  */
-public class LoadFragment<Params, Progress, Result> extends AsyncTaskFragment<Params, Progress, Result> {
+public class LoadFragment<Params, Progress, Result> extends BaseFragment {
+
+    private volatile AsyncTask task;
+    private Params[] params;
+    private FragmentManager manager;
+    private String tag = LoadFragment.class.getSimpleName();
 
     public interface OnDoBackground<Result,Params> {
         Result doBackground(Params[] params);
     }
 
     public interface OnPostExecute<Result> {
-        void onPostExecute(Result result);
+        void onPostExecute(Result result, LoadFragment fragment);
     }
 
     public interface OnCancelled<Result> {
@@ -24,7 +35,7 @@ public class LoadFragment<Params, Progress, Result> extends AsyncTaskFragment<Pa
     }
 
     public interface OnPreExecute {
-        void onPreExecute();
+        void onPreExecute(LoadFragment fragment);
     }
 
     public LoadFragment() {
@@ -55,20 +66,53 @@ public class LoadFragment<Params, Progress, Result> extends AsyncTaskFragment<Pa
         return this;
     }
 
-    @Override
     public LoadFragment<Params, Progress, Result> setParams(Params... params) {
-        super.setParams(params);
+        this.params = params;
         return this;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
+        final LoadFragment<Params, Progress, Result> current = this;
+        this.task = new AsyncTask<Params, Progress, Result>() {
+
+            @Override
+            protected void onPreExecute() {
+                current.onPreExecute();
+            }
+
+            @Override
+            protected void onPostExecute(Result result) {
+                current.onPostExecute(result);
+                cancelTask();
+            }
+
+            @Override
+            protected void onProgressUpdate(Progress... values) {
+
+            }
+
+            @Override
+            protected void onCancelled(Result result) {
+                current.onCancelled(result);
+                cancelTask();
+            }
+
+            @Override
+            protected void onCancelled() {
+                current.onCancelled();
+            }
+
+            @Override
+            protected Result doInBackground(Params... params) {
+                return current.doInBackground(params);
+            }
+        };
+        task.execute(params);
         View rootView = inflater.inflate(ru.kazantsev.template.R.layout.progressbar, container, false);
         return rootView;
     }
 
-    @Override
     protected Result doInBackground(Params[] params) {
         if(onDoBackground != null) {
             return onDoBackground.doBackground(params);
@@ -76,30 +120,52 @@ public class LoadFragment<Params, Progress, Result> extends AsyncTaskFragment<Pa
         return null;
     }
 
-    @Override
     protected void onPostExecute(Result result) {
         if(onPostExecute != null) {
-            onPostExecute.onPostExecute(result);
+            onPostExecute.onPostExecute(result, this);
         }
     }
 
-    @Override
     protected void onPreExecute() {
-        super.onPreExecute();
+        if(onPreExecute != null) {
+            onPreExecute.onPreExecute(this);
+        }
     }
 
-    @Override
-    protected void onProgressUpdate(Progress[] values) {
-        super.onProgressUpdate(values);
-    }
 
-    @Override
     protected void onCancelled(Result result) {
-        super.onCancelled(result);
+        if(onCancelled != null) {
+            onCancelled.onCancelled(result);
+        }
     }
 
-    @Override
     protected void onCancelled() {
-        super.onCancelled();
+        if(onCancelled != null) {
+            onCancelled.onCancelled(null);
+        }
+    }
+
+    public boolean eq(LoadFragment o) {
+        if (this == o) return true;
+        if (!super.equals(o)) return false;
+        LoadFragment<?, ?, ?> that = (LoadFragment<?, ?, ?>) o;
+        if (!Arrays.equals(params, that.params)) return false;
+        return !(tag != null ? !tag.equals(that.tag) : that.tag != null);
+    }
+
+    public void execute(BaseFragment baseFragment) {
+        new FragmentBuilder(baseFragment.getFragmentManager()).newFragment().replaceFragment(baseFragment, this);
+    }
+
+    private void cancelTask() {
+        if (manager == null) {
+            manager = getFragmentManager();
+        }
+        if (manager != null) {
+            if (!task.isCancelled()) {
+                task.cancel(true);
+            }
+            manager.beginTransaction().remove(this).commit();
+        }
     }
 }
