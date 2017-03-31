@@ -419,7 +419,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             List<I> items = null;
             try {
                 items = dataSource.getItems(currentCount, count);
-                if (items.size() == 0) {
+                if (items == null || items.size() == 0) {
                     return items;
                 }
             } catch (IOException e) {
@@ -434,7 +434,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             super.onPostExecute(result);
             if (itemList != null) {
                 int needMore = 0;
-                if (result.size() == 0) {
+                if (result == null || result.size() == 0) {
                     isEnd = true;
                 } else {
                     needMore = count - adapter.addItems(result).size();
