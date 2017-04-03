@@ -75,7 +75,7 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final LoadFragment<Params, Progress, Result> current = this;
-        if (!task.isCancelled()) {
+        if (task != null && !task.isCancelled()) {
             task.cancel(true);
         }
         this.task = new AsyncTask<Params, Progress, Result>() {
