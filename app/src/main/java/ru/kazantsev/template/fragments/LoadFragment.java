@@ -112,9 +112,16 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
                 return current.doInBackground(params);
             }
         };
-        task.execute(params);
         View rootView = inflater.inflate(ru.kazantsev.template.R.layout.progressbar, container, false);
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (task != null && !task.isCancelled()) {
+            task.execute(params);
+        }
     }
 
     protected Result doInBackground(Params[] params) {
