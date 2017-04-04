@@ -119,7 +119,7 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (task != null && !task.isCancelled()) {
+        if (task != null && !task.isCancelled() && task.getStatus().equals(AsyncTask.Status.PENDING)) {
             task.execute(params);
         }
     }
