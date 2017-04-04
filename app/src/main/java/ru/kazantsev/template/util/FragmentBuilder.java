@@ -138,7 +138,7 @@ public class FragmentBuilder {
             ArrayList list = (ArrayList) value;
             Object[] array = list.toArray();
             type = getArrayType(list.toArray());
-            if (type != ClassType.STRING || type != ClassType.CHARSEQUENCE || type != ClassType.PARCELABLE) {
+            if (type != ClassType.STRING && type != ClassType.CHARSEQUENCE && type != ClassType.PARCELABLE) {
                 type = ClassType.UNSUPPORTED;
             }
         }
