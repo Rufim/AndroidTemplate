@@ -277,7 +277,11 @@ public class FragmentBuilder {
             fragment = newFragment(fragmentClass);
             transaction.replace(container, fragment, name);
         } else {
-            fragment.getArguments().putAll(bundle);
+            if(fragment.getArguments() != null) {
+                fragment.getArguments().putAll(bundle);
+            } else {
+                fragment.setArguments(bundle);
+            }
             if (manager.findFragmentById(container) == fragment && removeIfExists) {
                 transaction.remove(fragment);
                 transaction.add(container, fragment, name);
