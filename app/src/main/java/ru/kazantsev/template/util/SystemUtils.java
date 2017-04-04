@@ -252,10 +252,11 @@ public class SystemUtils {
         return new TreeSet<File>(Arrays.asList(files));
     }
 
+
     @SuppressLint("NewApi")
-    public static String readFile(File file, String encoding) {
+    public static String readStream(InputStream isin, String encoding) {
         StringBuilder builder = new StringBuilder();
-        try (final InputStream is = new FileInputStream(file);
+        try (final InputStream is = isin;
              final InputStreamReader isr = new InputStreamReader(is, encoding);
              final BufferedReader reader = new BufferedReader(isr)) {
             String line = null;
@@ -267,6 +268,11 @@ public class SystemUtils {
             Log.w(TAG, e);
         }
         return builder.toString();
+    }
+
+    @SuppressLint("NewApi")
+    public static String readFile(File file, String encoding) throws FileNotFoundException {
+        return readStream(new FileInputStream(file), encoding);
     }
 
 
