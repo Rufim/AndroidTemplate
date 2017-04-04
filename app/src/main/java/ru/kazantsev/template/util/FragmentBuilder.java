@@ -89,7 +89,6 @@ public class FragmentBuilder {
     private boolean newFragment = false;
     private boolean removeIfExists = false;
     private boolean clearBackStack = false;
-    private boolean refresh = false;
     private int inAnimationId = -1;
     private int outAnimationId = -1;
     private String clearBackStackUpToName = null;
@@ -229,11 +228,6 @@ public class FragmentBuilder {
         return this;
     }
 
-    public FragmentBuilder refresh() {
-        this.refresh = true;
-        return this;
-    }
-
     public FragmentBuilder clearBackStack() {
         this.clearBackStack = true;
         return this;
@@ -313,25 +307,33 @@ public class FragmentBuilder {
         } else {
             fragment.setArguments(bundle);
         }
-        if(refresh) {
-            transaction.detach(fragment);
-            transaction.attach(fragment);
+        if (manager.findFragmentById(container) == fragment && removeIfExists) {
+            transaction.remove(fragment);
+            transaction.add(container, fragment, name);
         } else {
-            if (manager.findFragmentById(container) == fragment && removeIfExists) {
-                transaction.remove(fragment);
-                transaction.add(container, fragment, name);
-            } else {
-                transaction.replace(container, fragment, name);
-            }
-            if (toBackStack) {
-                transaction.addToBackStack(null);
-            }
+            transaction.replace(container, fragment, name);
+        }
+        if (toBackStack) {
+            transaction.addToBackStack(null);
         }
         if (inAnimationId > 0 && outAnimationId > 0) {
             transaction.setCustomAnimations(inAnimationId, outAnimationId);
         }
         transaction.commitAllowingStateLoss();
         return (F) fragment;
+    }
+
+    public <F extends Fragment> F refresh(F fragment) {
+        FragmentTransaction transaction = manager.beginTransaction();
+        if(fragment.getArguments() != null) {
+            fragment.getArguments().putAll(bundle);
+        } else {
+            fragment.setArguments(bundle);
+        }
+        transaction.detach(fragment);
+        transaction.attach(fragment);
+        transaction.commitAllowingStateLoss();
+        return fragment;
     }
 
     public <F extends Fragment> F replaceFragment(@IdRes int container, Fragment fragment) {
