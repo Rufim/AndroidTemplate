@@ -116,6 +116,14 @@ public class FragmentBuilder {
         return (F) fragment;
     }
 
+    private ClassType getArrayType(Object[] array) {
+        if(array.length == 0) {
+            return ClassType.cast(array.getClass().getComponentType());
+        } else {
+            return ClassType.cast(array[0].getClass());
+        }
+    }
+
     public FragmentBuilder putArg(String key, Object value) {
         ClassType type = ClassType.cast(value);
         ClassType baseType = type;
@@ -123,20 +131,22 @@ public class FragmentBuilder {
         boolean listFlag = false;
         if (type == ClassType.ARRAY) {
             arrayFlag = true;
-            type = ClassType.cast(value.getClass().getComponentType());
+            type = getArrayType((Object[]) value);
         }
         if (type == ClassType.ARRAYLIST) {
             listFlag = true;
             ArrayList list = (ArrayList) value;
-            type = ClassType.cast(list.toArray().getClass().getComponentType());
-            if (type != ClassType.STRING || type != ClassType.CHARSEQUENCE) {
+            Object[] array = list.toArray();
+            type = getArrayType(list.toArray());
+            if (type != ClassType.STRING || type != ClassType.CHARSEQUENCE || type != ClassType.PARCELABLE) {
                 type = ClassType.UNSUPPORTED;
             }
         }
         switch (type) {
             case PARCELABLE:
-                if (arrayFlag) break;
-                bundle.putParcelable(key, (Parcelable) value);
+                if (arrayFlag) bundle.putParcelableArray(key, (Parcelable[]) value);
+                else if (listFlag) bundle.putParcelableArrayList(key, (ArrayList<? extends Parcelable>) value);
+                else bundle.putParcelable(key, (Parcelable) value);
                 return this;
             case CHARSEQUENCE:
                 if (arrayFlag) bundle.putCharSequenceArray(key, (CharSequence[]) value);
