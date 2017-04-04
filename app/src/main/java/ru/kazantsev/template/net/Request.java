@@ -33,7 +33,7 @@ public class Request implements Cloneable, Serializable {
     private Method method = Method.GET;
     private int reconnectCount = 3;
 
-    enum Method {
+    public enum Method {
         OPTIONS,
         GET,
         HEAD,
