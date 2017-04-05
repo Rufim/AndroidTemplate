@@ -692,6 +692,15 @@ public class GuiUtils {
         }
     }
 
+    public static void setVisibility(int code, ViewGroup viewGroup , @IdRes int ... ids) {
+        for (int id : ids) {
+            View view = viewGroup.findViewById(id);
+            if(view != null) {
+                view.setVisibility(code);
+            }
+        }
+    }
+
     public static void setTextOrHide(View textView, CharSequence text, View... views) {
         if (views == null || views.length == 0) {
             views = new View[]{textView};
