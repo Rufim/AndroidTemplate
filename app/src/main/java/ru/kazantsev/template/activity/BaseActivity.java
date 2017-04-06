@@ -274,6 +274,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         supportInvalidateOptionsMenu();
     }
 
+    public <F extends Fragment> void replaceFragment(Class<F> fragmentClass, FragmentBuilder builder, String name) {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            builder.clearBackStack();
+        }
+        builder.replaceFragment(R.id.container, fragmentClass, name);
+        supportInvalidateOptionsMenu();
+    }
+
     public <F extends Fragment> void replaceFragment(F fragment) {
         replaceFragment(fragment, new FragmentBuilder(getSupportFragmentManager()));
     }
