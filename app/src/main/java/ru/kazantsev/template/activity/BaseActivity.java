@@ -262,6 +262,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         new FragmentBuilder(getSupportFragmentManager()).replaceFragment(R.id.container, fragmentClass);
     }
 
+    public FragmentBuilder newFragmentBuilder() {
+        return new FragmentBuilder(getSupportFragmentManager());
+    }
+
     public <F extends Fragment> void replaceFragment(Class<F> fragmentClass) {
         replaceFragment(fragmentClass, new FragmentBuilder(getSupportFragmentManager()));
     }
@@ -293,7 +297,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         builder.replaceFragment(R.id.container, fragment);
         supportInvalidateOptionsMenu();
     }
-
 
     public void showSnackbar(@StringRes int message) {
         GuiUtils.showSnackbar(container, message);
