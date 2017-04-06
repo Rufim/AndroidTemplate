@@ -180,8 +180,6 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
                 .replaceFragment(fragment, ErrorFragment.class);
     }
 
-
-
     private void cancelTask() {
         if (manager == null) {
             manager = getFragmentManager();

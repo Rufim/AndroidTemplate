@@ -41,6 +41,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static android.R.attr.background;
 import static android.R.attr.textColor;
 
 /**
@@ -701,6 +702,10 @@ public class GuiUtils {
         }
     }
 
+    public interface OnTextState {
+        void onTextState(View view, boolean isSetText);
+    }
+
     public static void setTextOrHide(View textView, CharSequence text, View... views) {
         if (views == null || views.length == 0) {
             views = new View[]{textView};
@@ -715,6 +720,30 @@ public class GuiUtils {
                 }
             } else {
                 setVisibility(View.GONE, views);
+            }
+        }
+    }
+
+    public static void setTextAnd(View textView, CharSequence text, OnTextState onTextState,  View... views) {
+        if (views == null || views.length == 0) {
+            views = new View[]{textView};
+        } else {
+            views = SystemUtils.concat(new View[]{textView}, views);
+        }
+        boolean isSetText = false;
+        if (textView != null) {
+            if (!TextUtils.isEmpty(text)) {
+                if (textView instanceof TextView) {
+                    ((TextView) textView).setText(text);
+                     isSetText = true;
+                }
+            } else {
+                setVisibility(View.GONE, views);
+            }
+        }
+        if(onTextState != null) {
+            for (View view : views) {
+                onTextState.onTextState(view, isSetText);
             }
         }
     }
