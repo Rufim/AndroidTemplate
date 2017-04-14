@@ -331,7 +331,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void cacheBundle(Fragment fragment, String tag) {
-        if(fragment.getArguments() != null && fragment.getArguments().size() > 0) {
+        if(fragment != null && fragment.getArguments() != null && fragment.getArguments().size() > 0) {
             tag = tag != null ? tag : fragment.getTag();
             if (TextUtils.isEmpty(tag)) {
                 tag = fragment.getClass().getSimpleName();
