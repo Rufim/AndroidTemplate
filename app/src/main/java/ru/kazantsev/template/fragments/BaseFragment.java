@@ -138,7 +138,9 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
         Bundle bundle = getBaseActivity().getCachedBoundle(tag);
         if(bundle != null) {
             if(getArguments() != null) {
-                getArguments().putAll(bundle);
+                if(!getArguments().equals(bundle)) {
+                    getArguments().putAll(bundle);
+                }
             } else {
                 setArguments(bundle);
             }

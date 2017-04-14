@@ -58,7 +58,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected MoveTask moveToIndex;
     protected ItemListAdapter.FilterEvent lastSearchQuery;
     protected boolean enableFiltering = false;
-    protected boolean enableScrollbar = true;
+    protected boolean enableSearch = false;
+    protected boolean enableScrollbar = false;
     protected long lastFilteringTime = 0;
 
     public ListFragment() {
@@ -135,22 +136,24 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.search, menu);
-        MenuItem searchItem = menu.findItem(R.id.search);
-        if (searchItem != null) {
-            searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-            SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-            searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-            if (enableFiltering) {
-                searchView.setQueryHint(getString(R.string.filter_hint));
-                searchView.setSuggestionsAdapter(null);
+        if(enableSearch) {
+            inflater.inflate(R.menu.search, menu);
+            MenuItem searchItem = menu.findItem(R.id.search);
+            if (searchItem != null) {
+                searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+                SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+                searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+                searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+                if (enableFiltering) {
+                    searchView.setQueryHint(getString(R.string.filter_hint));
+                    searchView.setSuggestionsAdapter(null);
+                }
+                searchView.setOnQueryTextListener(this);
+                searchView.setOnCloseListener(() -> {
+                    onSearchViewClose(searchView);
+                    return false;
+                });
             }
-            searchView.setOnQueryTextListener(this);
-            searchView.setOnCloseListener(() -> {
-                onSearchViewClose(searchView);
-                return false;
-            });
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
