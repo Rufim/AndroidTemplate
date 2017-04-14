@@ -110,6 +110,21 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
         postEvent(new FragmentAttachedEvent(this));
     }
 
+    public void restoreCachedBundle(String tag) {
+        Bundle bundle = getBaseActivity().getCachedBoundle(tag);
+        if(bundle != null) {
+            if(getArguments() != null) {
+                getArguments().putAll(bundle);
+            } else {
+                setArguments(bundle);
+            }
+        }
+    }
+
+    public void restoreCachedBundle() {
+        restoreCachedBundle(getTag());
+    }
+
     public boolean allowBackPress() {
        return true;
     }
