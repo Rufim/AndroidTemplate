@@ -128,6 +128,10 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
         }
     }
 
+    public FragmentBuilder newFragmentBuilder() {
+        return new FragmentBuilder(getFragmentManager());
+    }
+
     protected BaseActivity getBaseActivity() {
         return (BaseActivity) getActivity();
     }

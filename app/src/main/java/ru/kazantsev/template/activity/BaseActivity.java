@@ -26,7 +26,11 @@ import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
+import ru.kazantsev.template.util.TextUtils;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by 0shad on 11.07.2015.
@@ -47,6 +51,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     protected boolean disableNavigationBar = false;
     protected boolean toolbarClassic = false;
+    protected boolean enableFragmentCache = true;
+    protected boolean clearBackStack = true;
+
+    Map<String, Bundle> fragmentBundleCache = new HashMap<>();
 
     public interface BackCallback {
         boolean allowBackPress();
@@ -179,7 +187,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == android.R.id.home) {
+        if (id == android.R.id.home && clearBackStack) {
             if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                 onBackPressed();
                 return true;
@@ -271,18 +279,21 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public <F extends Fragment> void replaceFragment(Class<F> fragmentClass, FragmentBuilder builder) {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            builder.clearBackStack();
-        }
-        builder.replaceFragment(R.id.container, fragmentClass);
-        supportInvalidateOptionsMenu();
+        replaceFragment(fragmentClass, builder, null);
     }
 
     public <F extends Fragment> void replaceFragment(Class<F> fragmentClass, FragmentBuilder builder, String name) {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        if (clearBackStack && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             builder.clearBackStack();
         }
-        builder.replaceFragment(R.id.container, fragmentClass, name);
+        if(enableFragmentCache) {
+            cacheBundle(getCurrentFragment());
+        }
+        if(name == null) {
+            builder.replaceFragment(R.id.container, fragmentClass);
+        } else {
+            builder.replaceFragment(R.id.container, fragmentClass, name);
+        }
         supportInvalidateOptionsMenu();
     }
 
@@ -291,11 +302,41 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public <F extends Fragment> void replaceFragment(F fragment, FragmentBuilder builder) {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        replaceFragment(fragment, builder, null);
+    }
+
+
+    public <F extends Fragment> void replaceFragment(F fragment, FragmentBuilder builder, String name) {
+        if (clearBackStack && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             builder.clearBackStack();
         }
-        builder.replaceFragment(R.id.container, fragment);
+        if(enableFragmentCache) {
+            cacheBundle(getCurrentFragment());
+        }
+        if(name == null) {
+            builder.replaceFragment(R.id.container, fragment);
+        } else {
+            builder.replaceFragment(R.id.container, fragment, name);
+        }
         supportInvalidateOptionsMenu();
+    }
+
+    public void cacheBundle(Fragment fragment) {
+        cacheBundle(fragment, null);
+    }
+
+    public void cacheBundle(Fragment fragment, String tag) {
+        if(fragment.getArguments() != null && fragment.getArguments().size() > 0) {
+            tag = tag != null ? tag : fragment.getTag();
+            if (TextUtils.isEmpty(tag)) {
+                tag = fragment.getClass().getSimpleName();
+            }
+            fragmentBundleCache.put(tag, fragment.getArguments());
+        }
+    }
+
+    public Bundle getCachedBoundle(String tag) {
+        return fragmentBundleCache.get(tag);
     }
 
     public void showSnackbar(@StringRes int message) {
@@ -309,7 +350,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     public void shouldDisplayHomeUp() {
         //Enable Up button only  if there are entries in the back stack
-        if (actionBar != null) {
+        if (actionBar != null && clearBackStack) {
             boolean canback = getSupportFragmentManager().getBackStackEntryCount() > 0;
             if (canback) {
                 actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
