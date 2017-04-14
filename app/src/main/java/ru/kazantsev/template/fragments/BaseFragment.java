@@ -3,6 +3,7 @@ package ru.kazantsev.template.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -108,6 +109,22 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
     public void onAttach(Context context) {
         super.onAttach(context);
         postEvent(new FragmentAttachedEvent(this));
+    }
+
+    public void setTitle(@StringRes int title) {
+        if(title > 0) {
+            getBaseActivity().setTitle(title);
+        }
+    }
+
+    public void setSelectNavBar(@IdRes int selectNavBar) {
+        if(selectNavBar > 0) {
+            getBaseActivity().getNavigationView().setCheckedItem(selectNavBar);
+        }
+    }
+    public void setTitleAndSelectNavBar(@StringRes int title, @IdRes int selectNavBar) {
+        setTitle(title);
+        setSelectNavBar(selectNavBar);
     }
 
     public void restoreCachedBundle(String tag) {
