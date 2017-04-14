@@ -20,6 +20,7 @@ import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
+import ru.kazantsev.template.util.TextUtils;
 
 import java.lang.reflect.Field;
 
@@ -113,6 +114,12 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
 
     public void setTitle(@StringRes int title) {
         if(title > 0) {
+            getBaseActivity().setTitle(title);
+        }
+    }
+
+    public void setTitle(String title) {
+        if(title != null) {
             getBaseActivity().setTitle(title);
         }
     }
