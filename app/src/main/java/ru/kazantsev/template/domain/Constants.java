@@ -15,6 +15,7 @@ public class Constants {
     public static class ArgsName {
         public static final String LAST_FRAGMENT_TAG = "last_fragment_tag";
         public static final String LAST_FRAGMENT = "last_fragment";
+        public static final String FRAGMENT_CACHE = "fragment_cache";
         public static final String FRAGMENT_CLASS = "fragment_class";
         public static final String FRAGMENT_ARGS = "fragment_args";
         public static final String MESSAGE = "message";

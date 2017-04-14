@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
@@ -29,8 +31,7 @@ import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.util.TextUtils;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * Created by 0shad on 11.07.2015.
@@ -54,7 +55,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected boolean enableFragmentCache = true;
     protected boolean clearBackStack = true;
 
-    Map<String, Bundle> fragmentBundleCache = new HashMap<>();
+    ArrayList<BundleCache> fragmentBundleCache = new ArrayList<>();
 
     public interface BackCallback {
         boolean allowBackPress();
@@ -108,6 +109,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
         shouldDisplayHomeUp();
+        if(savedInstanceState != null && savedInstanceState.containsKey(Constants.ArgsName.FRAGMENT_CACHE)) {
+            fragmentBundleCache = savedInstanceState.getParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE);
+        }
     }
 
     @Override
@@ -129,6 +133,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(Constants.ArgsName.LAST_FRAGMENT_TAG, getCurrentFragment().getTag());
         outState.putBoolean(Constants.ArgsName.CONFIG_CHANGE, true);
+        outState.putParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE, fragmentBundleCache);
         super.onSaveInstanceState(outState);
     }
 
@@ -331,12 +336,17 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
             if (TextUtils.isEmpty(tag)) {
                 tag = fragment.getClass().getSimpleName();
             }
-            fragmentBundleCache.put(tag, fragment.getArguments());
+            fragmentBundleCache.add(new BundleCache(tag, fragment.getArguments()));
         }
     }
 
     public Bundle getCachedBoundle(String tag) {
-        return fragmentBundleCache.get(tag);
+        for (BundleCache bundleCache : fragmentBundleCache) {
+            if((tag == null && bundleCache.tag == null) || (tag != null && tag.equals(bundleCache.tag))) {
+                return bundleCache.bundle;
+            }
+        }
+        return null;
     }
 
     public void showSnackbar(@StringRes int message) {
@@ -375,5 +385,43 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         //This method is called when the up button is pressed. Just the pop back stack.
         getSupportFragmentManager().popBackStack();
         return true;
+    }
+
+    public static class BundleCache implements Parcelable {
+        final String tag;
+        final Bundle bundle;
+
+        private BundleCache(String tag, Bundle bundle){
+            this.tag = tag;
+            this.bundle = bundle;
+        }
+
+        protected BundleCache(Parcel in) {
+            tag = in.readString();
+            bundle = in.readBundle();
+        }
+
+        public static final Creator<BundleCache> CREATOR = new Creator<BundleCache>() {
+            @Override
+            public BundleCache createFromParcel(Parcel in) {
+                return new BundleCache(in);
+            }
+
+            @Override
+            public BundleCache[] newArray(int size) {
+                return new BundleCache[size];
+            }
+        };
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(tag);
+            dest.writeBundle(bundle);
+        }
     }
 }
