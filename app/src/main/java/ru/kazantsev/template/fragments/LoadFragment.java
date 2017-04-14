@@ -8,8 +8,11 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.util.FragmentBuilder;
+import ru.kazantsev.template.util.GuiUtils;
 
 import java.util.Arrays;
 
@@ -22,6 +25,9 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     private Params[] params;
     private FragmentManager manager;
     private String tag = LoadFragment.class.getSimpleName();
+
+    protected ProgressBar progressBar;
+    protected TextView loadingText;
 
     public interface OnDoBackground<Result,Params> {
         Result doBackground(Params[] params);
@@ -113,6 +119,8 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
             }
         };
         View rootView = inflater.inflate(ru.kazantsev.template.R.layout.progressbar, container, false);
+        loadingText = GuiUtils.getView(rootView, R.id.load_progress);
+        loadingText = GuiUtils.getView(rootView, R.id.loading_text);
         return rootView;
     }
 

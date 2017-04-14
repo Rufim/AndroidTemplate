@@ -318,7 +318,6 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         layoutManager.startSmoothScroll(linearSmoothScroller);
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
