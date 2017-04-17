@@ -118,7 +118,7 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
             }
         };
         View rootView = inflater.inflate(ru.kazantsev.template.R.layout.progressbar, container, false);
-        loadingText = GuiUtils.getView(rootView, R.id.load_progress);
+        progressBar = GuiUtils.getView(rootView, R.id.load_progress);
         loadingText = GuiUtils.getView(rootView, R.id.loading_text);
         return rootView;
     }
