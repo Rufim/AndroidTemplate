@@ -14,6 +14,7 @@ import android.view.*;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import butterknife.BindView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.adapter.MultiItemListAdapter;
