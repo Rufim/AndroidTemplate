@@ -8,6 +8,8 @@ import java.lang.annotation.Target;
 import java.lang.reflect.*;
 import java.util.*;
 
+import static ru.kazantsev.template.util.Primitives.checkArgument;
+
 /**
  * Created by 0shad on 13.07.2015.
  */
@@ -254,9 +256,7 @@ public class ReflectionUtils {
             // Neal isn't either but suspects some pathological case related
             // to nested classes exists.
             Type rawType = parameterizedType.getRawType();
-            if(!(rawType instanceof Class)) {
-                throw new IllegalArgumentException();
-            }
+            checkArgument(rawType instanceof Class);
             return (Class<?>) rawType;
 
         } else if (type instanceof GenericArrayType) {
