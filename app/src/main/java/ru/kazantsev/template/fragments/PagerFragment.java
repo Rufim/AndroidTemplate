@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import butterknife.BindView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.FragmentPagerAdapter;
 import ru.kazantsev.template.lister.DataSource;

@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import com.google.gson.internal.Primitives;
-import ru.kazantsev.template.R;
 import ru.kazantsev.template.fragments.ErrorFragment;
 
 import java.io.Serializable;

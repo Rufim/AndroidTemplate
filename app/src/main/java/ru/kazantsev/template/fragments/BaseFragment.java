@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import org.greenrobot.eventbus.EventBus;
@@ -20,7 +19,6 @@ import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
-import ru.kazantsev.template.util.TextUtils;
 
 import java.lang.reflect.Field;
 

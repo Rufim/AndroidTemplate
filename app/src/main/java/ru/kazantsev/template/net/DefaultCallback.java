@@ -1,6 +1,5 @@
 package ru.kazantsev.template.net;
 
-import android.util.Log;
 import com.google.gson.Gson;
 import net.vrallev.android.cat.Cat;
 import org.greenrobot.eventbus.EventBus;

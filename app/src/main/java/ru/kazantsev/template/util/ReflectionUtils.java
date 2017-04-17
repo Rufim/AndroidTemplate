@@ -8,8 +8,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.*;
 import java.util.*;
 
-import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
-
 /**
  * Created by 0shad on 13.07.2015.
  */
@@ -256,7 +254,9 @@ public class ReflectionUtils {
             // Neal isn't either but suspects some pathological case related
             // to nested classes exists.
             Type rawType = parameterizedType.getRawType();
-            checkArgument(rawType instanceof Class);
+            if(!(rawType instanceof Class)) {
+                throw new IllegalArgumentException();
+            }
             return (Class<?>) rawType;
 
         } else if (type instanceof GenericArrayType) {

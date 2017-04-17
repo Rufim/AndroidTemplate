@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import butterknife.BindView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.util.FragmentBuilder;
