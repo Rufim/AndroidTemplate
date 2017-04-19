@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import butterknife.BindView;
 import ru.kazantsev.template.R;
+import ru.kazantsev.template.R2;
 import ru.kazantsev.template.adapter.FragmentPagerAdapter;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
@@ -28,7 +30,6 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     protected ProgressBar loadMoreBar;
     protected PagerTabStrip pagerHeader;
     protected ViewPager pager;
-
     protected FragmentPagerAdapter<I, F> adapter;
     protected DataSource<I> dataSource;
     protected volatile boolean isLoading = false;
@@ -61,7 +62,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         if (currentItems == null) {
             currentItems = new ArrayList<>();
         }
-        adapter = getAdapter(currentItems);
+        adapter = newAdapter(currentItems);
         currentItems = adapter.getItems();
         pager.setAdapter(adapter);
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -146,7 +147,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     }
 
 
-    public abstract FragmentPagerAdapter<I, F> getAdapter(List<I> currentItems);
+    public abstract FragmentPagerAdapter<I, F> newAdapter(List<I> currentItems);
 
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -161,6 +162,11 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
 
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    protected void onDataTaskException(Exception ex) {
+        Log.e(TAG, "Cant get new Items: ", ex);
+        ErrorFragment.show(PagerFragment.this, R.string.error_network);
     }
 
     public class PagerDataTask extends AsyncTask<Void, Void, List<I>> {
@@ -192,9 +198,8 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
                 if (items.size() == 0) {
                     return items;
                 }
-            } catch (IOException e) {
-                Log.e(TAG, "Cant get new Items", e);
-                ErrorFragment.show(PagerFragment.this, R.string.error_network);
+            } catch (Exception ex) {
+                onDataTaskException(ex);
             }
             return items;
         }

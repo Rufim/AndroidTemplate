@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.BindView;
 import ru.kazantsev.template.R;
+import ru.kazantsev.template.R2;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.adapter.MultiItemListAdapter;
 import ru.kazantsev.template.lister.DataSource;
@@ -88,7 +89,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         }
     }
 
-    protected ItemListAdapter.FilterEvent getNewFilterEvent(String query) {
+    protected ItemListAdapter.FilterEvent newFilterEvent(String query) {
         return new ItemListAdapter.FilterEvent(query);
     }
 
@@ -104,7 +105,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     @Override
     public boolean onQueryTextSubmit(String query) {
         if (lastSearchQuery == null) {
-            lastSearchQuery = getNewFilterEvent(query);
+            lastSearchQuery = newFilterEvent(query);
         } else {
             lastSearchQuery.query = query;
         }
@@ -120,9 +121,13 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         adapter.enterFilteringMode();
         if (filterTask == null) {
             lastSearchQuery = null;
-            filterTask = new FilterTask(filterEvent);
+            filterTask = newFilterTask(filterEvent);
             getActivity().runOnUiThread(filterTask);
         }
+    }
+
+    public FilterTask newFilterTask(ItemListAdapter.FilterEvent filterEvent) {
+        return new FilterTask(filterEvent);
     }
 
     protected void onSearchViewClose(SearchView searchView) {
@@ -206,7 +211,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         loadItems(count, showProgress, null, null);
     }
 
-    protected abstract ItemListAdapter<I> getAdapter();
+    protected abstract ItemListAdapter<I> newAdapter();
 
     protected DataSource<I> getDataSource() throws Exception {
         return dataSource;
@@ -318,6 +323,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         layoutManager.startSmoothScroll(linearSmoothScroller);
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -331,10 +337,12 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         swipeRefresh.setOnRefreshListener(() -> {
             if (!isLoading) {
                 refreshData(false);
+            } else {
+                swipeRefresh.setRefreshing(false);
             }
         });
         if (adapter == null) {
-            adapter = getAdapter();
+            adapter = newAdapter();
         }
         try {
             setDataSource(getDataSource());
@@ -395,6 +403,11 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         }
     }
 
+    protected void onDataTaskException(Exception ex) {
+        Log.e(TAG, "Cant get new Items: ", ex);
+        ErrorFragment.show(ListFragment.this, R.string.error_network);
+    }
+
     public class DataTask extends AsyncTask<Void, Void, List<I>> {
 
         protected int count = 0;
@@ -424,9 +437,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 if (items == null || items.size() == 0) {
                     return items;
                 }
-            } catch (IOException e) {
-                Log.e(TAG, "Cant get new Items", e);
-                ErrorFragment.show(ListFragment.this, R.string.error_network);
+            } catch (Exception ex) {
+                onDataTaskException(ex);
             }
             return items;
         }
@@ -444,7 +456,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 currentCount = adapter.getAbsoluteItemCount();
                 isLoading = false;
                 dataTask = null;
-                if (needMore <= 0) {
+                if(needMore <= 0 || isEnd) {
                     if (onElementsLoadedTask != null) {
                         onElementsLoadedTask.execute(LoadedTaskParams);
                     }

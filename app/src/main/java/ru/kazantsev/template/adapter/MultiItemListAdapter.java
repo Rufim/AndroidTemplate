@@ -19,7 +19,7 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
     private static final int EMPTY_HEADER = -1;
 
     private final int[] layoutIds;
-    protected final int firstIsHeader;
+    protected int firstIsHeader;
 
     public MultiItemListAdapter(boolean firstIsHeader, @LayoutRes int... layoutIds) {
         super(-1);
