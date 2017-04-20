@@ -413,6 +413,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         protected int count = 0;
         protected AsyncTask onElementsLoadedTask;
         protected Object[] LoadedTaskParams;
+        protected int needMore = 0;
 
         public DataTask(int count) {
             this.count = count;
@@ -433,9 +434,17 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         protected List<I> doInBackground(Void... params) {
             List<I> items = null;
             try {
+                isLoading = true;
                 items = dataSource.getItems(currentCount, count);
                 if (items == null || items.size() == 0) {
-                    return items;
+                    isEnd = true;
+                } else {
+                    if(adapter.getItems().size() == 0) {
+                        adapter.setItems(items);
+                        needMore = count - items.size();
+                    } else {
+                        needMore = count - adapter.addItems(items, false).size();
+                    }
                 }
             } catch (Exception ex) {
                 onDataTaskException(ex);
@@ -445,18 +454,12 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
         @Override
         protected void onPostExecute(List<I> result) {
-            super.onPostExecute(result);
             if (itemList != null) {
-                int needMore = 0;
-                if (result == null || result.size() == 0) {
-                    isEnd = true;
-                } else {
-                    needMore = count - adapter.addItems(result).size();
-                }
                 currentCount = adapter.getAbsoluteItemCount();
                 isLoading = false;
                 dataTask = null;
                 if(needMore <= 0 || isEnd) {
+                    adapter.notifyChanged();
                     if (onElementsLoadedTask != null) {
                         onElementsLoadedTask.execute(LoadedTaskParams);
                     }

@@ -95,6 +95,11 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
     }
 
     @Override
+    public void setItems(List<I> items) {
+        super.setItems(toFlatList(items));
+    }
+
+    @Override
     public List<I> addItems(List<I> items) {
         return super.addItems(toFlatList(items));
     }

@@ -23,7 +23,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     protected List<I> items = new ArrayList<>();
     protected List<I> originalItems = null;
     protected Set<ViewHolder> currentHolders = Collections.newSetFromMap(new WeakHashMap<>());
-    protected final  int layoutId;
+    protected final int layoutId;
     protected FilterEvent lastQuery;
     protected boolean bindViews = true;
     protected boolean bindClicks = true;
@@ -46,7 +46,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(layoutId, parent, false);
         ViewHolder holder = newHolder(itemView);
-        if(bindViews) {
+        if (bindViews) {
             holder.bindViews(ItemListAdapter.this, bindClicks);
         }
         return holder;
@@ -94,6 +94,9 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         return this.items;
     }
 
+    public void setItems(List<I> items) {
+        this.items = items;
+    }
 
     public void clear() {
         originalItems = null;
@@ -119,15 +122,28 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     }
 
     public List<I> addItems(List<I> items) {
+        return addItems(items, true);
+    }
+
+    public List<I> addItems(List<I> items, boolean notify) {
         if (originalItems == null) {
-            this.items.addAll(items);
-            notifyDataSetChanged();
+            addItemsInternal(items, notify);
             return items;
         } else {
             this.originalItems.addAll(items);
-            List<I> added = new ArrayList<>(items);
-            added.retainAll(filter(lastQuery));
+            List<I> added = find(lastQuery, items);
+            addItemsInternal(added, notify);
             return added;
+        }
+    }
+
+    private void addItemsInternal(List<I> items, boolean notify) {
+        if (notify) {
+            for (I item : items) {
+                addItem(item);
+            }
+        } else {
+            this.items.addAll(items);
         }
     }
 
@@ -167,20 +183,25 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         }
     }
 
-    public void selectText(String query, boolean erase,  int color) {
+    public void selectText(String query, boolean erase, int color) {
         for (ViewHolder holder : currentHolders) {
             selectText(holder, erase, query, color);
         }
     }
 
     public List<I> filter(FilterEvent query) {
+        return filter(query, true);
+    }
+
+    public List<I> filter(FilterEvent query, boolean notify) {
         if (query == null) {
             return items;
         }
-        List<I> founded = null;
-        if (originalItems != null) {
-            founded = find(query, true);
+        List<I> founded = find(query, originalItems != null);
+        if (notify) {
             changeTo(founded);
+        } else {
+            items = founded;
         }
         lastQuery = query;
         return founded;
@@ -194,7 +215,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         if (query == null) return items;
         final List<I> filteredList = new ArrayList<>();
         for (I item : items) {
-            if(find(query, item)) {
+            if (find(query, item)) {
                 filteredList.add(item);
             }
         }
@@ -213,6 +234,14 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
             }
         }
         return false;
+    }
+
+    public void notifyChanged() {
+        if (originalItems == null) {
+            notifyDataSetChanged();
+        } else {
+            filter(lastQuery);
+        }
     }
 
     public synchronized void changeTo(List<I> items) {
@@ -263,7 +292,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         }
     }
 
-    public void onClick(View view, int position){
+    public void onClick(View view, int position) {
 
     }
 
@@ -288,6 +317,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         private static final String TAG = ViewHolder.class.getSimpleName();
 
         protected HashMap<Integer, View> views;
+
         /**
          * Constructor
          *
@@ -314,13 +344,13 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
 
         protected <C extends View.OnClickListener & View.OnLongClickListener> ViewHolder bindViews(C clickable, boolean bindClicks) {
             for (Map.Entry<Integer, View> viewEntry : views.entrySet()) {
-                if(viewEntry != itemView) {
+                if (viewEntry != itemView) {
                     View view = viewEntry.getValue();
-                    if(bindClicks) {
-                        if(view instanceof AdapterView) {
+                    if (bindClicks) {
+                        if (view instanceof AdapterView) {
                             AdapterView adapterView = (AdapterView) view;
                             // TODO: bind adapter
-                        }  else {
+                        } else {
                             view.setOnClickListener(clickable);
                             view.setOnLongClickListener(clickable);
                         }
@@ -347,7 +377,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
             return super.itemView;
         }
 
-        public <V extends View>  List<V> getViews(Class<V> viewClass) {
+        public <V extends View> List<V> getViews(Class<V> viewClass) {
             List<V> textViews = new ArrayList<>();
             for (Map.Entry<Integer, View> viewEntry : views.entrySet()) {
                 View view = viewEntry.getValue();
