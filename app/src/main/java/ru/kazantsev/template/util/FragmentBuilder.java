@@ -60,11 +60,11 @@ public class FragmentBuilder {
             for (ClassType type : values()) {
                 if (Primitives.isPrimitive(cl) && type.primitive == cl) {
                     return type;
-                } else if (type.clazz == cl) {
+                } else if (type.clazz.isAssignableFrom(cl)) {
                     return type;
                 } else {
                     for (Class<?> intClass : cl.getInterfaces()) {
-                        if (type.clazz == intClass) {
+                        if (type.clazz.isAssignableFrom(intClass)) {
                             return type;
                         }
                     }
