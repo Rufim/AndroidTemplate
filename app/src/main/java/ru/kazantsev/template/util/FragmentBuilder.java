@@ -193,15 +193,14 @@ public class FragmentBuilder {
                 else bundle.putDouble(key, (double) value);
                 return this;
             case UNSUPPORTED:
-                Log.e(TAG, "Try to send unsupported type value=" + value);
+                if (Serializable.class.isAssignableFrom(value.getClass())) {
+                    bundle.putSerializable(key, (Serializable) value);
+                } else {
+                    throw new IllegalArgumentException("Unsupported type " + value.getClass().getSimpleName());
+                }
                 return this;
         }
-        if (Serializable.class.isAssignableFrom(value.getClass())) {
-            bundle.putSerializable(key, (Serializable) value);
-        } else {
-            throw new IllegalArgumentException("Unsupported type " + value.getClass().getSimpleName());
-        }
-        return this;
+        throw new IllegalArgumentException("Unsupported type " + value.getClass().getSimpleName());
     }
 
     public FragmentBuilder putArgs(Map<String, Object> args) {
