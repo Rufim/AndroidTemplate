@@ -1,4 +1,4 @@
-package ru.kazantsev.template.database;
+package ru.kazantsev.template.database.snappy;
 
 import android.content.Context;
 import android.util.Log;

@@ -1,4 +1,4 @@
-package ru.kazantsev.template.database;
+package ru.kazantsev.template.database.requery;
 
 import io.requery.Converter;
 

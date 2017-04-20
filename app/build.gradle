@@ -104,4 +104,6 @@ dependencies {
     provided "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     provided "io.requery:requery:$requeryVersion"
     provided "io.requery:requery-android:$requeryVersion"
+    provided "com.j256.ormlite:ormlite-core:4.48"
+    provided "com.j256.ormlite:ormlite-android:4.48"
 }
