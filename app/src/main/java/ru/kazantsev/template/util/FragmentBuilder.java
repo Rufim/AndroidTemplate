@@ -42,6 +42,7 @@ public class FragmentBuilder {
         CHARSEQUENCE(CharSequence.class),
         PARCELABLE(Parcelable.class),
         SERIALIZABLE(Serializable.class),
+        ENUM(Enum.class),
         UNSUPPORTED(Void.class);
 
         private Class<?> clazz;
@@ -192,15 +193,13 @@ public class FragmentBuilder {
                 if (arrayFlag) bundle.putDoubleArray(key, (double[]) value);
                 else bundle.putDouble(key, (double) value);
                 return this;
-            case UNSUPPORTED:
-                if (Serializable.class.isAssignableFrom(value.getClass())) {
-                    bundle.putSerializable(key, (Serializable) value);
-                } else {
-                    throw new IllegalArgumentException("Unsupported type " + value.getClass().getSimpleName());
-                }
+            case SERIALIZABLE: case ENUM:
+                bundle.putSerializable(key, (Serializable) value);
                 return this;
+            default:
+                throw new IllegalArgumentException("Unsupported type " + value.getClass().getSimpleName());
         }
-        throw new IllegalArgumentException("Unsupported type " + value.getClass().getSimpleName());
+        return this;
     }
 
     public FragmentBuilder putArgs(Map<String, Object> args) {
