@@ -35,8 +35,8 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
 
     // Adapter's Constructor
     public ItemListAdapter(List<I> items, @LayoutRes int layoutId) {
-        this.items.addAll(items);
         this.layoutId = layoutId;
+        setItems(items);
     }
 
     // Create new views. This is invoked by the layout manager.

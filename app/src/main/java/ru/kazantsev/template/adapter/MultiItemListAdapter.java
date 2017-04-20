@@ -20,6 +20,7 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
 
     private final int[] layoutIds;
     protected int firstIsHeader;
+    protected boolean useFlatList = true;
 
     public MultiItemListAdapter(boolean firstIsHeader, @LayoutRes int... layoutIds) {
         super(-1);
@@ -27,9 +28,21 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
         this.firstIsHeader = firstIsHeader ? 1 : 0;
     }
 
+    public MultiItemListAdapter(boolean firstIsHeader, boolean useFlatList, @LayoutRes int... layoutIds) {
+        super(-1);
+        this.layoutIds = layoutIds;
+        this.firstIsHeader = firstIsHeader ? 1 : 0;
+        this.useFlatList = useFlatList;
+    }
+
     public MultiItemListAdapter(List<I> items, boolean firstIsHeader, @LayoutRes int... layoutIds) {
         this(firstIsHeader, layoutIds);
-        addItems(items);
+        setItems(items);
+    }
+
+    public MultiItemListAdapter(List<I> items, boolean firstIsHeader, boolean useFlatList, @LayoutRes int... layoutIds) {
+        this(firstIsHeader, useFlatList, layoutIds);
+        setItems(items);
     }
 
     public int getFirstIsHeader() {
@@ -131,6 +144,9 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
     }
 
     private List<I> toFlatList(List<I> items) {
+        if(!useFlatList) {
+            return items;
+        }
         List<I> flatList = new ArrayList<>();
         for (int i = 0; i < countItems(items); i++) {
             flatList.add(i, getItem(items, i, new AtomicInteger(0)));
