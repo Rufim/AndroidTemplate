@@ -12,18 +12,16 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import butterknife.BindView;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.R2;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.adapter.MultiItemListAdapter;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
-import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
-import java.io.IOException;
+
 import java.util.List;
 
 /**
@@ -38,13 +36,12 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected ProgressBar progressBar;
     protected TextView loadingText;
     protected ProgressBar loadMoreBar;
-    protected RecyclerView itemList;
+    protected FastScrollRecyclerView itemList;
     protected SwipeRefreshLayout swipeRefresh;
 
     protected SearchView searchView;
     protected ItemListAdapter<I> adapter;
     protected LinearLayoutManager layoutManager;
-    protected VerticalRecyclerViewFastScroller scroller;
     protected DataSource<I> savedDataSource;
     protected DataSource<I> dataSource;
 
@@ -369,22 +366,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 }
             }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && enableScrollbar) {
-            scroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fast_scroller);
-            scroller.setRecyclerView(itemList);
-            GuiUtils.fadeOut(scroller, 0, 100);
-            itemList.addOnScrollListener(scroller.getOnScrollListener());
-            itemList.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    GuiUtils.fadeIn(scroller, 0, 100);
-                    GuiUtils.fadeOut(scroller, 2000, 1000);
-                }
-            });
-        } else {
-            ((RelativeLayout) rootView).removeView(rootView.findViewById(R.id.fast_scroller));
-        }
+        itemList.setVerticalScrollBarEnabled(enableScrollbar);
         if (adapter != null) {
             firstLoad(true);
         }
