@@ -248,34 +248,6 @@ public class TextUtils {
         return calendar.getTime();
     }
 
-    public static Date parseData(String text) {
-        Calendar calendar = Calendar.getInstance();
-        if (text.contains(":")) {
-            String[] time = text.split(":");
-            int hours = Integer.parseInt(time[0]);
-            calendar.set(Calendar.MINUTE, Integer.parseInt(time[1]));
-            calendar.set(Calendar.HOUR_OF_DAY, hours);
-            return calendar.getTime();
-        } else if (text.contains("/")) {
-            String[] date = text.split("/");
-            if (date.length == 3) {
-                calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
-                calendar.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
-                calendar.set(Calendar.YEAR, Integer.parseInt(date[2]));
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                return calendar.getTime();
-            } else if (date.length == 2) {
-                calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[0]));
-                calendar.set(Calendar.MONTH, Integer.parseInt(date[1]) - 1);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                return calendar.getTime();
-            }
-        }
-        return null;
-    }
-
     public static String getShortFormattedDate(Date date, Locale locale) {
         Calendar calendarToday = Calendar.getInstance();
         Calendar calendarDate = Calendar.getInstance();
