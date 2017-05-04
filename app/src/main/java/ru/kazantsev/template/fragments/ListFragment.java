@@ -12,14 +12,15 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.R2;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.adapter.MultiItemListAdapter;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
+import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 
 import java.util.List;
@@ -36,12 +37,13 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected ProgressBar progressBar;
     protected TextView loadingText;
     protected ProgressBar loadMoreBar;
-    protected FastScrollRecyclerView itemList;
+    protected RecyclerView itemList;
     protected SwipeRefreshLayout swipeRefresh;
 
     protected SearchView searchView;
     protected ItemListAdapter<I> adapter;
     protected LinearLayoutManager layoutManager;
+    protected VerticalRecyclerViewFastScroller scroller;
     protected DataSource<I> savedDataSource;
     protected DataSource<I> dataSource;
 
@@ -54,7 +56,6 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected DataTask dataTask;
     protected FilterTask filterTask;
     protected MoveTask moveToIndex;
-    protected ItemListAdapter.FilterEvent lastSearchQuery;
     protected boolean enableFiltering = false;
     protected boolean enableSearch = false;
     protected boolean enableScrollbar = false;
@@ -101,13 +102,9 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        if (lastSearchQuery == null) {
-            lastSearchQuery = newFilterEvent(query);
-        } else {
-            lastSearchQuery.query = query;
-        }
         if (enableFiltering) {
-            filter(lastSearchQuery);
+            adapter.enterFilteringMode();
+            filter(newFilterEvent(query));
             return true;
         } else {
             return false;
@@ -117,7 +114,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     public void filter(ItemListAdapter.FilterEvent filterEvent) {
         adapter.enterFilteringMode();
         if (filterTask == null) {
-            lastSearchQuery = null;
+            adapter.setLastQuery(null);
             filterTask = newFilterTask(filterEvent);
             getActivity().runOnUiThread(filterTask);
         }
@@ -130,7 +127,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected void onSearchViewClose(SearchView searchView) {
         if (searchView != null) {
             if (enableFiltering) {
-                lastSearchQuery = null;
+                adapter.setLastQuery(null);
                 adapter.exitFilteringMode();
             }
         }
@@ -218,6 +215,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         currentCount = 0;
         pastVisibleItems = 0;
         isEnd = false;
+
         if (adapter != null) {
             adapter.clear();
             adapter.notifyDataSetChanged();
@@ -366,7 +364,22 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 }
             }
         });
-        itemList.setVerticalScrollBarEnabled(enableScrollbar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && enableScrollbar) {
+            scroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fast_scroller);
+            scroller.setRecyclerView(itemList);
+            GuiUtils.fadeOut(scroller, 0, 100);
+            itemList.addOnScrollListener(scroller.getOnScrollListener());
+            itemList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    GuiUtils.fadeIn(scroller, 0, 100);
+                    GuiUtils.fadeOut(scroller, 2000, 1000);
+                }
+            });
+        } else {
+            ((RelativeLayout) rootView).removeView(rootView.findViewById(R.id.fast_scroller));
+        }
         if (adapter != null) {
             firstLoad(true);
         }
@@ -423,7 +436,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 } else {
                     if(adapter.getItems().size() == 0) {
                         adapter.setItems(items);
-                        needMore = count - items.size();
+                        needMore = count - adapter.getItems().size();
                     } else {
                         needMore = count - adapter.addItems(items, false).size();
                     }
@@ -486,18 +499,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 itemList.scrollToPosition(adapter.getItemCount() - adapter.getItems().size());
                 adapter.filter(query);
                 filterTask = null;
-                if (lastSearchQuery != null) {
-                    long current = SystemClock.elapsedRealtime();
-                    if (current - lastFilteringTime < filteringCooldown) {
-                        Handler mainHandler = new Handler(getActivity().getMainLooper());
-                        mainHandler.postDelayed(() -> filter(lastSearchQuery), current - lastFilteringTime);
-                    } else {
-                        lastFilteringTime = current;
-                        filter(lastSearchQuery);
-                    }
-                } else {
-                    loadItems(true);
-                }
+                loadItems(true);
             }
         }
     }

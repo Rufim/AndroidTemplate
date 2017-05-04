@@ -95,11 +95,21 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     }
 
     public void setItems(List<I> items) {
-        this.items = items;
+        setItems(items, false);
     }
+
+    public void setItems(List<I> items, boolean notify) {
+        if(originalItems == null) {
+            this.items = items;
+        } else {
+            addItems(items, notify);
+        }
+    }
+
 
     public void clear() {
         originalItems = null;
+        lastQuery = null;
         items.clear();
     }
 
@@ -116,8 +126,9 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
 
     public void exitFilteringMode() {
         if (originalItems != null) {
-            changeTo(originalItems);
+            items = originalItems;
             this.originalItems = null;
+            notifyDataSetChanged();
         }
     }
 
@@ -147,8 +158,12 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         }
     }
 
-    public Object getLastQuery() {
+    public FilterEvent getLastQuery() {
         return lastQuery;
+    }
+
+    public void setLastQuery(FilterEvent lastQuery) {
+        this.lastQuery = lastQuery;
     }
 
     public void addItem(I item) {

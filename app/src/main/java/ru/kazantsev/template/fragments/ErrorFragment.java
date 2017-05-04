@@ -51,15 +51,6 @@ public class ErrorFragment extends BaseFragment {
         return rootView;
     }
 
-    @Override
-    public boolean allowBackPress() {
-        getFragmentManager().executePendingTransactions();
-        new FragmentBuilder(getFragmentManager())
-                .putArgs(fragmentArgs)
-                .replaceFragment(getId(), fragmentClass);
-        return false;
-    }
-
     public static void show(BaseFragment fragment, @StringRes int message, @DrawableRes int icon_id) {
         new FragmentBuilder(fragment.getFragmentManager())
                 .putArg(Constants.ArgsName.MESSAGE, fragment.getString(message))
