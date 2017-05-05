@@ -100,7 +100,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
 
     public void setItems(List<I> items, boolean notify) {
         if(originalItems == null) {
-            this.items = items;
+            this.items = new ArrayList<I>(items);
         } else {
             addItems(items, notify);
         }

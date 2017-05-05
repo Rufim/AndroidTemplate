@@ -52,6 +52,10 @@ public class TextUtils {
         return trimStrings;
     }
 
+    public static String[] splitByNewline(String string) {
+        return string.split("\\r?\\n");
+    }
+
     public static boolean isLink(String text, String scheme, String userAndPass, String hostOrIp, String path, String query, String anchor) {
         return isLink(text, scheme, userAndPass, hostOrIp, path, query, anchor, null);
     }
