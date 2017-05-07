@@ -81,12 +81,8 @@ public class SystemUtils {
         return resultBuffer;
     }
 
-    public static void copy(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024 * 32];
-        int read;
-        while ((read = in.read(buffer)) != -1) {
-            out.write(buffer, 0, read);
-        }
+    public static boolean copy(InputStream in, OutputStream out) throws IOException {
+        return readStream(in, out, new byte[1024 * 32]);
     }
 
     public static void copy(File src, File dst) throws IOException {
@@ -103,6 +99,31 @@ public class SystemUtils {
             close(out);
         }
     }
+
+    public static boolean readStream(InputStream is, OutputStream os, byte[] buffer) throws IOException {
+        int count = 0;
+        if ((count = is.read(buffer)) != -1) {
+            if (count > 0) {
+                os.write(buffer, 0, count);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean readStream(InputStream is, DataOutput output, byte[] buffer) throws IOException {
+        int count = 0;
+        if ((count = is.read(buffer)) != -1) {
+            if (count > 0) {
+                output.write(buffer, 0, count);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     public static byte[] toByteArray(InputStream input) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();

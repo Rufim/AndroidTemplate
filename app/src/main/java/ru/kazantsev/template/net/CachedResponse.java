@@ -1,6 +1,8 @@
 package ru.kazantsev.template.net;
 
 
+import ru.kazantsev.template.util.SystemUtils;
+
 import java.io.*;
 import java.net.URI;
 import java.util.zip.GZIPInputStream;
@@ -9,11 +11,23 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Created by Dmitry on 29.06.2015.
  */
-public class CachedResponse extends File implements Serializable {
+public class CachedResponse extends File implements Serializable, Response {
     private final Request request;
-    public boolean isDownloadOver = false;
-    public boolean isCached = false;
-    public boolean arched = false;
+
+    private boolean isDownloadOver = false;
+    private boolean isCached = false;
+    private boolean arched = false;
+    private String encoding = "UTF-8";
+
+    private CachedResponse() {
+        super("");
+        request = null;
+    }
+
+    public CachedResponse(String path) {
+        super(path);
+        this.request = null;
+    }
 
     public CachedResponse(File dir, String name, Request request) {
         super(dir, name);
@@ -51,7 +65,7 @@ public class CachedResponse extends File implements Serializable {
         try {
             zos = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(cachedResponse, false)));
             is = new FileInputStream(this);
-            while (readStream(is, zos, buffer));
+            while (SystemUtils.readStream(is, zos, buffer));
         } finally {
             if(zos != null) zos.close();
             if(is != null) is.close();;
@@ -67,7 +81,7 @@ public class CachedResponse extends File implements Serializable {
         try {
             os = new FileOutputStream(cachedResponse);
             zis = new GZIPInputStream(new FileInputStream(this));
-            while (readStream(zis, os, buffer)) ;
+            while (SystemUtils.readStream(zis, os, buffer)) ;
         } finally {
             if (os != null) os.close();
             if (zis != null) zis.close();
@@ -75,35 +89,50 @@ public class CachedResponse extends File implements Serializable {
         return cachedResponse;
     }
 
-    public static boolean readStream(InputStream is, OutputStream os, byte[] buffer) throws IOException {
-        int count = 0;
-        if ((count = is.read(buffer)) != -1) {
-            if (count > 0) {
-                os.write(buffer, 0, count);
-            }
-            return true;
-        } else {
-            return false;
-        }
+    public Request getRequest() {
+        return request;
     }
 
-    public static boolean readStream(InputStream is, DataOutput output, byte[] buffer) throws IOException {
-        int count = 0;
-        if ((count = is.read(buffer)) != -1) {
-            if (count > 0) {
-                output.write(buffer, 0, count);
-            }
-            return true;
-        } else {
-            return false;
-        }
+    public boolean isDownloadOver() {
+        return isDownloadOver;
+    }
+
+    public void setDownloadOver(boolean downloadOver) {
+        isDownloadOver = downloadOver;
+    }
+
+    @Override
+    public OutputStream getOutputStream() throws FileNotFoundException {
+        return new FileOutputStream(this);
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new FileInputStream(this);
+    }
+
+    @Override
+    public String getRawContent(String encoding) throws IOException {
+        return SystemUtils.readFile(this, encoding);
+    }
+
+    public String getRawContent() throws IOException {
+        return getRawContent(getEncoding());
     }
 
     public String getEncoding() {
-        return request.getEncoding();
+        return encoding;
     }
 
-    public Request getRequest() {
-        return request;
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    public boolean isCached() {
+        return isCached;
+    }
+
+    public void setCached(boolean cached) {
+        isCached = cached;
     }
 }

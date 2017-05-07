@@ -1,35 +1,42 @@
 package ru.kazantsev.template.net;
 
 import android.util.Log;
+import ru.kazantsev.template.util.SystemUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.concurrent.*;
 import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by Rufim on 07.07.2015.
  */
-public abstract class HTTPExecutor implements Callable<CachedResponse> {
+public class HTTPExecutor implements Callable<Response> {
 
     private static final String TAG = HTTPExecutor.class.getSimpleName();
 
     protected final Request request;
-    protected CachedResponse cachedResponse;
+    protected Response response;
+    protected int bufferSize = 1024 * 8;
 
     public HTTPExecutor(Request request) {
         this.request = request;
     }
 
-    protected abstract void configConnection(HttpURLConnection connection);
+    protected void configConnection(HttpURLConnection connection) {
+        connection.setConnectTimeout(3000);
+        connection.setUseCaches(false);
+    }
 
-    protected abstract CachedResponse prepareResponse() throws IOException;
+    protected Response prepareResponse() throws IOException {
+        return new SimpleResponse();
+    }
 
     @Override
-    public CachedResponse call() throws IOException {
+    public Response call() throws IOException {
         HttpURLConnection connection;
-        cachedResponse = null;
+        response = null;
         do {
             try {
                 if (Request.Method.PUT.equals(request.getMethod()) ||
@@ -68,20 +75,22 @@ public abstract class HTTPExecutor implements Callable<CachedResponse> {
                 }
                 connection.connect();
                 is = connection.getInputStream();
-                byte[] buffer = new byte[1024 * 8];
-                cachedResponse = prepareResponse();
-                if (cachedResponse == null) {
-                    throw new IOException("Error on create html cache file using path " + cachedResponse.getAbsolutePath());
+                byte[] buffer = new byte[bufferSize];
+                response = prepareResponse();
+                if (response == null) {
+                    throw new IOException("Error on prepare response");
                 }
-                if (cachedResponse.getRequest().isArchiveResult()) {
-                    zos = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(cachedResponse)));
-                    while (cachedResponse.readStream(is, zos, buffer)) ;
-                    cachedResponse.setArched(true);
+                if (request.isArchiveResult()) {
+                    zos = new GZIPOutputStream(new BufferedOutputStream(response.getOutputStream()));
+                    while (SystemUtils.readStream(is, zos, buffer)) ;
+                    response.setArched(true);
+                } else if(response instanceof CachedResponse) {
+                    raf = new RandomAccessFile((File) response, "rw");
+                    while (SystemUtils.readStream(is, raf, buffer)) ;
                 } else {
-                    raf = new RandomAccessFile(cachedResponse, "rw");
-                    while (cachedResponse.readStream(is, raf, buffer)) ;
+                    while (SystemUtils.readStream(is, response.getOutputStream(), buffer)) ;
                 }
-                cachedResponse.isDownloadOver = true;
+                response.setDownloadOver(true);
             } catch (Exception ex) {
                 Log.e(TAG, "Error on download html using url " + request.getUrl(), ex);
                 continue;
@@ -91,11 +100,41 @@ public abstract class HTTPExecutor implements Callable<CachedResponse> {
                 if (raf != null) raf.close();
                 if (is != null) is.close();
             }
-        } while (request.canReconnect() && cachedResponse == null);
-        Log.i(TAG, "Request completed using url: " + request.getUrl() + " bytes received " + cachedResponse.length() +
-                " Path: " + cachedResponse.getAbsolutePath());
-        return cachedResponse;
+        } while (request.canReconnect() && response == null);
+        Log.i(TAG, "Request completed using url: " + request.getUrl() + " bytes received " + response.length());
+        return response;
     }
 
+    public Response getResponse() {
+        return response;
+    }
 
+    public int getBufferSize() {
+        return bufferSize;
+    }
+
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
+    public Response execute(Request request, long minBytes) throws IOException, ExecutionException, InterruptedException {
+        Future future = executeAsync(request);
+        while (getResponse() == null || getResponse().length() < minBytes) {
+            try {
+                return (Response) future.get(100, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                //ignore and try again
+            }
+        }
+        return getResponse();
+    }
+
+    public Response execute(Request request) throws IOException, ExecutionException, InterruptedException {
+        return execute(request, Long.MAX_VALUE);
+    }
+
+    public Future<Response> executeAsync(Request request) throws IOException {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        return service.submit(this);
+    }
 }

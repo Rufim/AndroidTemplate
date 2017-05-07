@@ -3,11 +3,12 @@ package ru.kazantsev.template.net;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import ru.kazantsev.template.domain.Valuable;
+import ru.kazantsev.template.util.TextUtils;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,14 +22,15 @@ public class Request implements Cloneable, Serializable {
 
     private static final String TAG = Request.class.getSimpleName();
 
-    private URL url;
+    private transient URL url;
+    private String serialiseUrl;
     private String suffix = "";
     private List<Pair<String, String>> params = new ArrayList<>();
-    private boolean saveInCache = true;
     private boolean archiveResult = false;
     private boolean withParams = false;
-    private String encoding;
+    private String encoding = "UTF-8";
     private String content = "";
+    private String ref;
     private Map<String, String> headers = new HashMap<>();
     private Method method = Method.GET;
     private int reconnectCount = 3;
@@ -43,15 +45,35 @@ public class Request implements Cloneable, Serializable {
         TRACE;
     }
 
-    public Request(String url) throws MalformedURLException {
-        this.url = new URL(url);
+    protected Request() {
     }
 
-    public Request(URL url) {
-        this.url = url;
+    public Request(String url) throws MalformedURLException, UnsupportedEncodingException {
+            this(new URL(url));
     }
 
-    public Request setParam(String name, Object value) {
+    public Request(URL url) throws UnsupportedEncodingException {
+        try {
+            this.url = new URL(url.getProtocol() + "://" + url.getHost() + url.getPath());
+        } catch (MalformedURLException e) {
+        }
+        if (!TextUtils.isEmpty(url.getQuery())) {
+            withParams = true;
+            String query = url.getQuery().substring(1);
+            String[] params = query.split("&");
+            for (String param : params) {
+                String paramValue[] = param.split("=");
+                if(paramValue.length == 2) {
+                    addParam(paramValue[0], URLDecoder.decode(paramValue[1], encoding));
+                }
+            }
+        }
+        if(!TextUtils.isEmpty(url.getRef())) {
+
+        }
+    }
+
+    public Request addParam(String name, Object value) {
         withParams = true;
         Pair param = new Pair(name, value.toString());
         int index = -1;
@@ -92,8 +114,8 @@ public class Request implements Cloneable, Serializable {
         this.content = content;
     }
 
-    public Request setParam(Enum name, Object value) {
-        return setParam(name.name(), value);
+    public Request addParam(Enum name, Object value) {
+        return addParam(name.name(), value);
     }
 
     public String getParam(String name) {
@@ -151,18 +173,27 @@ public class Request implements Cloneable, Serializable {
         return this;
     }
 
+    public String getSuffix() {
+        return suffix;
+    }
+
+
+    private String getReference() {
+        return TextUtils.isEmpty(ref) ? "" : "#" + ref;
+    }
+
+    public String getRef() {
+        return ref;
+    }
+
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
+
     public boolean isWithParams() {
         return withParams;
     }
 
-    public boolean isSaveInCache() {
-        return saveInCache;
-    }
-
-    public Request saveInCache(boolean saveInCache) {
-        this.saveInCache = saveInCache;
-        return this;
-    }
 
     public boolean isArchiveResult() {
         return archiveResult;
@@ -175,24 +206,26 @@ public class Request implements Cloneable, Serializable {
 
     public URL getBaseUrl() {
         try {
-            return new URL(url + suffix);
+            return new URL(url + getSuffix());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Wrong suffix " + suffix, e);
+            Log.e(TAG, "Wrong suffix " + getSuffix(), e);
             return url;
         }
     }
 
     public URL getUrl() throws UnsupportedEncodingException, MalformedURLException {
         if (withParams) {
-            return new URL(url + suffix + encodeParams());
+            return new URL(url + getSuffix() + encodeParams() + getReference());
+        } else if(!TextUtils.isEmpty(suffix) || !TextUtils.isEmpty(ref)) {
+            return new URL(url + getSuffix() + getReference());
         } else {
-            return new URL(url + suffix);
+            return url;
         }
     }
 
     public Request initParams(Enum<? extends Valuable>[] values) {
         for (Enum<? extends Valuable> value : values) {
-            setParam(value.name(), ((Valuable) value).value());
+            addParam(value.name(), ((Valuable) value).value());
         }
         return this;
     }
@@ -215,13 +248,9 @@ public class Request implements Cloneable, Serializable {
     @Override
     public Request clone() {
         Request requestClone = null;
-        try {
-            requestClone = new Request(new URL(url.toString()));
-        } catch (MalformedURLException e) {
-            // Already was
-        }
+        requestClone = new Request();
+        requestClone.url = url;
         requestClone.encoding = encoding;
-        requestClone.saveInCache = saveInCache;
         requestClone.suffix = suffix;
         requestClone.withParams = withParams;
         requestClone.params.addAll(params);
@@ -238,7 +267,6 @@ public class Request implements Cloneable, Serializable {
 
         Request request = (Request) o;
 
-        if (saveInCache != request.saveInCache) return false;
         if (archiveResult != request.archiveResult) return false;
         if (withParams != request.withParams) return false;
         if (!url.equals(request.url)) return false;
@@ -256,7 +284,6 @@ public class Request implements Cloneable, Serializable {
         int result = url.hashCode();
         result = 31 * result + (suffix != null ? suffix.hashCode() : 0);
         result = 31 * result + params.hashCode();
-        result = 31 * result + (saveInCache ? 1 : 0);
         result = 31 * result + (archiveResult ? 1 : 0);
         result = 31 * result + (withParams ? 1 : 0);
         result = 31 * result + (encoding != null ? encoding.hashCode() : 0);
@@ -264,5 +291,15 @@ public class Request implements Cloneable, Serializable {
         result = 31 * result + headers.hashCode();
         result = 31 * result + method.hashCode();
         return result;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        serialiseUrl = url.toString();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        url = new URL(serialiseUrl);
     }
 }
