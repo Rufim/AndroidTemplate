@@ -181,9 +181,21 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     protected  void onDrawerOpened(View drawerView){}
 
-    @Subscribe
-    public abstract void onEvent(FragmentAttachedEvent fragmentAttached);
+    protected void onFragmentAttached(Fragment fragment) {}
 
+    @Subscribe
+    public void onEvent(FragmentAttachedEvent fragmentAttached) {
+        onFragmentAttached(fragmentAttached.fragment);
+    }
+
+
+    public int getCheckedNavigationItem() {
+        for (int i = 0; i < navigationView.getMenu().size(); i++) {
+           MenuItem item  = navigationView.getMenu().getItem(i);
+           if(item.isChecked()) return item.getItemId();
+        }
+        return -1;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
