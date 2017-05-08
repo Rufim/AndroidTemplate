@@ -3,6 +3,7 @@ package ru.kazantsev.template.fragments;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,14 @@ public class ErrorFragment extends BaseFragment {
         }
         errorMessage.setText(message);
         return rootView;
+    }
+
+    @Override
+    public boolean allowBackPress() {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.remove(this);
+        transaction.commitAllowingStateLoss();
+        return super.allowBackPress();
     }
 
     public static void show(BaseFragment fragment, @StringRes int message, @DrawableRes int icon_id) {

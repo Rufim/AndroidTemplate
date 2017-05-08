@@ -41,8 +41,10 @@
     <color name="xxlight_grey">#f5f5f5</color>
     <color name="xlight_grey">#d7d7d7</color>
     <color name="transparent_light_grey">#e0afafaf</color>
-    <color name="light_grey">#ffafafaf</color>
-    <color name="deep_grey">#ff767676</color>
+    <color name="light_grey">#afafaf</color>
+    <color name="deep_grey">#767676</color>
+    <color name="dark_grey">#303030</color>
+    <color name="light_black">#232323</color>
     <color name="transparent">#00000000</color>
     <color name="credit_card_background">#d8e5f1</color>
     <color name="credit_card_border">#a9d2f2</color>
