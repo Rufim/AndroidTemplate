@@ -32,8 +32,6 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     private static final String TAG = ListFragment.class.getSimpleName();
 
-    private final int filteringCooldown = 300;
-
     protected ProgressBar progressBar;
     protected TextView loadingText;
     protected ProgressBar loadMoreBar;
@@ -59,7 +57,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected boolean enableFiltering = false;
     protected boolean enableSearch = false;
     protected boolean enableScrollbar = false;
-    protected long lastFilteringTime = 0;
+
 
     public ListFragment() {
     }

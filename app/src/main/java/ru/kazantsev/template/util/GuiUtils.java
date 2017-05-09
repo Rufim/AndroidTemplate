@@ -615,7 +615,7 @@ public class GuiUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             defaultBackgroundResource = android.R.attr.colorPrimary;
         }
-        showSnackbar(viewContainer, message, GuiUtils.getThemeColor(viewContainer.getContext(), defaultBackgroundResource), GuiUtils.getThemeColor(viewContainer.getContext(), textColor));
+        showSnackbar(viewContainer, message, GuiUtils.getThemeColor(viewContainer.getContext(), textColor), GuiUtils.getThemeColor(viewContainer.getContext(), defaultBackgroundResource));
     }
 
     public static String getText(TextView textView) throws EmptyTextException {
