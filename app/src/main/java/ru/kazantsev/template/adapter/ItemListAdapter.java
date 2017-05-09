@@ -94,11 +94,11 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         return this.items;
     }
 
-    public void setItems(List<I> items) {
+    public synchronized void setItems(List<I> items) {
         setItems(items, false);
     }
 
-    public void setItems(List<I> items, boolean notify) {
+    public synchronized void setItems(List<I> items, boolean notify) {
         if(originalItems == null) {
             this.items = new ArrayList<I>(items);
         } else {
@@ -107,7 +107,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     }
 
 
-    public void clear() {
+    public synchronized void clear() {
         originalItems = null;
         lastQuery = null;
         items.clear();
@@ -118,13 +118,13 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         return this.originalItems == null ? this.items : this.originalItems;
     }
 
-    public void enterFilteringMode() {
+    public synchronized void enterFilteringMode() {
         if (originalItems == null) {
             this.originalItems = new ArrayList<>(items);
         }
     }
 
-    public void exitFilteringMode() {
+    public synchronized void exitFilteringMode() {
         if (originalItems != null) {
             items = originalItems;
             this.originalItems = null;
@@ -136,7 +136,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         return addItems(items, true);
     }
 
-    public List<I> addItems(List<I> items, boolean notify) {
+    public synchronized List<I> addItems(List<I> items, boolean notify) {
         if (originalItems == null) {
             addItemsInternal(items, notify);
             return items;
@@ -166,24 +166,24 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         this.lastQuery = lastQuery;
     }
 
-    public void addItem(I item) {
+    public synchronized void addItem(I item) {
         this.items.add(item);
         notifyItemInserted(this.items.size());
     }
 
 
-    public void addItem(int position, I item) {
+    public synchronized void addItem(int position, I item) {
         this.items.add(position, item);
         notifyItemInserted(position);
     }
 
-    public I removeItem(int position) {
+    public synchronized I removeItem(int position) {
         final I item = this.items.remove(position);
         notifyItemRemoved(position);
         return item;
     }
 
-    public void moveItem(int fromPosition, int toPosition) {
+    public synchronized void moveItem(int fromPosition, int toPosition) {
         final I item = this.items.remove(fromPosition);
         this.items.add(toPosition, item);
         notifyItemMoved(fromPosition, toPosition);
@@ -208,7 +208,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         return filter(query, true);
     }
 
-    public List<I> filter(FilterEvent query, boolean notify) {
+    public synchronized List<I> filter(FilterEvent query, boolean notify) {
         if (query == null) {
             return items;
         }

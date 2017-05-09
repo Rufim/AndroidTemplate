@@ -43,8 +43,8 @@
     <color name="transparent_light_grey">#e0afafaf</color>
     <color name="light_grey">#afafaf</color>
     <color name="deep_grey">#767676</color>
-    <color name="dark_grey">#303030</color>
-    <color name="light_black">#232323</color>
+    <color name="dark_grey">#3a3a3a</color>
+    <color name="light_black">#282828</color>
     <color name="transparent">#00000000</color>
     <color name="credit_card_background">#d8e5f1</color>
     <color name="credit_card_border">#a9d2f2</color>
