@@ -61,26 +61,32 @@ public class ErrorFragment extends BaseFragment {
     }
 
     public static void show(BaseFragment fragment, @StringRes int message, @DrawableRes int icon_id) {
-        new FragmentBuilder(fragment.getFragmentManager())
-                .putArg(Constants.ArgsName.MESSAGE, fragment.getString(message))
-                .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
-                .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
-                .putArg(Constants.ArgsName.RESOURCE_ID, icon_id)
-                .replaceFragment(fragment, ErrorFragment.class);
+        if (fragment != null && fragment.isAdded()) {
+            new FragmentBuilder(fragment.getFragmentManager())
+                    .putArg(Constants.ArgsName.MESSAGE, fragment.getString(message))
+                    .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
+                    .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
+                    .putArg(Constants.ArgsName.RESOURCE_ID, icon_id)
+                    .replaceFragment(fragment, ErrorFragment.class);
+        }
     }
 
     public static void show(BaseFragment fragment, @StringRes int message) {
-        new FragmentBuilder(fragment.getFragmentManager())
-                .putArg(Constants.ArgsName.MESSAGE, fragment.getString(message))
-                .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
-                .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
-                .replaceFragment(fragment, ErrorFragment.class);
+        if(fragment != null && fragment.isAdded()) {
+            new FragmentBuilder(fragment.getFragmentManager())
+                    .putArg(Constants.ArgsName.MESSAGE, fragment.getString(message))
+                    .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
+                    .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
+                    .replaceFragment(fragment, ErrorFragment.class);
+        }
     }
 
     public static void show(BaseFragment fragment) {
-        new FragmentBuilder(fragment.getFragmentManager())
-                .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
-                .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
-                .replaceFragment(fragment, ErrorFragment.class);
+        if (fragment != null && fragment.isAdded()) {
+            new FragmentBuilder(fragment.getFragmentManager())
+                    .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
+                    .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
+                    .replaceFragment(fragment, ErrorFragment.class);
+        }
     }
 }

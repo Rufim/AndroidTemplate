@@ -48,11 +48,19 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
     }
 
     protected static <F extends BaseFragment> F show(BaseFragment fragment, Class<F> fragmentClass, String key, Object obj) {
-        return new FragmentBuilder(fragment.getFragmentManager()).newFragment().addToBackStack().putArg(key, obj).replaceFragment(fragment, fragmentClass);
+        if (fragment.isAdded()) {
+            return new FragmentBuilder(fragment.getFragmentManager()).newFragment().addToBackStack().putArg(key, obj).replaceFragment(fragment, fragmentClass);
+        } else {
+            return null;
+        }
     }
 
     protected static <F extends BaseFragment> F show(BaseFragment fragment, Class<F> fragmentClass) {
-        return new FragmentBuilder(fragment.getFragmentManager()).newFragment().addToBackStack().replaceFragment(fragment, fragmentClass);
+        if (fragment.isAdded()) {
+            return new FragmentBuilder(fragment.getFragmentManager()).newFragment().addToBackStack().replaceFragment(fragment, fragmentClass);
+        } else {
+            return null;
+        }
     }
 
     // Подобными методами должны вызыватся наследуемые фрагмент(их нужно реализовывать для кажного фрагмента заново)
