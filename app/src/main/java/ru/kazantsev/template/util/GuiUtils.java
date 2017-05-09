@@ -887,6 +887,11 @@ public class GuiUtils {
         return result;
     }
 
+    public static TypedArray getAttr(Context context, int id) {
+        Resources.Theme theme = context.getTheme();
+        return theme.obtainStyledAttributes(new int[]{id});
+    }
+
     public static TypedArray getStyledAttrs(Context context) {
         int[] attrs = {android.R.attr.textColor,
                 android.R.attr.textSize,

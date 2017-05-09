@@ -1,28 +1,34 @@
 package ru.kazantsev.template.activity;
 
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.*;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.util.GuiUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 
 public abstract class NavigationActivity<T> extends BaseActivity {
 
-    ArrayAdapter<T> menuAdapter;
-    ListView navigationListMenu;
-    FrameLayout navigationHeader;
-    LinearLayout tabBar;
-    boolean enableButtomTabs = false;
+    protected ArrayAdapter<T> menuAdapter;
+    protected ListView navigationListMenu;
+    protected FrameLayout navigationHeader;
+    protected LinearLayout tabBar;
+    protected boolean enableButtomTabs = false;
+    protected int selectedBackground = -1;
+    protected Drawable usualBackground = null;
+    protected int selectedIndex = -1;
+
+    WeakHashMap<Integer,View> scrapHeap = new WeakHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +58,7 @@ public abstract class NavigationActivity<T> extends BaseActivity {
                     view = convertView;
                 }
                 T item = getItem(position);
-                view.setTag(item);
+                view.setTag(position);
                 onBindNavigationView(position, item, view);
                 return view;
             }
@@ -60,8 +66,20 @@ public abstract class NavigationActivity<T> extends BaseActivity {
         };
         navigationListMenu.setAdapter(menuAdapter);
         navigationListMenu.setOnItemClickListener((parent, view, position, id) -> {
-            if(onNavigationItemSelected(position, (T) view.getTag(), view)) {
+            if (onNavigationItemSelected(position, menuAdapter.getItem(position), view)) {
+                setSelected(position);
                 drawerLayout.closeDrawers();
+            }
+        });
+        selectedBackground = GuiUtils.getThemeColor(this, R.attr.colorAccent);
+        navigationListMenu.setRecyclerListener(new AbsListView.RecyclerListener() {
+            @Override
+            public void onMovedToScrapHeap(View view) {
+                if(view.getTag() != null && view.getTag() instanceof Integer) {
+                    scrapHeap.put((Integer) view.getTag(), view);
+                } else {
+                    Log.e(NavigationActivity.class.getSimpleName(), "Error while try to get scrap view please not use Tag or Navigation menu will work incorrectly");
+                }
             }
         });
     }
@@ -78,20 +96,84 @@ public abstract class NavigationActivity<T> extends BaseActivity {
 
     protected abstract boolean onNavigationItemSelected(int position, T item, View navigationView);
 
+    public void selectItem(int position) {
+        if (navigationListMenu.getCount() > position && navigationListMenu.getCount() > 0) {
+            if (onNavigationItemSelected(position, menuAdapter.getItem(position), navigationListMenu.getChildAt(position))) {
+                setSelected(position);
+            }
+        }
+    }
+
+    public void cleanSelection() {
+        if (selectedIndex >= 0) {
+            if (navigationListMenu.getCount() > selectedIndex && navigationListMenu.getCount() > 0) {
+                cleanViewSelection(getNavigationViewByPosition(selectedIndex, false));
+            }
+            selectedIndex = -1;
+        }
+    }
+
+    protected synchronized void setSelected(int position) {
+        if (selectedIndex >= 0) {
+            cleanViewSelection(getNavigationViewByPosition(selectedIndex, false));
+        }
+        View navView = getNavigationViewByPosition(position, true);
+        if (navView != null) {
+            usualBackground = navView.getBackground();
+            applyViewSelection(navView);
+            selectedIndex = position;
+        }
+    }
+
+    protected View getNavigationViewByPosition(int position, boolean createNew) {
+        if (menuAdapter.getCount() > position && menuAdapter.getCount() > 0) {
+            final int firstListItemPosition = navigationListMenu.getFirstVisiblePosition();
+            final int lastListItemPosition = firstListItemPosition + navigationListMenu.getChildCount() - 1;
+
+            if (position < firstListItemPosition || position > lastListItemPosition) {
+                View scrapView = scrapHeap.get(position);
+                if(scrapView == null) {
+                    return createNew ? navigationListMenu.getAdapter().getView(position, null, navigationListMenu) : null;
+                } else {
+                    return scrapView;
+                }
+            } else {
+                final int childIndex = position - firstListItemPosition;
+                return navigationListMenu.getChildAt(childIndex);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    protected void applyViewSelection(View navigationView) {
+        if (navigationView != null) {
+            navigationView.setBackgroundColor(selectedBackground);
+        }
+    }
+
+
+    protected void cleanViewSelection(View navigationView) {
+         if (navigationView != null) {
+            navigationView.setBackgroundDrawable(usualBackground);
+        }
+    }
+
     protected
     @LayoutRes
     int getNavigationHeaderId() {
         return -1;
     }
 
-    protected void onTabClick(View tab) {}
+    protected void onTabClick(View tab) {
+    }
 
     public void addNavigationMenu(T item) {
         menuAdapter.add(item);
     }
 
     public void setNavigationMenu(int position, T item) {
-        if(menuAdapter.getCount() > position) {
+        if (menuAdapter.getCount() > position) {
             menuAdapter.add(item);
         } else {
             menuAdapter.insert(item, position);
