@@ -7,6 +7,10 @@ import java.io.*;
  */
 public interface Response {
 
+    int getCode();
+
+    void setCode(int code);
+
     void setArched(boolean b);
 
     boolean isArched();

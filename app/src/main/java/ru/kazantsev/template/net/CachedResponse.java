@@ -17,6 +17,7 @@ public class CachedResponse extends File implements Serializable, Response {
     private boolean isDownloadOver = false;
     private boolean isCached = false;
     private boolean arched = false;
+    private int code;
     private String encoding = "UTF-8";
 
     private CachedResponse() {
@@ -55,6 +56,16 @@ public class CachedResponse extends File implements Serializable, Response {
 
     public void setArched(boolean arched) {
         this.arched = arched;
+    }
+
+    @Override
+    public int getCode() {
+        return code;
+    }
+
+    @Override
+    public void setCode(int code) {
+        this.code = code;
     }
 
     public CachedResponse pack() throws IOException {

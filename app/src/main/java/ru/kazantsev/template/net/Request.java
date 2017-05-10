@@ -49,27 +49,39 @@ public class Request implements Cloneable, Serializable {
     }
 
     public Request(String url) throws MalformedURLException, UnsupportedEncodingException {
-            this(new URL(url));
+        this(new URL(url), false);
+    }
+
+    public Request(String url, boolean parseParams) throws MalformedURLException, UnsupportedEncodingException {
+        this(new URL(url), parseParams);
     }
 
     public Request(URL url) throws UnsupportedEncodingException {
-        try {
-            this.url = new URL(url.getProtocol() + "://" + url.getHost() + url.getPath());
-        } catch (MalformedURLException e) {
-        }
-        if (!TextUtils.isEmpty(url.getQuery())) {
-            withParams = true;
-            String query = url.getQuery().substring(1);
-            String[] params = query.split("&");
-            for (String param : params) {
-                String paramValue[] = param.split("=");
-                if(paramValue.length == 2) {
-                    addParam(paramValue[0], URLDecoder.decode(paramValue[1], encoding));
-                }
-            }
-        }
-        if(!TextUtils.isEmpty(url.getRef())) {
+        this(url, false);
+    }
 
+    public Request(URL url, boolean parseParams) throws UnsupportedEncodingException {
+        if (parseParams) {
+            try {
+                this.url = new URL(url.getProtocol() + "://" + url.getHost() + url.getPath());
+                if (!TextUtils.isEmpty(url.getQuery())) {
+                    withParams = true;
+                    String query = url.getQuery().substring(1);
+                    String[] params = query.split("&");
+                    for (String param : params) {
+                        String paramValue[] = param.split("=");
+                        if (paramValue.length == 2) {
+                            addParam(paramValue[0], URLDecoder.decode(paramValue[1], encoding));
+                        }
+                    }
+                }
+                if (!TextUtils.isEmpty(url.getRef())) {
+                    ref = url.getRef();
+                }
+            } catch (MalformedURLException e) {
+            }
+        } else {
+            this.url = url;
         }
     }
 
@@ -102,8 +114,13 @@ public class Request implements Cloneable, Serializable {
         return method;
     }
 
-    public void setMethod(Method method) {
+    public Request setMethod(Method method) {
         this.method = method;
+        return this;
+    }
+
+    boolean isPutOrPost() {
+        return method.equals(Method.POST) || method.equals(Method.PUT);
     }
 
     public String getContent() {
@@ -214,18 +231,22 @@ public class Request implements Cloneable, Serializable {
     }
 
     public URL getUrl() throws UnsupportedEncodingException, MalformedURLException {
-        if (withParams) {
+        if (withParams && !isPutOrPost()) {
             return new URL(url + getSuffix() + encodeParams() + getReference());
-        } else if(!TextUtils.isEmpty(suffix) || !TextUtils.isEmpty(ref)) {
+        } else if (!TextUtils.isEmpty(suffix) || !TextUtils.isEmpty(ref)) {
             return new URL(url + getSuffix() + getReference());
         } else {
             return url;
         }
     }
 
-    public Request initParams(Enum<? extends Valuable>[] values) {
-        for (Enum<? extends Valuable> value : values) {
-            addParam(value.name(), ((Valuable) value).value());
+    public Request initParams(Enum[] values) {
+        for (Enum value : values) {
+            if (value instanceof Valuable) {
+                addParam(value.name(), ((Valuable) value).value());
+            } else {
+                addParam(value.name(), "");
+            }
         }
         return this;
     }
@@ -235,7 +256,7 @@ public class Request implements Cloneable, Serializable {
         for (Pair<String, String> param : params) {
             if (builder.length() != 0) {
                 builder.append("&");
-            } else {
+            } else if(!isPutOrPost()) {
                 builder.append("?");
             }
             builder.append(URLEncoder.encode(param.first, encoding));

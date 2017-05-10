@@ -12,10 +12,21 @@ public class SimpleResponse implements Response{
 
     private boolean isDownloadOver = false;
     private boolean arched = false;
+    private int code;
     private String encoding = "UTF-8";
 
     private ByteArrayOutputStream bufferedOutputStream;
 
+
+    @Override
+    public int getCode() {
+        return code;
+    }
+
+    @Override
+    public void setCode(int code) {
+        this.code = code;
+    }
 
     @Override
     public boolean isDownloadOver() {
@@ -38,6 +49,7 @@ public class SimpleResponse implements Response{
 
     @Override
     public long length() {
+        if(bufferedOutputStream == null) return 0;
         return bufferedOutputStream.size();
     }
 

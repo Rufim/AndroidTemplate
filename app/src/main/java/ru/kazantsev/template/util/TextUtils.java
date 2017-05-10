@@ -5,6 +5,8 @@ import android.util.Log;
 import org.intellij.lang.annotations.RegExp;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -87,6 +89,17 @@ public class TextUtils {
 
     public static boolean isEmpty(CharSequence string) {
         return string == null || string.length() == 0;
+    }
+
+    public static String convertEncoding(String string, String from, String to) {
+        return convertEncoding(string, Charset.forName(from), Charset.forName(to));
+    }
+
+    public static String convertEncoding(String string, Charset from, Charset to) {
+        ByteBuffer inputBuffer = ByteBuffer.wrap(string.getBytes());
+        CharBuffer data = from.decode(inputBuffer);
+        ByteBuffer outputBuffer = to.encode(data);
+        return  new String(outputBuffer.array(), to);
     }
 
     public static String linkify(String text) {

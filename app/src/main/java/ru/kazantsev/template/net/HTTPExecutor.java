@@ -39,12 +39,9 @@ public class HTTPExecutor implements Callable<Response> {
         response = null;
         do {
             try {
-                if (Request.Method.PUT.equals(request.getMethod()) ||
-                        Request.Method.POST.equals(request.getMethod())) {
-                    connection = (HttpURLConnection) request.getBaseUrl().openConnection();
+                connection = (HttpURLConnection) request.getUrl().openConnection();
+                if (request.isPutOrPost()) {
                     connection.setDoOutput(true);
-                } else {
-                    connection = (HttpURLConnection) request.getUrl().openConnection();
                 }
                 connection.setRequestMethod(request.getMethod().name());
             } catch (IOException ex) {
@@ -61,30 +58,28 @@ public class HTTPExecutor implements Callable<Response> {
             OutputStreamWriter osw = null;
             RandomAccessFile raf = null;
             try {
-                if (Request.Method.POST.equals(request.getMethod())) {
+                response = prepareResponse();
+                if (response == null) {
+                    throw new IOException("Error on prepare response");
+                }
+                if (request.isPutOrPost()) {
                     osw = new OutputStreamWriter(connection.getOutputStream(), request.getEncoding());
                     osw.write(request.encodeParams());
                     osw.flush();
                     osw.close();
                 }
-                if (Request.Method.PUT.equals(request.getMethod())) {
-                    osw = new OutputStreamWriter(connection.getOutputStream(), request.getEncoding());
-                    osw.write(request.getContent());
-                    osw.flush();
-                    osw.close();
+                response.setCode(connection.getResponseCode());
+                if (response.getCode() < 400) {
+                    is = connection.getInputStream();
+                } else {
+                    is = connection.getErrorStream();
                 }
-                connection.connect();
-                is = connection.getInputStream();
                 byte[] buffer = new byte[bufferSize];
-                response = prepareResponse();
-                if (response == null) {
-                    throw new IOException("Error on prepare response");
-                }
                 if (request.isArchiveResult()) {
                     zos = new GZIPOutputStream(new BufferedOutputStream(response.getOutputStream()));
                     while (SystemUtils.readStream(is, zos, buffer)) ;
                     response.setArched(true);
-                } else if(response instanceof CachedResponse) {
+                } else if (response instanceof CachedResponse) {
                     raf = new RandomAccessFile((File) response, "rw");
                     while (SystemUtils.readStream(is, raf, buffer)) ;
                 } else {
@@ -101,7 +96,7 @@ public class HTTPExecutor implements Callable<Response> {
                 if (is != null) is.close();
             }
         } while (request.canReconnect() && response == null);
-        Log.i(TAG, "Request completed using url: " + request.getUrl() + " bytes received " + response.length());
+        Log.i(TAG, "Request completed using url: " + request.getUrl() + (!request.isPutOrPost() ? " bytes received " + response.length() : ""));
         return response;
     }
 
@@ -117,8 +112,8 @@ public class HTTPExecutor implements Callable<Response> {
         this.bufferSize = bufferSize;
     }
 
-    public Response execute(Request request, long minBytes) throws IOException, ExecutionException, InterruptedException {
-        Future future = executeAsync(request);
+    public Response execute(long minBytes) throws IOException, ExecutionException, InterruptedException {
+        Future future = executeAsync();
         while (getResponse() == null || getResponse().length() < minBytes) {
             try {
                 return (Response) future.get(100, TimeUnit.MILLISECONDS);
@@ -129,11 +124,11 @@ public class HTTPExecutor implements Callable<Response> {
         return getResponse();
     }
 
-    public Response execute(Request request) throws IOException, ExecutionException, InterruptedException {
-        return execute(request, Long.MAX_VALUE);
+    public Response execute() throws IOException, ExecutionException, InterruptedException {
+        return execute(Long.MAX_VALUE);
     }
 
-    public Future<Response> executeAsync(Request request) throws IOException {
+    public Future<Response> executeAsync() throws IOException {
         ExecutorService service = Executors.newSingleThreadExecutor();
         return service.submit(this);
     }

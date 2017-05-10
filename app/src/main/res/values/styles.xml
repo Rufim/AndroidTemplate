@@ -22,7 +22,7 @@
     </style>
 
     <style name="default_multiline_edit_text">
-        <item name="android:inputMethod">textMultiLine</item>
+        <item name="android:inputType">textMultiLine</item>
         <item name="android:gravity">top|left</item>
     </style>
 
