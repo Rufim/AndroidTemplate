@@ -5,13 +5,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.util.GuiUtils;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -27,6 +27,8 @@ public abstract class NavigationActivity<T> extends BaseActivity {
     protected int selectedBackground = -1;
     protected Drawable usualBackground = null;
     protected int selectedIndex = -1;
+    protected float navigationInPercentWidth = -1;
+    protected int navigationFixedDpWidth = 250;
 
     WeakHashMap<Integer,View> scrapHeap = new WeakHashMap<>();
 
@@ -38,8 +40,12 @@ public abstract class NavigationActivity<T> extends BaseActivity {
             getContentLayout().addView(tabBar);
         }
         ViewGroup.LayoutParams params = getNavigationView().getLayoutParams();
-        Point size = GuiUtils.getScreenSize(this);
-        params.width = (int) ((size.x < size.y ? size.x : size.y) * 0.8);
+        if(navigationInPercentWidth > 0) {
+            Point size = GuiUtils.getScreenSize(this);
+            params.width = (int) ((size.x < size.y ? size.x : size.y) * navigationInPercentWidth);
+        } else if(navigationFixedDpWidth > 0) {
+            params.width = GuiUtils.dpToPx(navigationFixedDpWidth, this);
+        }
         getNavigationView().setLayoutParams(params);
         getNavigationView().addView(GuiUtils.inflate(getNavigationView(), R.layout.navigation_menu));
         navigationHeader = (FrameLayout) getNavigationView().findViewById(R.id.navigation_menu_header);

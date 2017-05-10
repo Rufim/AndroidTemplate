@@ -2,7 +2,6 @@ package ru.kazantsev.template.util;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.AnimatorRes;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -90,6 +89,8 @@ public class FragmentBuilder {
     private boolean clearBackStack = false;
     private int inAnimationId = -1;
     private int outAnimationId = -1;
+    private int inPopupAnimationId = -1;
+    private int outPopupAnimationId = -1;
     private String clearBackStackUpToName = null;
     private Fragment fragmentInvoker;
 
@@ -249,9 +250,16 @@ public class FragmentBuilder {
         return this;
     }
 
-    public void setAnimation(@AnimatorRes  int inAnimationId, @AnimatorRes int outAnimationId) {
+    public FragmentBuilder setAnimation(int inAnimationId, int outAnimationId) {
         this.inAnimationId = inAnimationId;
         this.outAnimationId = outAnimationId;
+        return this;
+    }
+
+    public FragmentBuilder setPopupAnimation(int inPopupAnimationId, int outPopupAnimationId) {
+        this.inPopupAnimationId = inPopupAnimationId;
+        this.outPopupAnimationId = outPopupAnimationId;
+        return this;
     }
 
     public <F extends Fragment> F replaceFragment(@IdRes int container, Class<F> fragmentClass) {
@@ -263,15 +271,7 @@ public class FragmentBuilder {
         if (fragmentClass == null && name == null) {
             return null;
         }
-        if(clearBackStack) {
-            manager.popBackStack(clearBackStackUpToName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        }
-
         Fragment fragment = manager.findFragmentByTag(name);
-        FragmentTransaction transaction = manager.beginTransaction();
-        if (inAnimationId > 0 && outAnimationId > 0) {
-            transaction.setCustomAnimations(inAnimationId, outAnimationId);
-        }
         if (fragment == null || newFragment) {
             if (fragmentClass == null) {
                 try {
@@ -280,54 +280,67 @@ public class FragmentBuilder {
                     return null;
                 }
             }
-            fragment = newFragment(fragmentClass);
-            transaction.replace(container, fragment, name);
+            fragment = newInstance(fragmentClass);
+        }
+        if(fragment != null) {
+            return replaceFragment(container, fragment, name);
         } else {
-            if(fragment.getArguments() != null) {
-                fragment.getArguments().putAll(bundle);
-            } else {
-                fragment.setArguments(bundle);
-            }
-            if (manager.findFragmentById(container) == fragment && removeIfExists) {
-                transaction.remove(fragment);
-                transaction.add(container, fragment, name);
-            } else {
-                transaction.replace(container, fragment, name);
-            }
+            Log.e(TAG, "Cannot instantinate fragment!!! ");
+            return null;
         }
-        if (toBackStack) {
-            transaction.addToBackStack(null);
-        }
-        transaction.commitAllowingStateLoss();
-        return (F) fragment;
     }
 
 
     public <F extends Fragment> F replaceFragment(@IdRes int container, Fragment fragment, String name) {
-        if (clearBackStack) {
+        clearBackStackUpToName();
+        FragmentTransaction transaction = manager.beginTransaction();
+        applyAnimation(transaction);
+        applyBundle(fragment);
+        removeIfExists(container, fragment, name, transaction);
+        toBackStack(transaction);
+        transaction.commitAllowingStateLoss();
+        return (F) fragment;
+    }
+
+    private void clearBackStackUpToName() {
+        if(clearBackStack) {
             manager.popBackStack(clearBackStackUpToName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
-        FragmentTransaction transaction = manager.beginTransaction();
+    }
+
+    private void applyAnimation(FragmentTransaction transaction) {
+        if (inAnimationId > 0 && outAnimationId > 0) {
+            if(inPopupAnimationId > 0 && outPopupAnimationId > 0) {
+                transaction.setCustomAnimations(inAnimationId, outAnimationId, inPopupAnimationId, outPopupAnimationId);
+            } else {
+                transaction.setCustomAnimations(inAnimationId, outAnimationId);
+            }
+        }
+    }
+
+    private void applyBundle(Fragment fragment) {
         if(fragment.getArguments() != null) {
             fragment.getArguments().putAll(bundle);
         } else {
             fragment.setArguments(bundle);
         }
+    }
+
+    private void removeIfExists (@IdRes int container, Fragment fragment, String name, FragmentTransaction transaction) {
         if (manager.findFragmentById(container) == fragment && removeIfExists) {
             transaction.remove(fragment);
             transaction.add(container, fragment, name);
         } else {
             transaction.replace(container, fragment, name);
         }
+    }
+
+    private void toBackStack(FragmentTransaction transaction) {
         if (toBackStack) {
             transaction.addToBackStack(null);
         }
-        if (inAnimationId > 0 && outAnimationId > 0) {
-            transaction.setCustomAnimations(inAnimationId, outAnimationId);
-        }
-        transaction.commitAllowingStateLoss();
-        return (F) fragment;
     }
+
 
     public <F extends Fragment> F refresh(F fragment) {
         FragmentTransaction transaction = manager.beginTransaction();

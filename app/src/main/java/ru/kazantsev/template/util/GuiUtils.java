@@ -25,6 +25,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.*;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
