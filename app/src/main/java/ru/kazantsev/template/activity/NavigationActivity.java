@@ -57,6 +57,13 @@ public abstract class NavigationActivity<T> extends BaseActivity {
                 } else {
                     view = convertView;
                 }
+                if(selectedIndex > 0) {
+                    if (position == selectedIndex) {
+                        applyViewSelection(view);
+                    } else if (convertView != null) {
+                        cleanViewSelection(view);
+                    }
+                }
                 T item = getItem(position);
                 view.setTag(position);
                 onBindNavigationView(position, item, view);
@@ -113,7 +120,7 @@ public abstract class NavigationActivity<T> extends BaseActivity {
         }
     }
 
-    protected synchronized void setSelected(int position) {
+    public synchronized void setSelected(int position) {
         if (selectedIndex >= 0) {
             cleanViewSelection(getNavigationViewByPosition(selectedIndex, false));
         }
