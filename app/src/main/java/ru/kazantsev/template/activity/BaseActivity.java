@@ -209,7 +209,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         int id = item.getItemId();
 
         if (id == android.R.id.home && clearBackStack) {
-            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            if (isHomeBack()) {
                 onBackPressed();
                 return true;
             }
@@ -219,6 +219,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    protected boolean isHomeBack() {
+        return getSupportFragmentManager().getBackStackEntryCount() > 0 || !isTaskRoot();
     }
 
     @Override
@@ -377,7 +381,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     public void shouldDisplayHomeUp() {
         //Enable Up button only  if there are entries in the back stack
         if (actionBar != null && clearBackStack) {
-            boolean canback = getSupportFragmentManager().getBackStackEntryCount() > 0;
+            boolean canback = isHomeBack();
             if (canback) {
                 actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
                 if(disableNavigationBar) {

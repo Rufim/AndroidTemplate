@@ -235,7 +235,11 @@ public class TextUtils {
                 if (dates.length == 3) {
                     calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dates[2]));
                     calendar.set(Calendar.MONTH, Integer.parseInt(dates[1]) - 1);
-                    calendar.set(Calendar.YEAR, Integer.parseInt(dates[0]));
+                    int year = Integer.parseInt(dates[0]);
+                    if(year < 100) {
+                        year += 2000;
+                    }
+                    calendar.set(Calendar.YEAR, year);
                 } else if (dates.length == 2) {
                     calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dates[0]));
                     calendar.set(Calendar.MONTH, Integer.parseInt(dates[1]) - 1);
