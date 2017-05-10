@@ -169,6 +169,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         }
     }
 
+    protected void onBackPressedOriginal() {
+        super.onBackPressed();
+    }
+
     protected abstract void handleIntent(Intent intent);
 
     protected boolean isConfigChange(@Nullable Bundle savedInstanceState) {
