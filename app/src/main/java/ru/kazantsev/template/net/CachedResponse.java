@@ -102,7 +102,7 @@ public class CachedResponse extends File implements Serializable, Response {
         try {
             zos = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(cachedResponse, false)));
             is = new FileInputStream(this);
-            while (SystemUtils.readStream(is, zos, buffer));
+            SystemUtils.readStream(is, zos, buffer);
         } finally {
             if(zos != null) zos.close();
             if(is != null) is.close();;
@@ -118,7 +118,7 @@ public class CachedResponse extends File implements Serializable, Response {
         try {
             os = new FileOutputStream(cachedResponse);
             zis = new GZIPInputStream(new FileInputStream(this));
-            while (SystemUtils.readStream(zis, os, buffer)) ;
+            SystemUtils.readStream(zis, os, buffer);
         } finally {
             if (os != null) os.close();
             if (zis != null) zis.close();
