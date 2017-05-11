@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import org.greenrobot.eventbus.EventBus;
@@ -26,6 +27,7 @@ import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
+import ru.kazantsev.template.util.AndroidSystemUtils;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.util.TextUtils;
@@ -45,7 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected DrawerLayout drawerLayout;
     protected NavigationView navigationView;
     protected Toolbar toolbar;
-    protected View mainBorder;
+    protected View toolbarShadow;
 
     protected ActionBar actionBar;
     protected ActionBarDrawerToggle actionBarDrawerToggle;
@@ -75,6 +77,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         drawerLayout = GuiUtils.getView(this, R.id.drawer_layout);
         navigationView = GuiUtils.getView(this, R.id.navigation_drawer);
         toolbar = GuiUtils.getView(this, R.id.toolbar);
+        toolbarShadow = GuiUtils.getView(this, R.id.toolbar_shadow);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
         actionBar = getSupportActionBar();
@@ -111,6 +114,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         shouldDisplayHomeUp();
         if(savedInstanceState != null && savedInstanceState.containsKey(Constants.ArgsName.FRAGMENT_CACHE)) {
             fragmentBundleCache = savedInstanceState.getParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE);
+        }
+        float elev = GuiUtils.getThemeDimen(this, R.attr.toolbarElevationSize);
+        if(elev > 0) {
+            setToolbarElevation((int) elev);
         }
     }
 
@@ -167,6 +174,15 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void setToolbarElevation(int elavation) {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) toolbarShadow.getLayoutParams();
+        params.height = elavation;
+        toolbarShadow.setLayoutParams(params);
+        params = (LinearLayout.LayoutParams) container.getLayoutParams();
+        params.topMargin = - elavation;
+        container.setLayoutParams(params);
     }
 
     protected void onBackPressedOriginal() {

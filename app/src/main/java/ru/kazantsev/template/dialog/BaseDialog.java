@@ -13,8 +13,6 @@ import ru.kazantsev.template.util.FragmentBuilder;
  */
 public  class BaseDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
-    private BaseDialog loginDialog;
-
     public static <F extends BaseDialog> F newInstance(Class<F> fragmentClass, Bundle args) {
         return FragmentBuilder.newInstance(fragmentClass, args);
     }

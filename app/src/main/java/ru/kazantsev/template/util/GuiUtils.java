@@ -881,9 +881,15 @@ public class GuiUtils {
     }
 
     public static int getThemeColor(Context context, int id) {
-        Resources.Theme theme = context.getTheme();
-        TypedArray a = theme.obtainStyledAttributes(new int[]{id});
+        TypedArray a = getAttr(context, id);
         int result = a.getColor(0, 0);
+        a.recycle();
+        return result;
+    }
+
+    public static float getThemeDimen(Context context, int id) {
+        TypedArray a = getAttr(context, id);
+        float result = a.getDimension(0, 0);
         a.recycle();
         return result;
     }

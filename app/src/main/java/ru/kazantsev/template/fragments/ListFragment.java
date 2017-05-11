@@ -15,7 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ru.kazantsev.template.R;
-import ru.kazantsev.template.R2;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.adapter.MultiItemListAdapter;
 import ru.kazantsev.template.lister.DataSource;
@@ -33,7 +32,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     private static final String TAG = ListFragment.class.getSimpleName();
 
     protected ProgressBar progressBar;
-    protected TextView loadingText;
+    protected TextView progressBarText;
     protected ProgressBar loadMoreBar;
     protected RecyclerView itemList;
     protected SwipeRefreshLayout swipeRefresh;
@@ -175,7 +174,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         }
         itemList.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
-        loadingText.setVisibility(View.GONE);
+        progressBarText.setVisibility(View.GONE);
         swipeRefresh.setRefreshing(false);
     }
 
@@ -323,7 +322,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         View rootView = inflater.inflate(R.layout.fragment_loading_list, container,
                 false);
         progressBar = GuiUtils.getView(rootView, R.id.load_progress);
-        loadingText = GuiUtils.getView(rootView, R.id.loading_text);
+        progressBarText = GuiUtils.getView(rootView, R.id.loading_text);
         loadMoreBar = GuiUtils.getView(rootView, R.id.load_more);
         itemList = GuiUtils.getView(rootView, R.id.items);
         swipeRefresh = GuiUtils.getView(rootView, R.id.refresh);
