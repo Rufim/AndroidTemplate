@@ -5,6 +5,8 @@ import ru.kazantsev.template.util.SystemUtils;
 
 import java.io.*;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -18,7 +20,9 @@ public class CachedResponse extends File implements Serializable, Response {
     private boolean isCached = false;
     private boolean arched = false;
     private int code;
-    private String encoding = "UTF-8";
+    private String message;
+    private String encoding;
+    private Map<String, List<String>> headers;
 
     private CachedResponse() {
         super("");
@@ -57,6 +61,28 @@ public class CachedResponse extends File implements Serializable, Response {
     public void setArched(boolean arched) {
         this.arched = arched;
     }
+
+
+    @Override
+    public Map<String, List<String>> getHeaders() {
+        return headers;
+    }
+
+    @Override
+    public void setHeaders(Map<String, List<String>> headers) {
+        this.headers = headers;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
 
     @Override
     public int getCode() {

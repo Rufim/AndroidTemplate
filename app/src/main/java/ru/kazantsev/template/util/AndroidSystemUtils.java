@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
+import android.support.annotation.StringRes;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
 import android.util.Log;

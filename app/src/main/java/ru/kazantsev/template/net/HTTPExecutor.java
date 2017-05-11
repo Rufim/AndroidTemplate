@@ -35,18 +35,17 @@ public class HTTPExecutor implements Callable<Response> {
 
     @Override
     public Response call() throws IOException {
-        HttpURLConnection connection;
+        HttpURLConnection connection = null;
         response = null;
         do {
             try {
                 connection = (HttpURLConnection) request.getUrl().openConnection();
-                if (request.isPutOrPost()) {
-                    connection.setDoOutput(true);
-                }
                 connection.setRequestMethod(request.getMethod().name());
             } catch (IOException ex) {
                 Log.e(TAG, "Error on establish connection" + request.getUrl(), ex);
                 continue;
+            } finally {
+                if (connection != null) connection.disconnect();
             }
             configConnection(connection);
             Map<String, String> headers = request.getHeaders();
@@ -63,12 +62,26 @@ public class HTTPExecutor implements Callable<Response> {
                     throw new IOException("Error on prepare response");
                 }
                 if (request.isPutOrPost()) {
+                    String params = request.encodeParams();
+                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    connection.setRequestProperty("Content-Length", String.valueOf(params.length()));
+                    connection.setDoOutput(true);
                     osw = new OutputStreamWriter(connection.getOutputStream(), request.getEncoding());
-                    osw.write(request.encodeParams());
+                    osw.write(params);
                     osw.flush();
                     osw.close();
                 }
                 response.setCode(connection.getResponseCode());
+                response.setMessage(connection.getResponseMessage());
+                response.setHeaders(connection.getHeaderFields());
+                if(response.getEncoding() == null) {
+                    String encoding = getEncodingFromResponse(connection);
+                    if(encoding != null) {
+                        response.setEncoding(encoding);
+                    } else {
+                        response.setEncoding("UTF-8");
+                    }
+                }
                 if (response.getCode() < 400) {
                     is = connection.getInputStream();
                 } else {
@@ -77,13 +90,13 @@ public class HTTPExecutor implements Callable<Response> {
                 byte[] buffer = new byte[bufferSize];
                 if (request.isArchiveResult()) {
                     zos = new GZIPOutputStream(new BufferedOutputStream(response.getOutputStream()));
-                    while (SystemUtils.readStream(is, zos, buffer)) ;
+                    SystemUtils.readStream(is, zos, buffer);
                     response.setArched(true);
                 } else if (response instanceof CachedResponse) {
                     raf = new RandomAccessFile((File) response, "rw");
-                    while (SystemUtils.readStream(is, raf, buffer)) ;
+                    SystemUtils.readStream(is, raf, buffer);
                 } else {
-                    while (SystemUtils.readStream(is, response.getOutputStream(), buffer)) ;
+                    SystemUtils.readStream(is, response.getOutputStream(), buffer);
                 }
                 response.setDownloadOver(true);
             } catch (Exception ex) {
@@ -94,10 +107,24 @@ public class HTTPExecutor implements Callable<Response> {
                 if (zos != null) zos.close();
                 if (raf != null) raf.close();
                 if (is != null) is.close();
+                if (connection != null) connection.disconnect();
             }
         } while (request.canReconnect() && response == null);
         Log.i(TAG, "Request completed using url: " + request.getUrl() + (!request.isPutOrPost() ? " bytes received " + response.length() : ""));
         return response;
+    }
+
+    private String getEncodingFromResponse(HttpURLConnection connection) {
+        String header = connection.getHeaderField("Content-Type");
+        String charset = "charset";
+        return parseParamFromHeader(header, charset);
+    }
+
+    public static String parseParamFromHeader(String header, String paramName) {
+        if (header != null && header.contains(paramName)) {
+            return header.substring(header.indexOf(paramName) + paramName.length() + 1).split(";")[0];
+        }
+        return null;
     }
 
     public Response getResponse() {
