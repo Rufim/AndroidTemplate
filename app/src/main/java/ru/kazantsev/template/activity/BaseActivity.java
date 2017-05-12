@@ -182,6 +182,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         toolbarShadow.setLayoutParams(params);
         params = (LinearLayout.LayoutParams) container.getLayoutParams();
         params.topMargin = - elavation;
+        params.bottomMargin = - (elavation * 2);
         container.setLayoutParams(params);
     }
 

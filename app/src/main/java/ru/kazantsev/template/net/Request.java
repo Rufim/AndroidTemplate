@@ -30,6 +30,7 @@ public class Request implements Cloneable, Serializable {
     private boolean withParams = false;
     private String encoding = "UTF-8";
     private String content = "";
+    private boolean followRedirect = false;
     private String ref;
     private Map<String, String> headers = new HashMap<>();
     private Method method = Method.GET;
@@ -211,6 +212,14 @@ public class Request implements Cloneable, Serializable {
         return withParams;
     }
 
+    public boolean isFollowRedirect() {
+        return followRedirect;
+    }
+
+    public Request setFollowRedirect(boolean followRedirect) {
+        this.followRedirect = followRedirect;
+        return this;
+    }
 
     public boolean isArchiveResult() {
         return archiveResult;

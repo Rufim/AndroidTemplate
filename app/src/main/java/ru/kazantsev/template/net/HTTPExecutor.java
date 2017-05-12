@@ -5,8 +5,13 @@ import ru.kazantsev.template.util.SystemUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.logging.Handler;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -16,12 +21,19 @@ public class HTTPExecutor implements Callable<Response> {
 
     private static final String TAG = HTTPExecutor.class.getSimpleName();
 
-    protected final Request request;
+    protected Request request;
     protected Response response;
     protected int bufferSize = 1024 * 8;
 
+    public static final String COOKIE = "Cookie";
+    public static final String SET_COOKIE = "Set-Cookie";
+
     public HTTPExecutor(Request request) {
         this.request = request;
+    }
+
+    public HTTPExecutor(String url) throws MalformedURLException, UnsupportedEncodingException {
+        this.request = new Request(url);
     }
 
     protected void configConnection(HttpURLConnection connection) {
@@ -68,6 +80,25 @@ public class HTTPExecutor implements Callable<Response> {
                     osw.flush();
                     osw.close();
                 }
+
+                int status = connection.getResponseCode();
+                if(request.isFollowRedirect() && isStatusRedirect(status)) {
+                    // get redirect url from "location" header field
+                    String newUrl = connection.getHeaderField("Location");
+                    // get the cookie if need, for login
+                    String cookies = connection.getHeaderField(SET_COOKIE);
+                    request = new Request(newUrl);
+                    response = call();
+                    if(cookies != null) {
+                        Map<String, List<String>> redirectHeaders = response.getHeaders();
+                        if(redirectHeaders.containsKey(SET_COOKIE)) {
+                            redirectHeaders.get(SET_COOKIE).add(cookies);
+                        } else {
+                            redirectHeaders.put(SET_COOKIE, Arrays.asList(cookies));
+                        }
+                    }
+                    return response;
+                }
                 response.setCode(connection.getResponseCode());
                 response.setMessage(connection.getResponseMessage());
                 response.setHeaders(connection.getHeaderFields());
@@ -109,6 +140,12 @@ public class HTTPExecutor implements Callable<Response> {
         } while (request.canReconnect() && response == null);
         Log.i(TAG, "Request completed using url: " + request.getUrl() + (!request.isPutOrPost() ? " bytes received " + response.length() : ""));
         return response;
+    }
+
+    private boolean isStatusRedirect(int status) {
+        return status == HttpURLConnection.HTTP_MOVED_TEMP
+                || status == HttpURLConnection.HTTP_MOVED_PERM
+                || status == HttpURLConnection.HTTP_SEE_OTHER;
     }
 
     private String getEncodingFromResponse(HttpURLConnection connection) {

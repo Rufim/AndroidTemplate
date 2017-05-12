@@ -15,6 +15,7 @@ import butterknife.Unbinder;
 import org.greenrobot.eventbus.EventBus;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.activity.BaseActivity;
+import ru.kazantsev.template.activity.NavigationActivity;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
@@ -133,7 +134,11 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
 
     public void setSelectNavBar(@IdRes int selectNavBar) {
         if(selectNavBar > 0) {
-            getBaseActivity().getNavigationView().setCheckedItem(selectNavBar);
+            if(getBaseActivity() instanceof NavigationActivity) {
+                ((NavigationActivity) getBaseActivity()).selectItem(selectNavBar);
+            } else {
+                getBaseActivity().getNavigationView().setCheckedItem(selectNavBar);
+            }
         }
     }
     public void setTitleAndSelectNavBar(@StringRes int title, @IdRes int selectNavBar) {

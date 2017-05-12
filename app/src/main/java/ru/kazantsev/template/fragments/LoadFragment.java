@@ -180,11 +180,13 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     }
 
     public void error(BaseFragment fragment, @StringRes int id) {
-        (new FragmentBuilder(getFragmentManager()))
-                .putArg("message", getString(id))
-                .putArg("fragment_class", fragment.getClass())
-                .putArg("fragment_args", fragment.getArguments())
-                .replaceFragment(fragment, ErrorFragment.class);
+        if(fragment != null && fragment.isAdded()) {
+            (new FragmentBuilder(getFragmentManager()))
+                    .putArg("message", getString(id))
+                    .putArg("fragment_class", fragment.getClass())
+                    .putArg("fragment_args", fragment.getArguments())
+                    .replaceFragment(fragment, ErrorFragment.class);
+        }
     }
 
     private void cancelTask() {
