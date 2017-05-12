@@ -37,6 +37,8 @@ public interface Response {
 
     String getRawContent(String encoding) throws IOException;
 
+    String getRawContent() throws IOException;
+
     void setHeaders(Map<String, List<String>> headerFields);
 
     Map<String, List<String>> getHeaders();

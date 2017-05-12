@@ -1,5 +1,6 @@
 package ru.kazantsev.template.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -94,7 +95,7 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
         setRetainInstance(retainInstance);
     }
 
-
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_base, container, false);
@@ -150,6 +151,12 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
             } else {
                 setArguments(bundle);
             }
+        }
+    }
+
+    public void safeInvalidateOptionsMenu() {
+        if(isAdded()) {
+            getActivity().invalidateOptionsMenu();
         }
     }
 

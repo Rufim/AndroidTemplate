@@ -62,12 +62,9 @@ public class HTTPExecutor implements Callable<Response> {
                     throw new IOException("Error on prepare response");
                 }
                 if (request.isPutOrPost()) {
-                    String params = request.encodeParams();
-                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                    connection.setRequestProperty("Content-Length", String.valueOf(params.length()));
                     connection.setDoOutput(true);
                     osw = new OutputStreamWriter(connection.getOutputStream(), request.getEncoding());
-                    osw.write(params);
+                    osw.write(request.encodeParams());
                     osw.flush();
                     osw.close();
                 }

@@ -552,6 +552,16 @@ public class TextUtils {
             return parts;
         }
 
+        public static ArrayList<String> extractLines(String source, String encoding, boolean notInclude, @RegExp String startReg, @RegExp String endReg) {
+            try {
+                if (source != null)
+                    return extractLines(new ByteArrayInputStream(source.getBytes(encoding)), encoding, notInclude, startReg, endReg);
+            } catch (UnsupportedEncodingException e) {
+                Log.e(TAG, "Unknown exception", e);
+            }
+            return new ArrayList<>();
+        }
+
         public static ArrayList<String> extractLines(File source, String encoding, boolean notInclude, @RegExp String startReg, @RegExp String endReg) {
             try {
                 if (source != null)
@@ -563,8 +573,7 @@ public class TextUtils {
             return new ArrayList<>();
         }
 
-        public static ArrayList<String> extractLines(InputStream source, String encoding, boolean notInclude, @RegExp String startReg, @RegExp String endReg) {
-            ArrayList<String> parts = new ArrayList<>();
+        public static ArrayList<String> extractLines(InputStream source, String encoding, boolean notInclude, @RegExp String startReg, @RegExp String endReg) {ArrayList<String> parts = new ArrayList<>();
             try (final InputStream is = source;
                  final InputStreamReader isr = new InputStreamReader(is, encoding);
                  final BufferedReader reader = new BufferedReader(isr)) {

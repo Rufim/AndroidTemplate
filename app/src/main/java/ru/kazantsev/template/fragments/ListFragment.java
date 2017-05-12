@@ -204,7 +204,11 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     protected abstract ItemListAdapter<I> newAdapter();
 
-    protected DataSource<I> getDataSource() throws Exception {
+    protected  DataSource<I> newDataSource() throws Exception {
+        return getDataSource();
+    }
+
+    public DataSource<I> getDataSource() {
         return dataSource;
     }
 
@@ -220,9 +224,16 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     }
 
     public void refreshData(boolean showProgress) {
-        if (dataSource != null) {
-            clearData();
-            loadItems(showProgress);
+        try {
+            if(dataSource == null) {
+                dataSource = newDataSource();
+            }
+            if (dataSource != null) {
+                clearData();
+                loadItems(showProgress);
+            }
+        } catch (Exception e) {
+            onDataTaskException(e);
         }
     }
 
@@ -337,10 +348,9 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             adapter = newAdapter();
         }
         try {
-            setDataSource(getDataSource());
+            setDataSource(newDataSource());
         } catch (Exception e) {
-            Log.e(TAG, "Unknown exception", e);
-            ErrorFragment.show(ListFragment.this, R.string.error);
+            onDataTaskException(e);
         }
         layoutManager = new LinearLayoutManager(rootView.getContext());
         itemList.setLayoutManager(layoutManager);
@@ -396,7 +406,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     }
 
     protected void onDataTaskException(Exception ex) {
-        Log.e(TAG, "Cant get new Items: ", ex);
+        Log.e(TAG, "Cant get new Items", ex);
         ErrorFragment.show(ListFragment.this, R.string.error_network);
     }
 
@@ -446,7 +456,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
         @Override
         protected void onPostExecute(List<I> result) {
-            if (itemList != null) {
+            if (itemList != null && adapter != null) {
                 currentCount = adapter.getAbsoluteItemCount();
                 isLoading = false;
                 dataTask = null;

@@ -579,16 +579,20 @@ public class GuiUtils {
     }
 
     public static void toast(Context context, String message) {
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast(context, message, true);
+    }
+
+    public static void toast(Context context, String message, boolean shortDuration) {
+        Toast toast = Toast.makeText(context, message, shortDuration ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
 
-    public static void toast(Context context, int messageId) {
+    public static void toast(Context context, @StringRes int messageId) {
         toast(context, messageId, true);
     }
 
-    public static void toast(Context context, int messageId, boolean shortDuration) {
+    public static void toast(Context context, @StringRes int messageId, boolean shortDuration) {
         Toast toast = Toast.makeText(context, messageId, shortDuration ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();

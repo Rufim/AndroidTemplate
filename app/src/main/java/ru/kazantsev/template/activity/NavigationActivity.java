@@ -39,14 +39,12 @@ public abstract class NavigationActivity<T> extends BaseActivity {
             tabBar = GuiUtils.inflate(getContentLayout(), R.layout.tab_bar);
             getContentLayout().addView(tabBar);
         }
-        ViewGroup.LayoutParams params = getNavigationView().getLayoutParams();
         if(navigationInPercentWidth > 0) {
             Point size = GuiUtils.getScreenSize(this);
-            params.width = (int) ((size.x < size.y ? size.x : size.y) * navigationInPercentWidth);
+            setNavigationLayoutWidth((int) ((size.x < size.y ? size.x : size.y) * navigationInPercentWidth));
         } else if(navigationFixedDpWidth > 0) {
-            params.width = GuiUtils.dpToPx(navigationFixedDpWidth, this);
+            setNavigationLayoutWidth(GuiUtils.dpToPx(navigationFixedDpWidth, this));
         }
-        getNavigationView().setLayoutParams(params);
         getNavigationView().addView(GuiUtils.inflate(getNavigationView(), R.layout.navigation_menu));
         navigationHeader = (FrameLayout) getNavigationView().findViewById(R.id.navigation_menu_header);
         if (getNavigationHeaderId() > 0) {
@@ -97,9 +95,14 @@ public abstract class NavigationActivity<T> extends BaseActivity {
         });
     }
 
-    protected abstract
-    @LayoutRes
-    int getNavigationViewId();
+    public void setNavigationLayoutWidth(int size) {
+        ViewGroup.LayoutParams params = getNavigationView().getLayoutParams();
+        params.width = size;
+        getNavigationView().setLayoutParams(params);
+
+    }
+
+    protected abstract @LayoutRes int getNavigationViewId();
 
     protected List<T> getNavigationIds() {
         return new ArrayList<T>();
