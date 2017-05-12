@@ -181,6 +181,13 @@ public class TextUtils {
         return false;
     }
 
+    public static boolean equalsOneOf(String str, String... strs) {
+        for (String s : strs) {
+            if (s.equals(str)) return true;
+        }
+        return false;
+    }
+
     public static String eraseHost(String link) {
         return link.replaceAll("https?\\:\\/\\/([a-z0-9-.]*)\\.([a-z]{2,5})", "");
     }
