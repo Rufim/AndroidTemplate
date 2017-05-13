@@ -187,7 +187,7 @@ public class AndroidSystemUtils {
 
     public static void openFileInExtApp(Context context, File file) throws IOException {
         // Create URI
-        if(file != null) return;
+        if(file == null) return;
         Uri uri = Uri.fromFile(file);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
