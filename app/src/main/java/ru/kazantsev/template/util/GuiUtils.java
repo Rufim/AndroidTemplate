@@ -26,7 +26,6 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.*;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -605,12 +604,16 @@ public class GuiUtils {
     }
 
     public static void showSnackbar(View viewContainer, CharSequence message, int textColor, int backgroundColor) {
+        makeCustomSnackbar(viewContainer, message, textColor, backgroundColor).show();
+    }
+
+    public static Snackbar makeCustomSnackbar(View viewContainer, CharSequence message, int textColor, int backgroundColor) {
         Snackbar snackbar = Snackbar.make(viewContainer, message, Snackbar.LENGTH_LONG);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         TextView tv = (TextView) Stream.of(GuiUtils.getAllChildren(snackbarLayout)).filter(v -> v instanceof TextView).findFirst().get();
         tv.setTextColor(textColor);
         snackbarLayout.setBackgroundColor(backgroundColor);
-        snackbar.show();
+        return snackbar;
     }
 
     public static void showSnackbar(View viewContainer, @StringRes int message, int textColor, int backgroundColor) {
@@ -627,6 +630,14 @@ public class GuiUtils {
             defaultBackgroundResource = android.R.attr.colorPrimary;
         }
         showSnackbar(viewContainer, message, GuiUtils.getThemeColor(viewContainer.getContext(), textColor), GuiUtils.getThemeColor(viewContainer.getContext(), defaultBackgroundResource));
+    }
+
+    public static Snackbar makeThemeSnackbar(View viewContainer, CharSequence message) {
+        int defaultBackgroundResource = android.R.attr.windowBackground;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            defaultBackgroundResource = android.R.attr.colorPrimary;
+        }
+        return makeCustomSnackbar(viewContainer, message, GuiUtils.getThemeColor(viewContainer.getContext(), textColor), GuiUtils.getThemeColor(viewContainer.getContext(), defaultBackgroundResource));
     }
 
     public static String getText(TextView textView) throws EmptyTextException {

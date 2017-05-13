@@ -6,7 +6,6 @@ import org.greenrobot.eventbus.EventBus;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.kazantsev.template.domain.entity.json.JsonError;
 import ru.kazantsev.template.domain.event.NetworkEvent;
 
 import java.io.IOException;
@@ -25,15 +24,7 @@ public class DefaultCallback<T> implements Callback<T> {
             if (onSuccess != null) onSuccess.response(response, this);
             else postResponseEvent(response, response.raw().request());
         } else if (response.errorBody() != null) {
-            try {
-                JsonError error = new Gson().fromJson(response.errorBody().string(), JsonError.class);
-                if (error.getRequesterInformation() != null) {
-                    error.setAction(error.getRequesterInformation().getReceivedParams().get("action"));
-                }
-                postErrorEvent(error, response.raw().request());
-            } catch (IOException e) {
-                Cat.e(e, "Cant read error");
-            }
+            postErrorEvent(response, response.raw().request());
         } else if (response.code() == HttpURLConnection.HTTP_FORBIDDEN) {
             Cat.e("Forbidden!");
             postErrorEvent(response, response.raw().request());

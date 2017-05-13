@@ -1,11 +1,13 @@
 package ru.kazantsev.template.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
@@ -16,9 +18,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -29,13 +31,11 @@ import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
 import ru.kazantsev.template.fragments.ListFragment;
-import ru.kazantsev.template.util.AndroidSystemUtils;
-import ru.kazantsev.template.util.FragmentBuilder;
-import ru.kazantsev.template.util.GuiUtils;
-import ru.kazantsev.template.util.TextUtils;
+import ru.kazantsev.template.util.*;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import java.util.ArrayList;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Created by 0shad on 11.07.2015.
@@ -60,10 +60,16 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected boolean clearBackStack = true;
 
     ArrayList<BundleCache> fragmentBundleCache = new ArrayList<>();
+    HashMap<String, List<PermissionAction>> waitingPermissionActions = new HashMap<>();
 
     public interface BackCallback {
         boolean allowBackPress();
     }
+
+    public interface PermissionAction {
+        void doAction(boolean permissionGained);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -244,6 +250,60 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        try {
+            List<String> unhandledPermissions = PermissionUtils.getUnhandledPermissions(requestCode, permissions, grantResults);
+            if(unhandledPermissions.size() > 0) {
+                for (String unhandledPermission : unhandledPermissions) {
+                    onDenyPermission(unhandledPermission);
+                }
+            }
+            for (String permission : permissions) {
+                if(!unhandledPermissions.contains(permission)) {
+                    onGainPermission(permission);
+                }
+            }
+        } catch (Exception e) {
+            Log.w(BaseActivity.class.getSimpleName(), e.getMessage());
+        }
+    }
+
+    public void doActionWithPermission(PermissionAction permissionAction, String permission) {
+        if (PermissionUtils.hasPermissions(this, permission)) {
+            permissionAction.doAction(true);
+        } else {
+            PermissionUtils.requestPermissions(this, permission);
+        }
+    }
+
+    private void addWaitingPermissionAction(String permission, PermissionAction action) {
+          if(waitingPermissionActions.containsKey(permission)) {
+              waitingPermissionActions.get(permission).add(action);
+          } else {
+              ArrayList<PermissionAction> actions = new ArrayList<>();
+              actions.add(action);
+              waitingPermissionActions.put(permission, actions);
+          }
+    }
+
+    public void onGainPermission(String gainedPermission) {
+        Iterator<PermissionAction> it = waitingPermissionActions.get(gainedPermission).iterator();
+        while (it.hasNext()) {
+            it.next().doAction(true);
+            it.remove();
+        }
+    }
+
+    public void onDenyPermission(String deniedPermission) {
+        Iterator<PermissionAction> it = waitingPermissionActions.get(deniedPermission).iterator();
+        while (it.hasNext()) {
+            it.next().doAction(false);
+            it.remove();
+        }
     }
 
     protected boolean isHomeBack() {

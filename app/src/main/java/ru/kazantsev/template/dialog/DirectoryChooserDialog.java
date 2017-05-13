@@ -30,9 +30,6 @@ import java.util.Comparator;
  * Time: 9:44
  * To change this template use File | Settings | File Templates.
  */
-
-//must be moved to Fragment or Base Dialog
-@Deprecated
 public class DirectoryChooserDialog extends AlertDialog {
 
     private static final String TAG = DirectoryChooserDialog.class.getSimpleName();
@@ -316,7 +313,7 @@ public class DirectoryChooserDialog extends AlertDialog {
                             if (fileTypes.length == 0) {
                                 return isNotHidden;
                             }
-                            int index = filename.lastIndexOf("build/intermediates/exploded-aar/io.fabric.sdk.android/fabric/1.3.10/res");
+                            int index = filename.lastIndexOf(".");
                             if (index != -1) {
                                 return isNotHidden && Arrays.asList(fileTypes).contains(filename.substring(index + 1));
                             }
@@ -335,13 +332,13 @@ public class DirectoryChooserDialog extends AlertDialog {
                 public int compare(String lf, String rf) {
                     lf = lf.toLowerCase();
                     rf = rf.toLowerCase();
-                    if (lf.contains("build/intermediates/exploded-aar/io.fabric.sdk.android/fabric/1.3.10/res")) {
-                        if (rf.contains("build/intermediates/exploded-aar/io.fabric.sdk.android/fabric/1.3.10/res")) {
+                    if (lf.contains(".")) {
+                        if (rf.contains(".")) {
                             return lf.compareTo(rf);
                         } else {
                             return -1;
                         }
-                    } else if (rf.contains("build/intermediates/exploded-aar/io.fabric.sdk.android/fabric/1.3.10/res")) {
+                    } else if (rf.contains(".")) {
                         return 1;
                     }
                     return lf.compareTo(rf);

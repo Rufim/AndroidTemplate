@@ -1,11 +1,13 @@
 package ru.kazantsev.template.util;
 
+import android.annotation.SuppressLint;
 import android.text.TextPaint;
 import android.text.style.URLSpan;
 
 /**
  * Created by 0shad on 31.10.2015.
  */
+@SuppressLint("ParcelCreator")
 public class URLSpanNoUnderline extends URLSpan {
 
     public URLSpanNoUnderline(String url) {

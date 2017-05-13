@@ -1,5 +1,6 @@
 package ru.kazantsev.template.util;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.StringRes;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
@@ -309,4 +311,10 @@ public class AndroidSystemUtils {
         return deviceId;
     }
 
+
+    public static void openApplicationSettings(Activity context, int requestCode) {
+        Intent appSettingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:" + context.getPackageName()));
+        context.startActivityForResult(appSettingsIntent, requestCode);
+    }
 }
