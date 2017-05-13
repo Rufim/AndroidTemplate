@@ -18,7 +18,7 @@
             android:layout_height="match_parent">
 
         <!-- The main content view -->
-        <LinearLayout
+        <RelativeLayout
                 android:id="@+id/content_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -28,17 +28,17 @@
             <View android:layout_width="match_parent"
                   android:layout_height="4dp"
                   android:id="@+id/toolbar_shadow"
+                  android:layout_alignParentTop="true"
                   android:background="@drawable/shadow"/>
 
             <!-- Real content goes here -->
             <FrameLayout
                     android:id="@+id/container"
-                    android:layout_marginTop="-4dp"
+                    android:layout_below="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
+                    android:layout_height="match_parent"/>
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <android.support.design.widget.NavigationView
                 android:id="@+id/navigation_drawer"

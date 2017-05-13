@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import ru.kazantsev.template.R;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 public abstract class BaseActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
     protected LinearLayout rootLayout;
-    protected LinearLayout contentLayout;
+    protected RelativeLayout contentLayout;
 
     protected FrameLayout container;
     protected DrawerLayout drawerLayout;
@@ -188,12 +189,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void setToolbarElevation(int elavation) {
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) toolbarShadow.getLayoutParams();
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) toolbarShadow.getLayoutParams();
         params.height = elavation;
         toolbarShadow.setLayoutParams(params);
-        params = (LinearLayout.LayoutParams) container.getLayoutParams();
-        params.topMargin = - elavation;
-        container.setLayoutParams(params);
     }
 
     protected void onBackPressedOriginal() {
@@ -297,7 +295,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return rootLayout;
     }
 
-    public LinearLayout getContentLayout() {
+    public RelativeLayout getContentLayout() {
         return contentLayout;
     }
 
