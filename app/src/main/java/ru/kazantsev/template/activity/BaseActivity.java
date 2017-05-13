@@ -198,6 +198,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) toolbarShadow.getLayoutParams();
         params.height = elavation;
         toolbarShadow.setLayoutParams(params);
+        toolbarShadow.bringToFront();
     }
 
     protected void onBackPressedOriginal() {
@@ -272,11 +273,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         }
     }
 
-    public void doActionWithPermission(PermissionAction permissionAction, String permission) {
+    public void doActionWithPermission(String permission, PermissionAction permissionAction) {
         if (PermissionUtils.hasPermissions(this, permission)) {
             permissionAction.doAction(true);
         } else {
             PermissionUtils.requestPermissions(this, permission);
+            addWaitingPermissionAction(permission, permissionAction);
         }
     }
 
