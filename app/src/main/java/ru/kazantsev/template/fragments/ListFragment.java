@@ -58,6 +58,18 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected boolean enableScrollbar = false;
 
 
+    public boolean isEnableFiltering() {
+        return enableFiltering;
+    }
+
+    public boolean isEnableSearch() {
+        return enableSearch;
+    }
+
+    public boolean isEnableScrollbar() {
+        return enableScrollbar;
+    }
+
     public ListFragment() {
     }
 

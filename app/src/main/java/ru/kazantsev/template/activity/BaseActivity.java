@@ -27,6 +27,7 @@ import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
+import ru.kazantsev.template.fragments.ListFragment;
 import ru.kazantsev.template.util.AndroidSystemUtils;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
@@ -151,6 +152,16 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     @Override
     protected void onNewIntent(Intent intent) {
+        // fix for earlier android  versions that send intent even if onQueryTextSubmit returns true
+        if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            Fragment fragment = getCurrentFragment();
+          if(getCurrentFragment() instanceof ListFragment) {
+              ListFragment list= (ListFragment) fragment;
+              if(list.isEnableFiltering()) {
+                  return;
+              }
+          }
+        }
         handleIntent(intent);
     }
 

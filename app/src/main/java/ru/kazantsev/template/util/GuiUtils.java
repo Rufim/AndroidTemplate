@@ -1,5 +1,6 @@
 package ru.kazantsev.template.util;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -576,6 +577,11 @@ public class GuiUtils {
         view.setAnimation(animation);
         animation.start();
         ((View) view.getParent()).invalidate();
+    }
+
+    public static void slide(View target, int px, boolean vertical) {
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(target, "Translation" + (vertical ? "Y" : "X"), px);
+        objectAnimator.start();
     }
 
     public static void toast(Context context, String message) {

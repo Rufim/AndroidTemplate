@@ -12,35 +12,41 @@ public class PicassoTransformImage implements Transformation {
     final int width;
     final int height;
     final int maxWidth;
-    final float density;
+    final String tag;
 
 
-    public PicassoTransformImage(int width, int height, int maxWidth, float density) {
+    public PicassoTransformImage(int width, int height, int maxWidth, String tag) {
         this.width = width;
         this.height = height;
         this.maxWidth = maxWidth;
-        this.density = density;
+        this.tag = tag;
     }
+
+
 
     @Override
     public Bitmap transform(Bitmap bitmap) {
         int bitmapWidth = bitmap.getWidth();
         int bitmapHeight = bitmap.getHeight();
-        float scale = 1;
+        float scaleX = 1;
+        float scaleY = 1;
         if (width < 0 && height > 0) {
-            scale = ((float) height / bitmapHeight);
+            scaleX = scaleY = ((float) height / bitmapHeight);
         }
         if (width > 0 && height < 0) {
-            scale = ((float) width / bitmapWidth);
+            scaleX = scaleY = ((float) width / bitmapWidth);
         }
-        scale *= density;
-        if (scale * bitmapWidth > maxWidth) {
-            scale = ((float) maxWidth / bitmapWidth);
+        if(width > 0 && height > 0) {
+            scaleY = ((float) height / bitmapHeight);
+            scaleX = ((float) width / bitmapWidth);
+        }
+        if (scaleX * bitmapWidth > maxWidth) {
+            scaleX = scaleY = ((float) maxWidth / bitmapWidth);
         }
         Bitmap scaledBitmap;
-        if (scale != 1) {
+        if (scaleX != 1 || scaleY != 1) {
             Matrix matrix = new Matrix();
-            matrix.postScale(scale, scale);
+            matrix.postScale(scaleX, scaleY);
             // Create a new bitmap and convert it to a format understood by the ImageView
             scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true);
             if (scaledBitmap != bitmap) {
@@ -55,7 +61,7 @@ public class PicassoTransformImage implements Transformation {
 
     @Override
     public String key() {
-        return "transformation_" + "Width:" + Math.min(width * density, maxWidth) + "Height:" + height;
+        return tag == null ? "" : tag + "transformation_" + "Width:" + Math.min(width, maxWidth) + "Height:" + height;
     }
 
 }
