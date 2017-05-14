@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".MainActivity">
-        <android.support.v7.widget.RecyclerView
+        <ru.kazantsev.template.view.AdvancedRecyclerView
                 android:id="@+id/items"
                 android:layout_alignParentTop="true"
                 android:layout_width="match_parent"
@@ -31,7 +31,7 @@
 
     <include layout="@layout/progressbar"/>
 
-    <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
+    <ru.kazantsev.template.view.scroller.FastScroller
             android:id="@+id/fast_scroller"
             android:layout_width="16dp"
             android:layout_height="match_parent"

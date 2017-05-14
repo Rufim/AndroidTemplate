@@ -31,6 +31,7 @@ public class OnSwipeTouchListener implements OnTouchListener {
 
         @Override
         public boolean onDown(MotionEvent e) {
+            onClick();
             return true;
         }
 
@@ -74,5 +75,9 @@ public class OnSwipeTouchListener implements OnTouchListener {
     }
 
     public void onSwipeBottom() {
+    }
+
+    public void onClick() {
+
     }
 }

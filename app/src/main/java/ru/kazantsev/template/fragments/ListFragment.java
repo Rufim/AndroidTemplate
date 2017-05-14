@@ -19,6 +19,8 @@ import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.adapter.MultiItemListAdapter;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
+import ru.kazantsev.template.view.AdvancedRecyclerView;
+import ru.kazantsev.template.view.scroller.FastScroller;
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 
@@ -34,13 +36,13 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected ProgressBar progressBar;
     protected TextView progressBarText;
     protected ProgressBar loadMoreBar;
-    protected RecyclerView itemList;
+    protected AdvancedRecyclerView itemList;
     protected SwipeRefreshLayout swipeRefresh;
 
     protected SearchView searchView;
     protected ItemListAdapter<I> adapter;
     protected LinearLayoutManager layoutManager;
-    protected VerticalRecyclerViewFastScroller scroller;
+    protected FastScroller scroller;
     protected DataSource<I> savedDataSource;
     protected DataSource<I> dataSource;
 
@@ -251,55 +253,20 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
 
     public int findFirstVisibleItemPosition(boolean completelyVisible) {
-        final View child = findOneVisibleChild(0, layoutManager.getChildCount(), completelyVisible, !completelyVisible);
-        return child == null ? RecyclerView.NO_POSITION : itemList.getChildAdapterPosition(child);
+        return itemList.findFirstVisibleItemPosition(completelyVisible);
     }
 
     public int findLastVisibleItemPosition(boolean completelyVisible) {
-        final View child = findOneVisibleChild(layoutManager.getChildCount() - 1, -1, completelyVisible, !completelyVisible);
-        return child == null ? RecyclerView.NO_POSITION : itemList.getChildAdapterPosition(child);
+        return itemList.findLastVisibleItemPosition(completelyVisible);
     }
 
     protected View findOneVisibleChild(int fromIndex, int toIndex, boolean completelyVisible,
                                        boolean acceptPartiallyVisible) {
-        OrientationHelper helper;
-        if (layoutManager.canScrollVertically()) {
-            helper = OrientationHelper.createVerticalHelper(layoutManager);
-        } else {
-            helper = OrientationHelper.createHorizontalHelper(layoutManager);
-        }
-
-        final int start = helper.getStartAfterPadding();
-        final int end = helper.getEndAfterPadding();
-        final int next = toIndex > fromIndex ? 1 : -1;
-        View partiallyVisible = null;
-        for (int i = fromIndex; i != toIndex; i += next) {
-            final View child = layoutManager.getChildAt(i);
-            final int childStart = helper.getDecoratedStart(child);
-            final int childEnd = helper.getDecoratedEnd(child);
-            if (childStart < end && childEnd > start) {
-                if (completelyVisible) {
-                    if (childStart >= start && childEnd <= end) {
-                        return child;
-                    } else if (acceptPartiallyVisible && partiallyVisible == null) {
-                        partiallyVisible = child;
-                    }
-                } else {
-                    return child;
-                }
-            }
-        }
-        return partiallyVisible;
+        return itemList.findOneVisibleChild(fromIndex, toIndex, completelyVisible, acceptPartiallyVisible);
     }
 
     private boolean isItemVisible(int index) {
-        index += ((MultiItemListAdapter) adapter).getFirstIsHeader();
-        int first = findFirstVisibleItemPosition(true);
-        int last = findLastVisibleItemPosition(true);
-        if (first > index || index > last) {
-            return false;
-        }
-        return true;
+        return itemList.isItemVisible(index);
     }
 
     public void scrollToIndex(int index) {
@@ -318,26 +285,6 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             loadItems(index + pageSize, true, moveToIndex, index, textOffset);
         }
     }
-
-    public void smoothScrollToIndex(int position, int offset) {
-        LinearSmoothScroller linearSmoothScroller = new LinearSmoothScroller(itemList.getContext()) {
-
-            @Override
-            public PointF computeScrollVectorForPosition(int targetPosition) {
-                PointF calculate = layoutManager.computeScrollVectorForPosition(targetPosition);
-                calculate.y += offset;
-                return calculate;
-            }
-
-            @Override
-            protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
-                return 25f / TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, displayMetrics.densityDpi, displayMetrics);
-            }
-        };
-        linearSmoothScroller.setTargetPosition(position);
-        layoutManager.startSmoothScroll(linearSmoothScroller);
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -384,7 +331,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             }
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && enableScrollbar) {
-            scroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fast_scroller);
+            scroller = (FastScroller) rootView.findViewById(R.id.fast_scroller);
             scroller.setRecyclerView(itemList);
             GuiUtils.fadeOut(scroller, 0, 100);
             itemList.addOnScrollListener(scroller.getOnScrollListener());
