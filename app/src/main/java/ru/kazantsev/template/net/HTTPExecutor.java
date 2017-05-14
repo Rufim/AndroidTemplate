@@ -6,12 +6,10 @@ import ru.kazantsev.template.util.SystemUtils;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.logging.Handler;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -49,7 +47,9 @@ public class HTTPExecutor implements Callable<Response> {
     public Response call() throws IOException {
         HttpURLConnection connection = null;
         response = null;
+        IOException exception;
         do {
+            exception = null;
             try {
                 connection = (HttpURLConnection) request.getUrl().openConnection();
                 connection.setRequestMethod(request.getMethod().name());
@@ -71,6 +71,7 @@ public class HTTPExecutor implements Callable<Response> {
             try {
                 response = prepareResponse();
                 if (response == null) {
+                    request.setReconnectCount(0);
                     throw new IOException("Error on prepare response");
                 }
                 if (request.isPutOrPost()) {
@@ -127,8 +128,11 @@ public class HTTPExecutor implements Callable<Response> {
                     SystemUtils.readStream(is, response.getOutputStream(), buffer);
                 }
                 response.setDownloadOver(true);
-            } catch (Exception ex) {
+                break;
+            } catch (IOException ex) {
+                exception = ex;
                 Log.e(TAG, "Error on download html using url " + request.getUrl(), ex);
+                SystemUtils.sleepQuietly(300);
                 continue;
             } finally {
                 if (osw != null) osw.close();
@@ -137,7 +141,11 @@ public class HTTPExecutor implements Callable<Response> {
                 if (is != null) is.close();
                 if (connection != null) connection.disconnect();
             }
-        } while (request.canReconnect() && response == null);
+        } while (request.canReconnect());
+        if(response == null) {
+            exception = new IOException("Cant obtain response");
+        }
+        if(exception != null) return new ExceptionResponse(exception);
         Log.i(TAG, "Request completed using url: " + request.getUrl() + (!request.isPutOrPost() ? " bytes received " + response.length() : ""));
         return response;
     }
@@ -175,14 +183,26 @@ public class HTTPExecutor implements Callable<Response> {
 
     public Response execute(long minBytes) throws IOException, ExecutionException, InterruptedException {
         Future future = executeAsync();
-        while (getResponse() == null || getResponse().length() < minBytes) {
-            try {
-                return (Response) future.get(100, TimeUnit.MILLISECONDS);
-            } catch (TimeoutException e) {
-                //ignore and try again
+        if(getResponse() == null || (getResponse().length() < minBytes && !getResponse().isDownloadOver())) {
+            while (getResponse() == null || getResponse().length() < minBytes){
+                try {
+                    future.get(300, TimeUnit.MILLISECONDS);
+                    break;
+                } catch (TimeoutException e) {
+                    //ignore and try again
+                }
             }
+            if (getResponse() instanceof ExceptionResponse) {
+                throw ((ExceptionResponse) response).getException();
+            }
+            if (getResponse() == null) {
+                throw new IOException("Cannot obtain response");
+            } else {
+                return response;
+            }
+        } else {
+            return getResponse();
         }
-        return getResponse();
     }
 
     public Response execute() throws IOException, ExecutionException, InterruptedException {
