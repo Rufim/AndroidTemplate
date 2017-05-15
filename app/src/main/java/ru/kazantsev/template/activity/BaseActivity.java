@@ -198,7 +198,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) toolbarShadow.getLayoutParams();
         params.height = elavation;
         toolbarShadow.setLayoutParams(params);
-        toolbarShadow.bringToFront();
     }
 
     protected void onBackPressedOriginal() {

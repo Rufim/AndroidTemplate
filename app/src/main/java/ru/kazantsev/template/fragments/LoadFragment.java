@@ -176,7 +176,9 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
     }
 
     public void execute(BaseFragment baseFragment) {
-        new FragmentBuilder(baseFragment.getFragmentManager()).replaceFragment(baseFragment, this);
+        if(baseFragment != null && baseFragment.isAdded()) {
+            new FragmentBuilder(baseFragment.getFragmentManager()).replaceFragment(baseFragment, this);
+        }
     }
 
     public void error(BaseFragment fragment, @StringRes int id) {

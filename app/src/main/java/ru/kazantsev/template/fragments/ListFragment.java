@@ -21,7 +21,6 @@ import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.view.AdvancedRecyclerView;
 import ru.kazantsev.template.view.scroller.FastScroller;
-import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 
 import java.util.List;
