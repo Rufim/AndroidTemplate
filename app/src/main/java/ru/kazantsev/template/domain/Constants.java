@@ -18,6 +18,7 @@ public class Constants {
         public static final String FRAGMENT_CACHE = "fragment_cache";
         public static final String FRAGMENT_CLASS = "fragment_class";
         public static final String FRAGMENT_ARGS = "fragment_args";
+        public static final String FRAGMENT_EXCEPTION = "fragment_exception";
         public static final String MESSAGE = "message";
         public static final String RESOURCE_ID = "resource_id";
         public static final String CONFIG_CHANGE = "config_change";

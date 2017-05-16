@@ -5,6 +5,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ public class ErrorFragment extends BaseFragment {
     SwipeRefreshLayout swipeRefresh;
     Class<BaseFragment> fragmentClass;
     Bundle fragmentArgs;
+    Exception exception;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class ErrorFragment extends BaseFragment {
         fragmentArgs = getArguments().getParcelable(Constants.ArgsName.FRAGMENT_ARGS);
         int icon_id = getArguments().getInt(Constants.ArgsName.RESOURCE_ID, R.drawable.ic_action_report_problem);
         errorImage.setImageResource(icon_id);
+        exception = (Exception) getArguments().getSerializable(Constants.ArgsName.FRAGMENT_EXCEPTION);
         swipeRefresh.setOnRefreshListener(() -> {
             getFragmentManager().executePendingTransactions();
             new FragmentBuilder(getFragmentManager())
@@ -45,10 +48,11 @@ public class ErrorFragment extends BaseFragment {
                     .replaceFragment(getId(), fragmentClass);
         });
         String message = getArguments().getString(Constants.ArgsName.MESSAGE);
-        if(message == null) {
+        if (message == null) {
             message = getString(R.string.error);
         }
         errorMessage.setText(message);
+        Log.e(fragmentClass.getSimpleName(), message, exception);
         return rootView;
     }
 
@@ -60,33 +64,36 @@ public class ErrorFragment extends BaseFragment {
         return super.allowBackPress();
     }
 
-    public static void show(BaseFragment fragment, @StringRes int message, @DrawableRes int icon_id) {
+    public static void show(BaseFragment fragment, @StringRes Integer message,  @DrawableRes Integer iconId, Exception exception) {
         if (fragment != null && fragment.isAdded()) {
-            new FragmentBuilder(fragment.getFragmentManager())
-                    .putArg(Constants.ArgsName.MESSAGE, fragment.getString(message))
+            FragmentBuilder builder = new FragmentBuilder(fragment.getFragmentManager())
                     .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
-                    .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
-                    .putArg(Constants.ArgsName.RESOURCE_ID, icon_id)
-                    .replaceFragment(fragment, ErrorFragment.class);
+                    .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments());
+            if (message != null) builder.putArg(Constants.ArgsName.MESSAGE, fragment.getString(message));
+            if (exception != null) builder.putArg(Constants.ArgsName.FRAGMENT_EXCEPTION, exception);
+            if (iconId != null) builder.putArg(Constants.ArgsName.RESOURCE_ID, iconId);
+            builder.replaceFragment(fragment, ErrorFragment.class);
         }
+    }
+
+
+    public static void show(BaseFragment fragment, @StringRes int message, @DrawableRes int iconId) {
+        show(fragment, message, iconId, null);
     }
 
     public static void show(BaseFragment fragment, @StringRes int message) {
-        if(fragment != null && fragment.isAdded()) {
-            new FragmentBuilder(fragment.getFragmentManager())
-                    .putArg(Constants.ArgsName.MESSAGE, fragment.getString(message))
-                    .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
-                    .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
-                    .replaceFragment(fragment, ErrorFragment.class);
-        }
+        show(fragment, message, (Integer)null, null);
     }
 
     public static void show(BaseFragment fragment) {
-        if (fragment != null && fragment.isAdded()) {
-            new FragmentBuilder(fragment.getFragmentManager())
-                    .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
-                    .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments())
-                    .replaceFragment(fragment, ErrorFragment.class);
-        }
+        show(fragment, (Integer)null, (Integer)null, null);
+    }
+
+    public static void show(BaseFragment fragment, @StringRes int message, Exception exception) {
+        show(fragment, message, (Integer)null, exception);
+    }
+
+    public static void show(BaseFragment fragment, Exception exception) {
+        show(fragment, (Integer)null, (Integer) null, exception);
     }
 }
