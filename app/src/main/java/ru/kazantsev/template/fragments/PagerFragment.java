@@ -166,7 +166,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
 
     protected void onDataTaskException(Exception ex) {
         Log.e(TAG, "Cant get new Items: ", ex);
-        ErrorFragment.show(PagerFragment.this, R.string.error_network);
+        ErrorFragment.show(PagerFragment.this, R.string.error);
     }
 
     public class PagerDataTask extends AsyncTask<Void, Void, List<I>> {
