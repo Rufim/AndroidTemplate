@@ -277,6 +277,7 @@ public class TextUtils {
     }
 
     public static String getShortFormattedDate(Date date, Locale locale) {
+        if(date == null) return "";
         Calendar calendarToday = Calendar.getInstance();
         Calendar calendarDate = Calendar.getInstance();
         calendarDate.setTime(date);
