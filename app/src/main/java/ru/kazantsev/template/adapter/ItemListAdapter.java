@@ -332,6 +332,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         private static final String TAG = ViewHolder.class.getSimpleName();
 
         protected HashMap<Integer, View> views;
+        protected Object tag;
 
         /**
          * Constructor
@@ -355,6 +356,14 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         public abstract List<View> getViews(View itemView);
 
         public void onCreateHolder(View itemView) {
+        }
+
+        public Object getTag() {
+            return tag;
+        }
+
+        public void setTag(Object tag) {
+            this.tag = tag;
         }
 
         protected <C extends View.OnClickListener & View.OnLongClickListener> ViewHolder bindViews(C clickable, boolean bindClicks) {
