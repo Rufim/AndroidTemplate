@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
@@ -157,6 +158,33 @@ public class AndroidSystemUtils {
         }
         return prefMap;
     }
+
+    public static <T> T getPreference(SharedPreferences preferences, String key, T defValue) {
+        T value = (T) preferences.getAll().get(key);
+        if (value == null) {
+            return defValue;
+        }
+        return value;
+    }
+
+    public static <T> T getPreference(SharedPreferences preferences, String key) {
+        return getPreference(preferences, key, null);
+    }
+
+    public static <T> T getStringResPreference(Context context, @StringRes int idResString) {
+        return getStringResPreference(context, idResString, null);
+    }
+
+    public static <T> T getStringResPreference(Context context, @StringRes int idResString, T defValue) {
+        SharedPreferences preferences = getDefaultPreference(context);
+        String key = context.getString(idResString);
+        T value = (T) preferences.getAll().get(key);
+        if(value == null) {
+            return defValue;
+        }
+        return value;
+    }
+
 
     public static String getInternalMemory(Context context) {
         File path = Environment.getDataDirectory();

@@ -24,61 +24,6 @@ public class FragmentBuilder {
 
     private static final int VIEW_ID_TAG = 101;
 
-    public enum ClassType {
-
-        ARRAYLIST(ArrayList.class),
-        STRING(String.class),
-        ARRAY(Object[].class),
-        CHAR(Character.class),
-        BYTE(Byte.class),
-        BOOLEAN(Boolean.class),
-        SHORT(Short.class),
-        INTEGER(Integer.class),
-        LONG(Long.class),
-        FLOAT(Float.class),
-        DOUBLE(Double.class),
-        BUNDLE(Bundle.class),
-        CHARSEQUENCE(CharSequence.class),
-        PARCELABLE(Parcelable.class),
-        SERIALIZABLE(Serializable.class),
-        ENUM(Enum.class),
-        UNSUPPORTED(Void.class);
-
-        private Class<?> clazz;
-        private Class<?> primitive;
-
-        private ClassType(Class<?> Clazz) {
-            this.clazz = Clazz;
-            if (Primitives.isWrapperType(Clazz)) {
-                this.primitive = Primitives.unwrap(Clazz);
-            }
-        }
-
-        public static ClassType cast(Class<?> cl) {
-            if (null == cl) cl = Void.class;
-            for (ClassType type : values()) {
-                if (Primitives.isPrimitive(cl) && type.primitive == cl) {
-                    return type;
-                } else if (type.clazz.isAssignableFrom(cl)) {
-                    return type;
-                } else {
-                    for (Class<?> intClass : cl.getInterfaces()) {
-                        if (type.clazz.isAssignableFrom(intClass)) {
-                            return type;
-                        }
-                    }
-                }
-            }
-            return UNSUPPORTED;
-        }
-
-        public static ClassType cast(Object obj) {
-            if (null == obj) return cast(Void.class);
-            return cast(obj.getClass());
-        }
-
-    }
-
 
     private FragmentManager manager;
     private Bundle bundle = new Bundle();

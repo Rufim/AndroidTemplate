@@ -78,8 +78,8 @@ public class AdvancedRecyclerView extends RecyclerView {
         if(getAdapter() instanceof MultiItemListAdapter) {
             index += ((MultiItemListAdapter) getAdapter()).getFirstIsHeader();
         }
-        int first = findFirstVisibleItemPosition(true);
-        int last = findLastVisibleItemPosition(true);
+        int first = findFirstVisibleItemPosition(false);
+        int last = findLastVisibleItemPosition(false);
         if (first > index || index > last) {
             return false;
         }
