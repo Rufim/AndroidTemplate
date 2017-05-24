@@ -54,7 +54,7 @@ public class DirectoryChooserDialog extends AlertDialog {
         void onDirectoryChanged(File chosenFile);
     }
 
-    public void setFileTypes(String[] fileTypes) {
+    public void setFileTypes(String... fileTypes) {
         this.fileTypes = fileTypes;
     }
 
