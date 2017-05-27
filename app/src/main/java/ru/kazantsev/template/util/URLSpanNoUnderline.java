@@ -19,4 +19,5 @@ public class URLSpanNoUnderline extends URLSpan {
         super.updateDrawState(ds);
         ds.setUnderlineText(false);
     }
+
 }

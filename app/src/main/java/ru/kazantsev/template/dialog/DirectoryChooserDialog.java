@@ -45,6 +45,8 @@ public class DirectoryChooserDialog extends AlertDialog {
     private LinearLayout contentView;
     private ArrayList<File> createdNewDirectories = new ArrayList<File>();
     private boolean allowRootDir = false;
+    private boolean chooseFile;
+    private String createTitle;
 
     public interface OnChooseFileListener {
         void onChosenFile(File chosenFile);
@@ -76,17 +78,32 @@ public class DirectoryChooserDialog extends AlertDialog {
         setSourceDirectory(sourceDirectory);
     }
 
+    public DirectoryChooserDialog(Context context, boolean chooseFile,  String sourceDirectory, boolean withPathTextView) {
+        this(context, chooseFile, withPathTextView);
+        setSourceDirectory(sourceDirectory);
+    }
+
     public DirectoryChooserDialog(final Context context, boolean withPathTextView) {
+        this(context, false, withPathTextView);
+    }
+
+    public DirectoryChooserDialog(final Context context, boolean chooseFile, boolean withPathTextView) {
         super(context);
-        setTitle("Выберите папку");
-        setButton(AlertDialog.BUTTON_POSITIVE, context.getResources().getString(android.R.string.ok), new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (onChooseFileListener != null) {
-                    onChooseFileListener.onChosenFile(currentDir);
+        this.chooseFile = chooseFile;
+        if(!chooseFile) {
+            setTitle("Выберите папку");
+            setButton(AlertDialog.BUTTON_POSITIVE, context.getResources().getString(android.R.string.ok), new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if (onChooseFileListener != null) {
+                        onChooseFileListener.onChosenFile(currentDir);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            setTitle("Выберите файл");
+        }
+        createTitle = chooseFile ? "Создать файл" : "Создать папку";
         contentView = new LinearLayout(getContext());
 
         contentView.setOrientation(LinearLayout.VERTICAL);
@@ -136,7 +153,7 @@ public class DirectoryChooserDialog extends AlertDialog {
             contentView.addView(divider);
         }
         contentView.addView(filesListView);
-        setNeutralButton("Создать папку", new OnClickListener() {
+        setNeutralButton(createTitle, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -195,11 +212,20 @@ public class DirectoryChooserDialog extends AlertDialog {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0 && currentDir.getParent() != null) {
                     setSourceDirectory(new File(currentDir.getParentFile().getAbsolutePath()));
+                    changePath();
+                    checkPath(currentDir.getAbsolutePath());
                 } else {
-                    setSourceDirectory(new File(currentDir.getAbsolutePath(), mFileList[i]));
+                    File chosen = new File(currentDir.getAbsolutePath(), mFileList[i]);
+                    if(chooseFile && chosen.exists() && !chosen.isDirectory()) {
+                        if(onChooseFileListener != null) {
+                            onChooseFileListener.onChosenFile(chosen);
+                        }
+                    }  else {
+                        setSourceDirectory(new File(currentDir.getAbsolutePath(), mFileList[i]));
+                        changePath();
+                        checkPath(currentDir.getAbsolutePath());
+                    }
                 }
-                changePath();
-                checkPath(currentDir.getAbsolutePath());
             }
         });
         changePath();
@@ -216,21 +242,27 @@ public class DirectoryChooserDialog extends AlertDialog {
                 public void onClick(View v) {
                     Context context = DirectoryChooserDialog.this.getContext();
                     Builder createNewDirectory = new Builder(context);
-                    createNewDirectory.setTitle("Создать папку");
+                    createNewDirectory.setTitle(createTitle);
                     final EditText editText = new EditText(context);
                     editText.setSingleLine();
                     createNewDirectory.setView(editText);
                     createNewDirectory.setPositiveButton(context.getResources().getString(android.R.string.ok), new OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            File newDir = new File(currentDir.getAbsolutePath(), editText.getText().toString());
-                            if (newDir.mkdir()) {
-                                Log.i(TAG, "Created directory " + newDir);
-                            } else {
-                                Log.w(TAG, "Failed to create directory " + newDir);
+                            File newFile = new File(currentDir.getAbsolutePath(), editText.getText().toString());
+                            try {
+                                if (chooseFile ? newFile.createNewFile() : newFile.mkdir()) {
+                                    Log.i(TAG, "Created file " + newFile);
+                                    if (!chooseFile) {
+                                        createdNewDirectories.add(newFile);
+                                    }
+                                    changePath();
+                                } else {
+                                    Log.w(TAG, "Failed to create file " + newFile);
+                                }
+                            } catch (IOException e) {
+                                Log.e(TAG, "Unknown exception", e);
                             }
-                            createdNewDirectories.add(newDir);
-                            changePath();
                         }
                     });
                     createNewDirectory.setNegativeButton(context.getResources().getString(android.R.string.cancel), new OnClickListener() {
