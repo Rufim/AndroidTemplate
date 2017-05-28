@@ -316,13 +316,13 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     public boolean onLongClick(View view) {
         ViewHolder holder = (ViewHolder) view.getTag();
         if (holder.getView(view.getId()) != null) {
-            onLongClick(view, holder.getLayoutPosition());
+            return onLongClick(view, holder.getLayoutPosition());
         }
         return false;
     }
 
-    public void onLongClick(View view, int position) {
-
+    public boolean onLongClick(View view, int position) {
+        return false;
     }
 
 
