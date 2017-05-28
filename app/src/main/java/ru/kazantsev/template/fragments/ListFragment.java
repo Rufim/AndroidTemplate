@@ -89,8 +89,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     public boolean restoreLister() {
         if (savedDataSource != null) {
             dataSource = savedDataSource;
-            refreshData(true);
             savedDataSource = null;
+            refreshData(true);
             return true;
         } else {
             return false;
