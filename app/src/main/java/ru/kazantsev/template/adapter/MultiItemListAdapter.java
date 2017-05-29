@@ -168,7 +168,7 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
 
     public I getItem(int position) {
         synchronized (lock) {
-            if (items.size() > position && items.size() > 0)
+            if (items.size() > (position - getFirstIsHeader()) && items.size() > 0)
                 return this.items.get(position - getFirstIsHeader());
             else return null;
         }
