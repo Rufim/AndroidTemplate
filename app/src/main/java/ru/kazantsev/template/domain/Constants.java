@@ -1,10 +1,16 @@
 package ru.kazantsev.template.domain;
 
 
+import ru.kazantsev.template.util.AndroidSystemUtils;
+
 /**
  * Created by Rufim on 07.01.2015.
  */
 public class Constants {
+
+    public static class App {
+        public static final int CORES = AndroidSystemUtils.getNumberOfCores();
+    }
 
     public static class Assets {
         public static final String ROBOTO_FONT_PATH = "fonts/roboto/Roboto-Regular.ttf";
