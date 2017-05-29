@@ -17,6 +17,7 @@ import android.widget.TextView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.adapter.MultiItemListAdapter;
+import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.view.AdvancedRecyclerView;
@@ -24,6 +25,8 @@ import ru.kazantsev.template.view.scroller.FastScroller;
 
 
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 /**
  * Created by Rufim on 17.01.2015.
@@ -57,6 +60,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected boolean enableFiltering = false;
     protected boolean enableSearch = false;
     protected boolean enableScrollbar = false;
+    protected final static BlockingQueue<Runnable> tasks = new LinkedBlockingQueue<>();
+    protected final static ThreadPoolExecutor executor = new ThreadPoolExecutor(Constants.App.CORES, Constants.App.CORES, 30L, TimeUnit.SECONDS, tasks);
 
 
     public boolean isEnableFiltering() {
@@ -197,8 +202,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         }
         if (dataSource != null && dataTask == null) {
             startLoading(showProgress);
-            DataTask dataTask = new DataTask(count, onElementsLoadedTask, params);
-            dataTask.execute();
+            dataTask = new DataTask(count, onElementsLoadedTask, params);
+            dataTask.executeOnExecutor(executor);
         }
     }
 

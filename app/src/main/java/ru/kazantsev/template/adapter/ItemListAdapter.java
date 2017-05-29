@@ -27,6 +27,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     protected FilterEvent lastQuery;
     protected boolean bindViews = true;
     protected boolean bindClicks = true;
+    protected final Object lock = new Object();
 
     // Adapter's Constructor
     public ItemListAdapter(@LayoutRes int layoutId) {
@@ -94,23 +95,27 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         return this.items;
     }
 
-    public synchronized void setItems(List<I> items) {
+    public void setItems(List<I> items) {
         setItems(items, false);
     }
 
     public synchronized void setItems(List<I> items, boolean notify) {
-        if(originalItems == null) {
-            this.items = new ArrayList<I>(items);
-        } else {
-            addItems(items, notify);
+        synchronized (lock) {
+            if (originalItems == null) {
+                this.items = new ArrayList<I>(items);
+            } else {
+                addItems(items, notify);
+            }
         }
     }
 
 
-    public synchronized void clear() {
-        originalItems = null;
-        lastQuery = null;
-        items.clear();
+    public void clear() {
+        synchronized (lock) {
+            originalItems = null;
+            lastQuery = null;
+            items.clear();
+        }
     }
 
 
@@ -118,17 +123,21 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         return this.originalItems == null ? this.items : this.originalItems;
     }
 
-    public synchronized void enterFilteringMode() {
-        if (originalItems == null) {
-            this.originalItems = new ArrayList<>(items);
+    public void enterFilteringMode() {
+        synchronized (lock) {
+            if (originalItems == null) {
+                this.originalItems = new ArrayList<>(items);
+            }
         }
     }
 
-    public synchronized void exitFilteringMode() {
-        if (originalItems != null) {
-            items = originalItems;
-            this.originalItems = null;
-            notifyDataSetChanged();
+    public void exitFilteringMode() {
+        synchronized (lock) {
+            if (originalItems != null) {
+                items = originalItems;
+                this.originalItems = null;
+                notifyDataSetChanged();
+            }
         }
     }
 
@@ -137,24 +146,28 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     }
 
     public synchronized List<I> addItems(List<I> items, boolean notify) {
-        if (originalItems == null) {
-            addItemsInternal(items, notify);
-            return items;
-        } else {
-            this.originalItems.addAll(items);
-            List<I> added = find(lastQuery, items);
-            addItemsInternal(added, notify);
-            return added;
+        synchronized (lock) {
+            if (originalItems == null) {
+                addItemsInternal(items, notify);
+                return items;
+            } else {
+                this.originalItems.addAll(items);
+                List<I> added = find(lastQuery, items);
+                addItemsInternal(added, notify);
+                return added;
+            }
         }
     }
 
     private void addItemsInternal(List<I> items, boolean notify) {
-        if (notify) {
-            for (I item : items) {
-                addItem(item);
+        synchronized (lock) {
+            if (notify) {
+                for (I item : items) {
+                    addItem(item);
+                }
+            } else {
+                this.items.addAll(items);
             }
-        } else {
-            this.items.addAll(items);
         }
     }
 
@@ -166,27 +179,35 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         this.lastQuery = lastQuery;
     }
 
-    public synchronized void addItem(I item) {
-        this.items.add(item);
-        notifyItemInserted(this.items.size());
+    public void addItem(I item) {
+        synchronized (lock) {
+            this.items.add(item);
+            notifyItemInserted(this.items.size());
+        }
     }
 
 
-    public synchronized void addItem(int position, I item) {
-        this.items.add(position, item);
-        notifyItemInserted(position);
+    public void addItem(int position, I item) {
+        synchronized (lock) {
+            this.items.add(position, item);
+            notifyItemInserted(position);
+        }
     }
 
-    public synchronized I removeItem(int position) {
-        final I item = this.items.remove(position);
-        notifyItemRemoved(position);
-        return item;
+    public I removeItem(int position) {
+        synchronized (lock) {
+            final I item = this.items.remove(position);
+            notifyItemRemoved(position);
+            return item;
+        }
     }
 
-    public synchronized void moveItem(int fromPosition, int toPosition) {
-        final I item = this.items.remove(fromPosition);
-        this.items.add(toPosition, item);
-        notifyItemMoved(fromPosition, toPosition);
+    public void moveItem(int fromPosition, int toPosition) {
+        synchronized (lock) {
+            final I item = this.items.remove(fromPosition);
+            this.items.add(toPosition, item);
+            notifyItemMoved(fromPosition, toPosition);
+        }
     }
 
     public void selectText(ViewHolder holder, boolean erase, String query, int color) {
@@ -208,18 +229,20 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         return filter(query, true);
     }
 
-    public synchronized List<I> filter(FilterEvent query, boolean notify) {
-        if (query == null) {
-            return items;
+    public List<I> filter(FilterEvent query, boolean notify) {
+        synchronized (lock) {
+            if (query == null) {
+                return items;
+            }
+            List<I> founded = find(query, originalItems != null);
+            if (notify) {
+                changeTo(founded);
+            } else {
+                items = founded;
+            }
+            lastQuery = query;
+            return founded;
         }
-        List<I> founded = find(query, originalItems != null);
-        if (notify) {
-            changeTo(founded);
-        } else {
-            items = founded;
-        }
-        lastQuery = query;
-        return founded;
     }
 
     public List<I> find(FilterEvent query, boolean original) {
@@ -259,42 +282,50 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         }
     }
 
-    public synchronized void changeTo(List<I> items) {
-        applyAndAnimateRemovals(items);
-        applyAndAnimateAdditions(items);
-        applyAndAnimateMovedItems(items);
+    public void changeTo(List<I> items) {
+        synchronized (lock) {
+            applyAndAnimateRemovals(items);
+            applyAndAnimateAdditions(items);
+            applyAndAnimateMovedItems(items);
+        }
     }
 
     private void applyAndAnimateRemovals(List<I> newItems) {
-        for (int i = this.items.size() - 1; i >= 0; i--) {
-            final I item = this.items.get(i);
-            if (!newItems.contains(item)) {
-                removeItem(i);
+        synchronized (lock) {
+            for (int i = this.items.size() - 1; i >= 0; i--) {
+                final I item = this.items.get(i);
+                if (!newItems.contains(item)) {
+                    removeItem(i);
+                }
             }
         }
     }
 
     private void applyAndAnimateAdditions(List<I> newItems) {
-        for (int i = 0; i < newItems.size(); i++) {
-            final I item = newItems.get(i);
-            if (!this.items.contains(item)) {
-                if (this.items.size() > i)
-                    addItem(i, item);
-                else
-                    addItem(item);
+        synchronized (lock) {
+            for (int i = 0; i < newItems.size(); i++) {
+                final I item = newItems.get(i);
+                if (!this.items.contains(item)) {
+                    if (this.items.size() > i)
+                        addItem(i, item);
+                    else
+                        addItem(item);
+                }
             }
         }
     }
 
     private void applyAndAnimateMovedItems(List<I> newItems) {
-        for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
-            final I item = newItems.get(toPosition);
-            final int fromPosition = this.items.indexOf(item);
-            if (fromPosition >= 0 && fromPosition != toPosition) {
-                if (this.items.size() > toPosition)
-                    moveItem(fromPosition, toPosition);
-                else
-                    moveItem(fromPosition, this.items.size() - 1);
+        synchronized (lock) {
+            for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
+                final I item = newItems.get(toPosition);
+                final int fromPosition = this.items.indexOf(item);
+                if (fromPosition >= 0 && fromPosition != toPosition) {
+                    if (this.items.size() > toPosition)
+                        moveItem(fromPosition, toPosition);
+                    else
+                        moveItem(fromPosition, this.items.size() - 1);
+                }
             }
         }
     }

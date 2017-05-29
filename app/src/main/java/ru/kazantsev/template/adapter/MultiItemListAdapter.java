@@ -121,43 +121,57 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
 
     @Override
     public void addItem(I item) {
-        this.items.add(item);
-        notifyItemInserted(this.items.size() + getFirstIsHeader());
+        synchronized (lock) {
+            this.items.add(item);
+            notifyItemInserted(this.items.size() + getFirstIsHeader());
+        }
     }
 
     @Override
     public void addItem(int position, I item) {
-        this.items.add(position, item);
-        notifyItemInserted(position + getFirstIsHeader());
+        synchronized (lock) {
+            this.items.add(position, item);
+            notifyItemInserted(position + getFirstIsHeader());
+        }
     }
 
     @Override
     public I removeItem(int position) {
-        final I item = this.items.remove(position);
-        notifyItemRemoved(position + getFirstIsHeader());
-        return item;
+        synchronized (lock) {
+            final I item = this.items.remove(position);
+            notifyItemRemoved(position + getFirstIsHeader());
+            return item;
+        }
     }
 
     @Override
     public void moveItem(int fromPosition, int toPosition) {
-        final I item = this.items.remove(fromPosition);
-        this.items.add(toPosition, item);
-        notifyItemMoved(fromPosition + getFirstIsHeader(), toPosition + getFirstIsHeader());
+        synchronized (lock) {
+            final I item = this.items.remove(fromPosition);
+            this.items.add(toPosition, item);
+            notifyItemMoved(fromPosition + getFirstIsHeader(), toPosition + getFirstIsHeader());
+        }
     }
 
     private List<I> toFlatList(List<I> items) {
-        if(!useFlatList) {
-            return items;
+        synchronized (lock) {
+            if (!useFlatList) {
+                return items;
+            }
+            List<I> flatList = new ArrayList<>();
+            for (int i = 0; i < countItems(items); i++) {
+                flatList.add(i, getItem(items, i, new AtomicInteger(0)));
+            }
+            return flatList;
         }
-        List<I> flatList = new ArrayList<>();
-        for (int i = 0; i < countItems(items); i++) {
-            flatList.add(i, getItem(items, i, new AtomicInteger(0)));
-        }
-        return flatList;
     }
 
     public I getItem(int position) {
-        return this.items.get(position - getFirstIsHeader());
+        synchronized (lock) {
+            if (items.size() > position && items.size() > 0)
+                return this.items.get(position - getFirstIsHeader());
+            else return null;
+        }
         //return getItem(items, position - getFirstIsHeader(), new AtomicInteger(0));
     }
 
