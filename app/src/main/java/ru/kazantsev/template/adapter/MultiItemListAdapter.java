@@ -64,15 +64,17 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
     public ItemListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // Create a new view by inflating the row item xml.
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        if (SystemUtils.contains(layoutIds, viewType)) {
+        if (!SystemUtils.contains(layoutIds, viewType)) {
+            Log.e(TAG, "Cannot resolve layout view type id = " + viewType);
+        }
+        if(viewType > 0) {
             ViewHolder holder = newHolder(inflater.inflate(viewType, parent, false));
             if (bindViews) {
                 holder.bindViews(MultiItemListAdapter.this, bindClicks);
             }
             return holder;
         } else {
-            Log.e(TAG, "Cannot resolve layout view type");
-            return null;
+            throw new RuntimeException("Illegal view id " + viewType);
         }
     }
 
