@@ -3,6 +3,7 @@ package ru.kazantsev.template.adapter;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,6 +28,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     protected FilterEvent lastQuery;
     protected boolean bindViews = true;
     protected boolean bindClicks = true;
+    protected boolean performSelectRoot = true;
     protected final Object lock = new Object();
 
     // Adapter's Constructor
@@ -332,24 +334,47 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
 
     @Override
     public void onClick(View view) {
-        ViewHolder holder = (ViewHolder) view.getTag();
-        if (holder.getView(view.getId()) != null) {
-            onClick(view, holder.getLayoutPosition());
+        boolean handled = false;
+        if(view.getTag() instanceof ViewHolder) {
+            ViewHolder holder = (ViewHolder) view.getTag();
+            if (holder.getView(view.getId()) != null) {
+                handled = onClick(view, holder.getLayoutPosition());
+                if(handled && performSelectRoot && view.getParent() != null) {
+                    ((View)view.getParent()).setPressed(true);
+                    view.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((View)view.getParent()).setPressed(false);
+                        }
+                    }, 100);
+                }
+            }
+        }
+        if(!handled && view.getParent() != null){
+            ((View)view.getParent()).performClick();
         }
     }
 
-    public void onClick(View view, int position) {
-
+    public boolean onClick(View view, int position){
+        return false;
     }
 
-    // Implement OnLongClick listener.
     @Override
     public boolean onLongClick(View view) {
-        ViewHolder holder = (ViewHolder) view.getTag();
-        if (holder.getView(view.getId()) != null) {
-            return onLongClick(view, holder.getLayoutPosition());
+        boolean handled = false;
+        if (view.getTag() instanceof ViewHolder) {
+            ViewHolder holder = (ViewHolder) view.getTag();
+            if (holder.getView(view.getId()) != null) {
+                handled = onLongClick(view, holder.getLayoutPosition());
+                if(handled && performSelectRoot) {
+                    ((View)view.getParent()).setSelected(true);
+                }
+            }
         }
-        return false;
+        if(!handled && view.getParent() != null) {
+            ((View)view.getParent()).performLongClick();
+        }
+        return handled;
     }
 
     public boolean onLongClick(View view, int position) {

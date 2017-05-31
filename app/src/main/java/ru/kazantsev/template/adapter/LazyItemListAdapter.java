@@ -31,19 +31,8 @@ public abstract class LazyItemListAdapter<I> extends ItemListAdapter<I>{
     public abstract void onBindHolder(ViewHolder holder, @Nullable I item);
 
     @Override
-    public void onClick(View view) {
-        boolean handled = false;
-        if(view.getTag() instanceof ViewHolder) {
-            ViewHolder holder = (ViewHolder) view.getTag();
-            if (holder.getView(view.getId()) != null) {
-                handled = onClick(view, items.get(translatePosition(holder.getLayoutPosition())));
-            }
-        } else {
-            handled = onClick(view, null);
-        }
-        if(!handled && view.getParent() != null){
-            ((View)view.getParent()).performClick();
-        }
+    public boolean onClick(View view, int position) {
+       return onClick(view, items.get(translatePosition(position)));
     }
 
     public boolean onClick(View view, @Nullable I item){
@@ -51,20 +40,8 @@ public abstract class LazyItemListAdapter<I> extends ItemListAdapter<I>{
     }
 
     @Override
-    public boolean onLongClick(View view) {
-        boolean handled = false;
-        if (view.getTag() instanceof ViewHolder) {
-            ViewHolder holder = (ViewHolder) view.getTag();
-            if (holder.getView(view.getId()) != null) {
-                handled = onLongClick(view, items.get(translatePosition(holder.getLayoutPosition())));
-            }
-        } else {
-            handled = onLongClick(view, null);
-        }
-        if(!handled && view.getParent() != null) {
-            ((View)view.getParent()).performLongClick();
-        }
-        return handled;
+    public boolean onLongClick(View view, int position) {
+        return onLongClick(view, items.get(translatePosition(position)));
     }
 
     public boolean onLongClick(View view, @Nullable I item) {

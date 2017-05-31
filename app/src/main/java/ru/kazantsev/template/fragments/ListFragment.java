@@ -2,21 +2,17 @@ package ru.kazantsev.template.fragments;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.graphics.PointF;
 import android.os.*;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.*;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.ItemListAdapter;
-import ru.kazantsev.template.adapter.MultiItemListAdapter;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
@@ -25,7 +21,6 @@ import ru.kazantsev.template.view.scroller.FastScroller;
 
 
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.*;
 
 /**
@@ -220,7 +215,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         loadItems(count, showProgress, null, null);
     }
 
-    protected abstract ItemListAdapter<I> newAdapter();
+    protected abstract ItemListAdapter<I> newAdaptor();
 
     protected  DataSource<I> newDataSource() throws Exception {
         return getDataSource();
@@ -308,7 +303,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             }
         });
         if (adapter == null) {
-            adapter = newAdapter();
+            adapter = newAdaptor();
         }
         try {
             setDataSource(newDataSource());
