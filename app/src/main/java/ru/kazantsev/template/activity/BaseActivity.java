@@ -347,6 +347,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return toolbar;
     }
 
+    public View getToolbarShadow() {
+        return toolbarShadow;
+    }
+
     @Nullable
     public ActionBar getCurrentActionBar() {
         return actionBar;
