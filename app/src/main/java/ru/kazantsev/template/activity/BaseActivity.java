@@ -146,6 +146,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        if(getCurrentFragment() != null)
         outState.putString(Constants.ArgsName.LAST_FRAGMENT_TAG, getCurrentFragment().getTag());
         outState.putBoolean(Constants.ArgsName.CONFIG_CHANGE, true);
         outState.putParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE, fragmentBundleCache);
