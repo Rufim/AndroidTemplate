@@ -838,25 +838,12 @@ public class GuiUtils {
         if (textView == null) {
             return;
         }
-
-        Spannable raw = new SpannableString(textView.getText());
-
-        if (erase) {
-            BackgroundColorSpan[] spans = raw.getSpans(0,
-                    raw.length(),
-                    BackgroundColorSpan.class);
-
-            if (spans.length > 0) {
-                for (BackgroundColorSpan span : spans) {
-                    raw.removeSpan(span);
-                }
-            }
-        }
+        Spannable raw = new SpannableString(erase ? textView.getText().toString() : textView.getText());
         if (end > raw.length()) {
             end = raw.length();
         }
         raw.setSpan(new BackgroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        textView.setText(raw);
+        textView.setText(raw, TextView.BufferType.SPANNABLE);
     }
 
     public static void selectText(TextView textView, boolean erase, String query, int color) {
