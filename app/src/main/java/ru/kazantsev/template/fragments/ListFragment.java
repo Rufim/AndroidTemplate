@@ -215,7 +215,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         loadItems(count, showProgress, null, null);
     }
 
-    protected abstract ItemListAdapter<I> newAdaptor();
+    protected abstract ItemListAdapter<I> newAdapter();
 
     protected  DataSource<I> newDataSource() throws Exception {
         return getDataSource();
@@ -303,7 +303,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             }
         });
         if (adapter == null) {
-            adapter = newAdaptor();
+            adapter = newAdapter();
         }
         try {
             setDataSource(newDataSource());
