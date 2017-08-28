@@ -56,7 +56,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     protected boolean disableNavigationBar = false;
     protected boolean toolbarClassic = false;
-    protected boolean enableFragmentCache = true;
+    protected boolean enableFragmentCache = false;
     protected boolean clearBackStack = true;
 
     ArrayList<BundleCache> fragmentBundleCache = new ArrayList<>();
@@ -149,7 +149,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         if(getCurrentFragment() != null)
         outState.putString(Constants.ArgsName.LAST_FRAGMENT_TAG, getCurrentFragment().getTag());
         outState.putBoolean(Constants.ArgsName.CONFIG_CHANGE, true);
-        outState.putParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE, fragmentBundleCache);
+        if(enableFragmentCache) {
+            outState.putParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE, fragmentBundleCache);
+        }
         super.onSaveInstanceState(outState);
     }
 
