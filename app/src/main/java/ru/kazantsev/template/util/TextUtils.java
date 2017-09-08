@@ -338,6 +338,7 @@ public class TextUtils {
         public Queue<String> end = new ArrayDeque<>();
         public Integer skipStart = 0;
         public Integer skipEnd = 0;
+        public Integer matchCount = 1;
         public int flags = 0;
 
         public Splitter() {
@@ -376,6 +377,15 @@ public class TextUtils {
 
         public Splitter setSkipEnd(Integer skip_end) {
             this.skipEnd = skip_end;
+            return this;
+        }
+
+        public Integer getMatchCount() {
+            return matchCount;
+        }
+
+        public Splitter setMatchCount(Integer matchCount) {
+            this.matchCount = matchCount;
             return this;
         }
 
@@ -453,35 +463,39 @@ public class TextUtils {
                     Pattern start = splitter.nextStart();
                     Pattern end = splitter.nextEnd();
                     StringBuilder builder = new StringBuilder();
-                    boolean matchedStart = start == null;
-                    boolean matchedEnd;
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        if (!matchedStart) {
-                            matchedStart = start.matcher(line).find();
+                    String line = "";
+                    int matchCount = 0;
+                    while (matchCount < splitter.getMatchCount() && line != null) {
+                        boolean matchedStart = start == null;
+                        boolean matchedEnd;
+                        while ((line = reader.readLine()) != null) {
+                            if (!matchedStart) {
+                                matchedStart = start.matcher(line).find();
+                                if (matchedStart) {
+                                    if (splitter.skipStart-- > 0) {
+                                        matchedStart = false;
+                                    } else {
+                                        start = splitter.nextStart();
+                                        if (notInclude) continue;
+                                    }
+                                }
+                            }
                             if (matchedStart) {
-                                if (splitter.skipStart-- > 0) {
-                                    matchedStart = false;
+                                matchedEnd = end != null && end.matcher(line).find();
+                                if (matchedEnd) {
+                                    end = splitter.nextEnd();
+                                    if (splitter.skipEnd-- > 0) matchedEnd = false;
+
+                                }
+                                if (matchedEnd) {
+                                    if (!notInclude) builder.append(line + "\n");
+                                    break;
                                 } else {
-                                    start = splitter.nextStart();
-                                    if (notInclude) continue;
+                                    builder.append(line + "\n");
                                 }
                             }
                         }
-                        if (matchedStart) {
-                            matchedEnd = end != null && end.matcher(line).find();
-                            if (matchedEnd) {
-                                end = splitter.nextEnd();
-                                if (splitter.skipEnd-- > 0) matchedEnd = false;
-
-                            }
-                            if (matchedEnd) {
-                                if (!notInclude) builder.append(line + "\n");
-                                break;
-                            } else {
-                                builder.append(line + "\n");
-                            }
-                        }
+                        matchCount++;
                     }
                     parts[i++] = builder.toString();
                 }

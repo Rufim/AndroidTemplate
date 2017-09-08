@@ -22,26 +22,26 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
     protected int firstIsHeader;
     protected boolean useFlatList = true;
 
-    public MultiItemListAdapter(boolean firstIsHeader, @LayoutRes int... layoutIds) {
+    public MultiItemListAdapter(@LayoutRes int... layoutIds) {
         super(-1);
         this.layoutIds = layoutIds;
-        this.firstIsHeader = firstIsHeader ? 1 : 0;
+        this.firstIsHeader = layoutIds.length > 1 && layoutIds[0] > 0 ? 1 : 0;
     }
 
-    public MultiItemListAdapter(boolean firstIsHeader, boolean useFlatList, @LayoutRes int... layoutIds) {
+    public MultiItemListAdapter(boolean useFlatList, @LayoutRes int... layoutIds) {
         super(-1);
         this.layoutIds = layoutIds;
-        this.firstIsHeader = firstIsHeader ? 1 : 0;
+        this.firstIsHeader = layoutIds.length > 1 && layoutIds[0] > 0 ? 1 : 0;
         this.useFlatList = useFlatList;
     }
 
-    public MultiItemListAdapter(List<I> items, boolean firstIsHeader, @LayoutRes int... layoutIds) {
-        this(firstIsHeader, layoutIds);
+    public MultiItemListAdapter(List<I> items, @LayoutRes int... layoutIds) {
+        this(layoutIds);
         setItems(items);
     }
 
-    public MultiItemListAdapter(List<I> items, boolean firstIsHeader, boolean useFlatList, @LayoutRes int... layoutIds) {
-        this(firstIsHeader, useFlatList, layoutIds);
+    public MultiItemListAdapter(List<I> items, boolean useFlatList, @LayoutRes int... layoutIds) {
+        this(useFlatList, layoutIds);
         setItems(items);
     }
 
