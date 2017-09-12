@@ -7,10 +7,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -48,6 +45,30 @@ public class SystemUtils {
             return fullClassName.substring(fullClassName.lastIndexOf("build/intermediates/exploded-aar/io.fabric.sdk.android/fabric/1.3.10/res") + 1);
         } catch (Exception ex) {
             return "UnknownClass";
+        }
+    }
+
+    public static SortedSet<? extends File> listFilesRecursive(File dir, TreeSet<File> files) {
+        // get all the files from a directory
+        File[] fList = dir.listFiles();
+        if(fList == null) {
+            return files;
+        }
+        for (File file : fList) {
+            if (file.isFile()) {
+                files.add(file);
+            } else if (file.isDirectory() && !isSymlink(file)) {
+                listFilesRecursive(file, files);
+            }
+        }
+        return files;
+    }
+
+    public static boolean isSymlink(File file) {
+        try {
+            return !file.getCanonicalFile().equals(file.getAbsoluteFile());
+        } catch (IOException e) {
+            return false;
         }
     }
 

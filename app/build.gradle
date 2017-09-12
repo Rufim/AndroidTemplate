@@ -7,7 +7,6 @@ ext {
     compileSdkProjectVersion = 25
     buildToolsProjectVersion = '25.0.2'
     supportLibraryVersion = '25.3.1'
-    requeryVersion = '1.2.1'
     retrofitVersion = '2.1.0'
     butterknifeVersion = '8.5.1'
     versionProjectCode = 1
@@ -102,8 +101,6 @@ dependencies {
     provided "com.snappydb:snappydb-lib:0.5.2"
     provided "com.squareup.retrofit2:retrofit:$retrofitVersion"
     provided "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-    provided "io.requery:requery:$requeryVersion"
-    provided "io.requery:requery-android:$requeryVersion"
     provided "com.j256.ormlite:ormlite-core:4.48"
     provided "com.j256.ormlite:ormlite-android:4.48"
 }
