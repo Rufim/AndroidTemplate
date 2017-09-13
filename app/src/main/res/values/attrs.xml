@@ -5,4 +5,5 @@
     <attr name="colorPrimaryDarkDrawable" format="reference"/>
     <attr name="colorAccentDrawable" format="reference"/>
     <attr name="toolbarElevationSize" format="dimension|reference"/>
+    <attr name="toolbarShadowDrawable" format="reference"/>
 </resources>

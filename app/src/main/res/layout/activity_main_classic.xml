@@ -28,7 +28,7 @@
                   android:layout_height="4dp"
                   android:id="@+id/toolbar_shadow"
                   android:layout_below="@id/toolbar"
-                  android:background="@drawable/shadow"/>
+                  android:background="?attr/toolbarShadowDrawable"/>
 
             <!-- Real content goes here -->
             <FrameLayout
