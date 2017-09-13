@@ -215,6 +215,10 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         loadItems(count, showProgress, null, null);
     }
 
+    public void onPostLoadItems() {
+
+    }
+
     protected abstract ItemListAdapter<I> newAdapter();
 
     protected  DataSource<I> newDataSource() throws Exception {
@@ -424,6 +428,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                         onElementsLoadedTask.execute(LoadedTaskParams);
                     }
                     stopLoading();
+                    onPostLoadItems();
                 } else {
                     loadItems(needMore, true, onElementsLoadedTask, LoadedTaskParams);
                 }

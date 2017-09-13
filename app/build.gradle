@@ -75,8 +75,6 @@ android {
 
 }
 retrolambda {
-    jdk = System.getenv("JAVA8_HOME")
-    oldJdk = System.getenv("JAVA7_HOME")
     defaultMethods = true
 }
 

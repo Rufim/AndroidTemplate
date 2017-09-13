@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by 0shad on 20.05.2017.
@@ -26,6 +29,9 @@ public enum ClassType {
     CHARSEQUENCE(CharSequence.class),
     PARCELABLE(Parcelable.class),
     SERIALIZABLE(Serializable.class),
+    SET(Set.class),
+    LIST(List.class),
+    MAP(Map.class),
     ENUM(Enum.class),
     UNSUPPORTED(Void.class);
 

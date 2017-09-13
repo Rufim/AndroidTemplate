@@ -13,12 +13,14 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -158,6 +160,40 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    public void openDrawer(){
+        drawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    public void closeDrawer(){
+        drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    public void lockDrawerClosed() {
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    public void unlockDrawer() {
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+    }
+
+    public void hideActionBar() {
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+        if(getActionBar() != null) {
+            getActionBar().hide();
+        }
+    }
+
+    public void showActionBar() {
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().show();
+        }
+        if(getActionBar() != null) {
+            getActionBar().show();
+        }
     }
 
     @Override
