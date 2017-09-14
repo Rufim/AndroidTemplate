@@ -29,7 +29,7 @@
                   android:layout_height="4dp"
                   android:id="@+id/toolbar_shadow"
                   android:layout_alignParentTop="true"
-                  android:background="@drawable/shadow"/>
+                  android:background="?attr/toolbarShadowDrawable"/>
 
             <!-- Real content goes here -->
             <FrameLayout
