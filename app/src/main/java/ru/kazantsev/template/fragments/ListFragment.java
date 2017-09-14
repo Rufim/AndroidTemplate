@@ -428,7 +428,9 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                         onElementsLoadedTask.execute(LoadedTaskParams);
                     }
                     stopLoading();
-                    onPostLoadItems();
+                    if(isAdded()) {
+                        onPostLoadItems();
+                    }
                 } else {
                     loadItems(needMore, true, onElementsLoadedTask, LoadedTaskParams);
                 }

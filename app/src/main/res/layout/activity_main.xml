@@ -47,7 +47,7 @@
                 android:layout_gravity="start"
                 android:fitsSystemWindows="false"
                 android:background="?attr/colorPrimaryDark"
-                app:itemTextColor="@color/white"/>
+                app:itemTextColor="?android:attr/textColorPrimary"/>
 
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>
