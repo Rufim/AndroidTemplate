@@ -82,7 +82,7 @@ public abstract class NavigationActivity<T> extends BaseActivity {
                 drawerLayout.closeDrawers();
             }
         });
-        selectedBackground = GuiUtils.getThemeColor(this, R.attr.colorAccent);
+        selectedBackground = GuiUtils.getThemeColor(this, android.R.attr.colorControlActivated);
         navigationListMenu.setRecyclerListener(new AbsListView.RecyclerListener() {
             @Override
             public void onMovedToScrapHeap(View view) {
