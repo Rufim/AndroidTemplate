@@ -74,6 +74,10 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
         return show(manager, container, BaseFragment.class, Constants.ArgsName.MESSAGE, message);
     }
 
+    public static BaseFragment show(FragmentBuilder builder, @IdRes int container, String message) {
+        return show(builder.putArg(Constants.ArgsName.MESSAGE, message), container, BaseFragment.class);
+    }
+
     public static BaseFragment show(BaseFragment fragment, String message) {
         return show(fragment, BaseFragment.class, Constants.ArgsName.MESSAGE, message);
     }
