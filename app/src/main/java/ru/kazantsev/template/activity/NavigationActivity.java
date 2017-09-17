@@ -2,6 +2,7 @@ package ru.kazantsev.template.activity;
 
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.util.Log;
@@ -82,7 +83,7 @@ public abstract class NavigationActivity<T> extends BaseActivity {
                 drawerLayout.closeDrawers();
             }
         });
-        selectedBackground = GuiUtils.getThemeColor(this, android.R.attr.colorControlActivated);
+        selectedBackground = GuiUtils.getThemeColor(this, R.attr.colorControlActivated);
         navigationListMenu.setRecyclerListener(new AbsListView.RecyclerListener() {
             @Override
             public void onMovedToScrapHeap(View view) {
