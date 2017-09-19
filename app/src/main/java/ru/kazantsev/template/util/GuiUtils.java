@@ -895,6 +895,14 @@ public class GuiUtils {
         return result;
     }
 
+    public static Drawable getThemeDrawable(Context context, int id) {
+        TypedArray a = getAttr(context, id);
+        Drawable result = a.getDrawable(0);
+        a.recycle();
+        return result;
+    }
+
+
     public static float getThemeDimen(Context context, int id) {
         TypedArray a = getAttr(context, id);
         float result = a.getDimension(0, 0);

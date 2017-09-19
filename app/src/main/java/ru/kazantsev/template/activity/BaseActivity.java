@@ -13,6 +13,7 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -512,7 +513,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         if (actionBar != null && clearBackStack) {
             boolean canback = isHomeBack();
             if (canback) {
-                actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
+                actionBar.setHomeAsUpIndicator(ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material));
                 if(disableNavigationBar) {
                     actionBar.setDisplayHomeAsUpEnabled(true);
                 }
