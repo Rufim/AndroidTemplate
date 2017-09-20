@@ -6,6 +6,10 @@
         <item name="android:dropDownVerticalOffset">-4.0dip</item>
     </style>
 
+    <style name="PopupMenuColor" parent="ThemeOverlay.AppCompat">
+        <item name="android:colorBackground">?attr/colorOverlay</item>
+    </style>
+
     <style name="AppSearchViewStyle" parent="Widget.AppCompat.SearchView">
         <item name="queryBackground">@android:color/transparent</item>
         <item name="searchIcon">@drawable/ic_action_search</item>

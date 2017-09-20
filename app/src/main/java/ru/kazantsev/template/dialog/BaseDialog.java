@@ -3,7 +3,9 @@ package ru.kazantsev.template.dialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.BuildConfig;
 import android.support.v4.app.DialogFragment;
 import android.view.Window;
 import org.greenrobot.eventbus.EventBus;
@@ -29,6 +31,14 @@ public  class BaseDialog extends DialogFragment implements DialogInterface.OnCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && GuiUtils.getThemeColor(getContext(), R.attr.colorOverlay) != 0) {
+            getDialog().getWindow().setBackgroundDrawableResource(R.drawable.base_dialog_background);
+        }
     }
 
     public void onClick(DialogInterface dialog, int which) {
