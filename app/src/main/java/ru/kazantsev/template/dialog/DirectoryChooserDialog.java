@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.*;
+import ru.kazantsev.template.R;
+import ru.kazantsev.template.util.GuiUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -231,6 +233,9 @@ public class DirectoryChooserDialog extends AlertDialog {
         changePath();
         super.setView(contentView, 0, 10, 0, 0);
         super.show();
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && GuiUtils.getThemeColor(getContext(), ru.kazantsev.template.R.attr.colorOverlay) != 0) {
+            getWindow().setBackgroundDrawableResource(R.drawable.base_dialog_background);
+        }
         checkPath(currentDir.getAbsolutePath());
         Button neutralButton = getButton(BUTTON_NEUTRAL);
         if(pathTextView != null) {

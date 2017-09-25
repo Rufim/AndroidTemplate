@@ -4,8 +4,7 @@ import android.util.Log;
 import ru.kazantsev.template.util.SystemUtils;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+import java.net.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -212,5 +211,47 @@ public class HTTPExecutor implements Callable<Response> {
     public Future<Response> executeAsync() throws IOException {
         ExecutorService service = Executors.newSingleThreadExecutor();
         return service.submit(this);
+    }
+
+
+    public static boolean pingHost(String host, int port, int timeout) {
+        Socket socket = null;
+        try  {
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(host, port), timeout);
+            return true;
+        } catch (IOException e) {
+            return false; // Either timeout or unreachable or failed DNS lookup.
+        } finally {
+            if(socket != null) {
+                try {
+                    socket.close();
+                } catch (Exception ex){
+                    //ignore;
+                }
+            }
+        }
+    }
+
+    /**
+     * Pings a HTTP URL. This effectively sends a HEAD request and returns <code>true</code> if the response code is in
+     * the 200-399 range.
+     * @param url The HTTP URL to be pinged.
+     * @param timeout The timeout in millis for both the connection timeout and the response read timeout. Note that
+     * the total timeout is effectively two times the given timeout.
+     * @return <code>true</code> if the given HTTP URL has returned response code 200-399 on a HEAD request within the
+     * given timeout, otherwise <code>false</code>.
+     */
+    public static int pingURL(String url, int timeout) {
+        url = url.replaceFirst("^https", "http"); // Otherwise an exception may be thrown on invalid SSL certificates.
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
+            connection.setRequestMethod("HEAD");
+            return connection.getResponseCode();
+        } catch (IOException exception) {
+            return HttpURLConnection.HTTP_NOT_FOUND;
+        }
     }
 }
