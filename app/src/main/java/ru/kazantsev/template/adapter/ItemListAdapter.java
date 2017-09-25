@@ -3,7 +3,6 @@ package ru.kazantsev.template.adapter;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -340,18 +339,24 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
             if (holder.getView(view.getId()) != null) {
                 handled = onClick(view, holder.getLayoutPosition());
                 if(handled && performSelectRoot && view.getParent() instanceof View) {
-                    ((View)view.getParent()).setPressed(true);
-                    view.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((View)view.getParent()).setPressed(false);
-                        }
-                    }, 100);
+                    clickEmulate((View) view.getParent());
                 }
             }
         }
         if(!handled && view.getParent() instanceof View && performSelectRoot){
             ((View)view.getParent()).performClick();
+        }
+    }
+
+    public void clickEmulate(View view) {
+        if(view != null) {
+            view.setPressed(true);
+            view.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    view.setPressed(false);
+                }
+            },100);
         }
     }
 
