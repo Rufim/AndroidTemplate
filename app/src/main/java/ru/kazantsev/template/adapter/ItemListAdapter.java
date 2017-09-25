@@ -28,7 +28,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     protected FilterEvent lastQuery;
     protected boolean bindViews = true;
     protected boolean bindClicks = true;
-    protected boolean performSelectRoot = true;
+    protected boolean performSelectRoot = false;
     protected final Object lock = new Object();
 
     // Adapter's Constructor
@@ -339,7 +339,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
             ViewHolder holder = (ViewHolder) view.getTag();
             if (holder.getView(view.getId()) != null) {
                 handled = onClick(view, holder.getLayoutPosition());
-                if(handled && performSelectRoot && view.getParent() != null) {
+                if(handled && performSelectRoot && view.getParent() instanceof View) {
                     ((View)view.getParent()).setPressed(true);
                     view.postDelayed(new Runnable() {
                         @Override
@@ -350,7 +350,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
                 }
             }
         }
-        if(!handled && view.getParent() != null){
+        if(!handled && view.getParent() instanceof View && performSelectRoot){
             ((View)view.getParent()).performClick();
         }
     }
