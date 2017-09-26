@@ -26,6 +26,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     protected final int layoutId;
     protected FilterEvent lastQuery;
     protected boolean bindViews = true;
+    protected boolean bindOnlyRootViews = true;
     protected boolean bindClicks = true;
     protected boolean performSelectRoot = false;
     protected final Object lock = new Object();
@@ -49,7 +50,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
                 .inflate(layoutId, parent, false);
         ViewHolder holder = newHolder(itemView);
         if (bindViews) {
-            holder.bindViews(ItemListAdapter.this, bindClicks);
+            holder.bindViews(ItemListAdapter.this, bindClicks, bindOnlyRootViews);
         }
         return holder;
     }
@@ -338,17 +339,14 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
             ViewHolder holder = (ViewHolder) view.getTag();
             if (holder.getView(view.getId()) != null) {
                 handled = onClick(view, holder.getLayoutPosition());
-                if(handled && performSelectRoot && view.getParent() instanceof View) {
+                if(handled && performSelectRoot && view.getParent() instanceof View && !(view instanceof AdapterView)) {
                     clickEmulate((View) view.getParent());
                 }
             }
         }
-        if(!handled && view.getParent() instanceof View && performSelectRoot){
-            ((View)view.getParent()).performClick();
-        }
     }
 
-    public void clickEmulate(View view) {
+    public void clickEmulate(final View view) {
         if(view != null) {
             view.setPressed(true);
             view.postDelayed(new Runnable() {
@@ -370,14 +368,11 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         if (view.getTag() instanceof ViewHolder) {
             ViewHolder holder = (ViewHolder) view.getTag();
             if (holder.getView(view.getId()) != null) {
-                handled = onLongClick(view, holder.getLayoutPosition());
-                if(handled && performSelectRoot) {
+                handled = onClick(view, holder.getLayoutPosition());
+                if(handled && performSelectRoot && view.getParent() instanceof View && !(view instanceof AdapterView)) {
                     ((View)view.getParent()).setSelected(true);
                 }
             }
-        }
-        if(!handled && view.getParent() != null) {
-            ((View)view.getParent()).performLongClick();
         }
         return handled;
     }
@@ -427,17 +422,16 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
             this.tag = tag;
         }
 
-        protected <C extends View.OnClickListener & View.OnLongClickListener> ViewHolder bindViews(C clickable, boolean bindClicks) {
+        public  <C extends View.OnClickListener & View.OnLongClickListener> ViewHolder bindViews(C clickable, boolean bindClicks, boolean onlyRoot) {
             for (Map.Entry<Integer, View> viewEntry : views.entrySet()) {
                 if (viewEntry != itemView) {
                     View view = viewEntry.getValue();
                     if (bindClicks) {
-                        if (view instanceof AdapterView) {
-                            AdapterView adapterView = (AdapterView) view;
-                            // TODO: bind adapter
-                        } else {
-                            view.setOnClickListener(clickable);
-                            view.setOnLongClickListener(clickable);
+                        if (!(view instanceof AdapterView)) {
+                            if(!onlyRoot || (view instanceof ViewGroup)) {
+                                view.setOnClickListener(clickable);
+                                view.setOnLongClickListener(clickable);
+                            }
                         }
                     }
                     view.setTag(ViewHolder.this);

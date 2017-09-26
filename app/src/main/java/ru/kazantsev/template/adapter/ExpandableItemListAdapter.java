@@ -20,6 +20,7 @@ public abstract class ExpandableItemListAdapter<G,C> extends BaseExpandableListA
     private final int group_view;
     private final int child_view;
     protected boolean bindViews = true;
+    protected boolean bindOnlyRootViews = true;
     protected boolean bindClicks = true;
 
     public ExpandableItemListAdapter(@LayoutRes int group_view, @LayoutRes int child_view, Map<Pair<Integer, G>, List<C>> items) {
@@ -91,7 +92,7 @@ public abstract class ExpandableItemListAdapter<G,C> extends BaseExpandableListA
         }
         ExpandableItemListAdapter.ViewHolder holder = newHolder(view);
         if (bindViews) {
-            holder.bindViews(ExpandableItemListAdapter.this, bindClicks);
+            holder.bindViews(ExpandableItemListAdapter.this, bindClicks, bindOnlyRootViews);
         }
         holder.setGroup(isGroup);
         return holder;
@@ -325,17 +326,16 @@ public abstract class ExpandableItemListAdapter<G,C> extends BaseExpandableListA
         public void onCreateHolder(View itemView) {
         }
 
-        protected <C extends View.OnClickListener & View.OnLongClickListener> ViewHolder bindViews(C clickable, boolean bindClicks) {
+        protected <C extends View.OnClickListener & View.OnLongClickListener> ViewHolder bindViews(C clickable, boolean bindClicks, boolean onlyRoot) {
             for (Map.Entry<Integer, View> viewEntry : views.entrySet()) {
                 if (viewEntry != itemView) {
                     View view = viewEntry.getValue();
                     if (bindClicks) {
-                        if (view instanceof AdapterView) {
-                            AdapterView adapterView = (AdapterView) view;
-                            // TODO: bind adapter
-                        } else {
-                            view.setOnClickListener(clickable);
-                            view.setOnLongClickListener(clickable);
+                        if (!(view instanceof AdapterView)) {
+                            if(!onlyRoot || (view instanceof ViewGroup)) {
+                                view.setOnClickListener(clickable);
+                                view.setOnLongClickListener(clickable);
+                            }
                         }
                     }
                     view.setTag(ViewHolder.this);
