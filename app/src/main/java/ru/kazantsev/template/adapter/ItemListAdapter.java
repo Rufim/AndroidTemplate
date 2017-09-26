@@ -368,7 +368,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
         if (view.getTag() instanceof ViewHolder) {
             ViewHolder holder = (ViewHolder) view.getTag();
             if (holder.getView(view.getId()) != null) {
-                handled = onClick(view, holder.getLayoutPosition());
+                handled = onLongClick(view, holder.getLayoutPosition());
                 if(handled && performSelectRoot && view.getParent() instanceof View && !(view instanceof AdapterView)) {
                     ((View)view.getParent()).setSelected(true);
                 }
