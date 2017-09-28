@@ -249,6 +249,7 @@ public class HTTPExecutor implements Callable<Response> {
             connection.setConnectTimeout(timeout);
             connection.setReadTimeout(timeout);
             connection.setRequestMethod("HEAD");
+            connection.setRequestProperty("Accept-Encoding", "");
             return connection.getResponseCode();
         } catch (IOException exception) {
             return HttpURLConnection.HTTP_NOT_FOUND;
