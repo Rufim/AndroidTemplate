@@ -240,7 +240,7 @@ public class Request implements Cloneable, Serializable {
     }
 
     public URL getUrl() throws UnsupportedEncodingException, MalformedURLException {
-        if (withParams && !isPutOrPost()) {
+        if (withParams) {
             return new URL(url + getSuffix() + encodeParams() + getReference());
         } else if (!TextUtils.isEmpty(suffix) || !TextUtils.isEmpty(ref)) {
             return new URL(url + getSuffix() + getReference());
