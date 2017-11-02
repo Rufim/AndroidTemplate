@@ -46,8 +46,8 @@ public class TextUtils {
         return string.replaceAll("^\\s+|\\s+$", "");
     }
 
-    public static String [] trim(String ... strings) {
-        String [] trimStrings = new String[strings.length];
+    public static String[] trim(String... strings) {
+        String[] trimStrings = new String[strings.length];
         for (int i = 0; i < strings.length; i++) {
             trimStrings[i] = trim(trim(strings[i]));
         }
@@ -91,6 +91,10 @@ public class TextUtils {
         return string == null || string.length() == 0;
     }
 
+    public static boolean notEmpty(CharSequence string) {
+        return !isEmpty(string);
+    }
+
     public static String convertEncoding(String string, String from, String to) {
         return convertEncoding(string, Charset.forName(from), Charset.forName(to));
     }
@@ -99,7 +103,7 @@ public class TextUtils {
         ByteBuffer inputBuffer = ByteBuffer.wrap(string.getBytes());
         CharBuffer data = from.decode(inputBuffer);
         ByteBuffer outputBuffer = to.encode(data);
-        return  new String(outputBuffer.array(), to);
+        return new String(outputBuffer.array(), to);
     }
 
     public static String linkify(String text) {
@@ -218,14 +222,14 @@ public class TextUtils {
         return pieces;
     }
 
-    public static Date extractData(SimpleDateFormat dateFormat, String source) throws  ParseException {
+    public static Date extractData(SimpleDateFormat dateFormat, String source) throws ParseException {
         Calendar calendar = Calendar.getInstance();
         dateFormat.setCalendar(calendar);
         return dateFormat.parse(source);
     }
 
     public static Date extractData(String source, @RegExp String date, @RegExp String time) {
-       return extractData(source, date, time, "\\s");
+        return extractData(source, date, time, "\\s");
     }
 
     public static Date extractData(String source, @RegExp String date, @RegExp String time, @RegExp String separator) {
@@ -256,7 +260,7 @@ public class TextUtils {
                     calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dates[2]));
                     calendar.set(Calendar.MONTH, Integer.parseInt(dates[1]) - 1);
                     int year = Integer.parseInt(dates[0]);
-                    if(year < 100) {
+                    if (year < 100) {
                         year += 2000;
                     }
                     calendar.set(Calendar.YEAR, year);
@@ -277,7 +281,7 @@ public class TextUtils {
     }
 
     public static String getShortFormattedDate(Date date, Locale locale) {
-        if(date == null) return "";
+        if (date == null) return "";
         Calendar calendarToday = Calendar.getInstance();
         Calendar calendarDate = Calendar.getInstance();
         calendarDate.setTime(date);
@@ -294,7 +298,7 @@ public class TextUtils {
             byte[] array = md.digest(string.getBytes(Charset.forName(encoding)));
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
@@ -488,10 +492,18 @@ public class TextUtils {
 
                                 }
                                 if (matchedEnd) {
-                                    if (!notInclude) builder.append(line + "\n");
+                                    if (!notInclude) {
+                                        builder.append(line);
+                                        builder.append("\n");
+                                    }
+                                    ;
                                     break;
                                 } else {
-                                    builder.append(line + "\n");
+                                    {
+                                        builder.append(line);
+                                        builder.append("\n");
+                                    }
+                                    ;
                                 }
                             }
                         }
@@ -595,7 +607,8 @@ public class TextUtils {
             return new ArrayList<>();
         }
 
-        public static ArrayList<String> extractLines(InputStream source, String encoding, boolean notInclude, @RegExp String startReg, @RegExp String endReg) {ArrayList<String> parts = new ArrayList<>();
+        public static ArrayList<String> extractLines(InputStream source, String encoding, boolean notInclude, @RegExp String startReg, @RegExp String endReg) {
+            ArrayList<String> parts = new ArrayList<>();
             try (final InputStream is = source;
                  final InputStreamReader isr = new InputStreamReader(is, encoding);
                  final BufferedReader reader = new BufferedReader(isr)) {
@@ -609,14 +622,22 @@ public class TextUtils {
                     if (putStrings) {
                         if (end.matcher(line).find() && builder != null) {
                             putStrings = false;
-                            if (!notInclude) builder.append(line + "\n");
+                            if (!notInclude) {
+                                builder.append(line);
+                                builder.append("\n");
+                            }
+                            ;
                             parts.add(builder.toString());
                             continue;
                         }
                     } else {
                         if (start.matcher(line).find()) {
                             builder = new StringBuilder();
-                            if (!notInclude) builder.append(line + "\n");
+                            if (!notInclude) {
+                                builder.append(line);
+                                builder.append("\n");
+                            }
+                            ;
                             if (!end.matcher(line).find()) {
                                 putStrings = true;
                             } else if (builder.length() != 0) {
@@ -627,7 +648,11 @@ public class TextUtils {
                         }
                     }
                     if (putStrings) {
-                        builder.append(line + "\n");
+                        {
+                            builder.append(line);
+                            builder.append("\n");
+                        }
+                        ;
                     }
                 }
             } catch (Exception e) {

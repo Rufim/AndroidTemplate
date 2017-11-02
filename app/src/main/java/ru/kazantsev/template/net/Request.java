@@ -6,14 +6,9 @@ import ru.kazantsev.template.domain.Valuable;
 import ru.kazantsev.template.util.TextUtils;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.*;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Dmitry on 29.06.2015.
@@ -30,9 +25,10 @@ public class Request implements Cloneable, Serializable {
     private boolean withParams = false;
     private String encoding = "UTF-8";
     private String content = "";
-    private boolean followRedirect = false;
+    private boolean followRedirect = HttpURLConnection.getFollowRedirects();
     private String ref;
-    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> headers = new LinkedHashMap<>();
+    private Map<String, String> cookies = new LinkedHashMap<>();
     private Method method = Method.GET;
     private int reconnectCount = 3;
 
@@ -67,7 +63,7 @@ public class Request implements Cloneable, Serializable {
                 this.url = new URL(url.getProtocol() + "://" + url.getHost() + url.getPath());
                 if (!TextUtils.isEmpty(url.getQuery())) {
                     withParams = true;
-                    String query = url.getQuery().substring(1);
+                    String query = url.getQuery();
                     String[] params = query.split("&");
                     for (String param : params) {
                         String paramValue[] = param.split("=");
@@ -164,12 +160,48 @@ public class Request implements Cloneable, Serializable {
         return headers;
     }
 
+    public Map<String, String> getCookies() {
+        return cookies;
+    }
+
+    public String generateCookieHeader() {
+        if(cookies.size() > 0) {
+            StringBuilder builder = new StringBuilder();
+            Iterator<Map.Entry<String, String>> it = cookies.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, String> val = it.next();
+                builder.append(val.getKey());
+                builder.append("=");
+                builder.append(val.getValue());
+                if(it.hasNext()) builder.append("; ");
+            }
+            return builder.toString();
+        } else {
+            return "";
+        }
+    }
+
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
     public Request addHeader(String name, String value) {
         headers.put(name, value);
+        return this;
+    }
+
+    public Request addHeader(Enum name, String value) {
+        addHeader(name.name(), value);
+        return this;
+    }
+
+    public Request addCookie(String name, String value) {
+        cookies.put(name, value);
+        return this;
+    }
+
+    public Request addCookie(Enum name, String value) {
+        addCookie(name.name(), value);
         return this;
     }
 
@@ -279,12 +311,16 @@ public class Request implements Cloneable, Serializable {
     public Request clone() {
         Request requestClone = null;
         requestClone = new Request();
-        requestClone.url = url;
+        try {
+            requestClone.url = new URL(url.toString());
+        } catch (MalformedURLException e) {
+        }
         requestClone.encoding = encoding;
         requestClone.suffix = suffix;
         requestClone.withParams = withParams;
         requestClone.params.addAll(params);
         requestClone.headers.putAll(headers);
+        requestClone.cookies.putAll(cookies);
         requestClone.content = content;
         requestClone.method = method;
         return requestClone;
@@ -331,5 +367,9 @@ public class Request implements Cloneable, Serializable {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         url = new URL(serialiseUrl);
+    }
+
+    public Response execute() throws InterruptedException, ExecutionException, IOException {
+        return new HTTPExecutor(this).execute();
     }
 }

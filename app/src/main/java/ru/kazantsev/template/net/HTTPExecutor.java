@@ -2,10 +2,12 @@ package ru.kazantsev.template.net;
 
 import android.util.Log;
 import ru.kazantsev.template.util.SystemUtils;
+import ru.kazantsev.template.util.TextUtils;
 
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -21,9 +23,6 @@ public class HTTPExecutor implements Callable<Response> {
     protected Request request;
     protected Response response;
     protected int bufferSize = 1024 * 8;
-
-    public static final String COOKIE = "Cookie";
-    public static final String SET_COOKIE = "Set-Cookie";
 
     public HTTPExecutor(Request request) {
         this.request = request;
@@ -59,7 +58,13 @@ public class HTTPExecutor implements Callable<Response> {
                 if (connection != null) connection.disconnect();
             }
             configConnection(connection);
-            Map<String, String> headers = request.getHeaders();
+            Map<String, String> headers = new LinkedHashMap<>(request.getHeaders());
+            if(request.getCookies() != null && request.getCookies().size() > 0) {
+                if(headers.containsKey(Header.COOKIE) && TextUtils.notEmpty(headers.get(Header.COOKIE))) {
+                   request.getCookies().putAll(parseParamsFromHeader(headers.get(Header.COOKIE)));
+                }
+                headers.put(Header.COOKIE, request.generateCookieHeader());
+            }
             for (Map.Entry<String, String> header : headers.entrySet()) {
                 connection.setRequestProperty(header.getKey(), header.getValue());
             }
@@ -86,18 +91,16 @@ public class HTTPExecutor implements Callable<Response> {
                     // get redirect url from "location" header field
                     String newUrl = connection.getHeaderField("Location");
                     // get the cookie if need, for login
-                    String cookies = connection.getHeaderField(SET_COOKIE);
-                    request = new Request(newUrl);
-                    response = call();
-                    if(cookies != null) {
-                        Map<String, List<String>> redirectHeaders = response.getHeaders();
-                        if(redirectHeaders.containsKey(SET_COOKIE)) {
-                            redirectHeaders.get(SET_COOKIE).add(cookies);
-                        } else {
-                            redirectHeaders.put(SET_COOKIE, Arrays.asList(cookies));
-                        }
+                    String newCookies = connection.getHeaderField(Header.SET_COOKIE);
+                    Request newRequest = new Request(newUrl);
+                    newRequest.getHeaders().putAll(request.getHeaders());
+                    newRequest.getCookies().putAll(request.getCookies());
+                    newRequest.setFollowRedirect(true);
+                    if(newCookies != null) {
+                        newRequest.getCookies().putAll(parseParamsFromHeader(newCookies));
                     }
-                    return response;
+                    request = newRequest;
+                    return call();
                 }
                 response.setCode(connection.getResponseCode());
                 response.setMessage(connection.getResponseMessage());
@@ -161,11 +164,31 @@ public class HTTPExecutor implements Callable<Response> {
         return parseParamFromHeader(header, charset);
     }
 
+    public static String parseParamFromHeader(String header, Enum paramName) {
+        return parseParamFromHeader(header, paramName.name());
+    }
+
     public static String parseParamFromHeader(String header, String paramName) {
         if (header != null && header.contains(paramName)) {
             return header.substring(header.indexOf(paramName) + paramName.length() + 1).split(";")[0];
         }
         return null;
+    }
+
+    public static Map<String, String> parseParamsFromHeader(String header) {
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        String[] keyValues = header.split("; ");
+        if(keyValues != null && keyValues.length > 0) {
+            for (String keyValue : keyValues) {
+                int split = keyValue.indexOf("=");
+                if(split > 0 && keyValue.length() > split + 1) {
+                    params.put(keyValue.substring(0, split), keyValue.substring(split + 1));
+                } else {
+                    params.put(keyValue, "");
+                }
+            }
+        }
+        return params;
     }
 
     public Response getResponse() {
