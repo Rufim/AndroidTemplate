@@ -8,6 +8,7 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import butterknife.ButterKnife;
@@ -166,6 +167,28 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
     public void safeInvalidateOptionsMenu() {
         if(isAdded()) {
             getActivity().invalidateOptionsMenu();
+        }
+    }
+
+    public MenuItem safeGetMenuItem(@IdRes int id) {
+        if (getBaseActivity() != null && getBaseActivity().getToolbar() != null) {
+            return getBaseActivity().getToolbar().getMenu().findItem(id);
+        }
+        return null;
+    }
+
+    public void safeCheckMenuItem(@IdRes int id, boolean state) {
+        MenuItem item = safeGetMenuItem(id);
+        if (item != null) {
+            item.setChecked(state);
+        }
+
+    }
+
+    public void safeEnableMenuItem(@IdRes int id, boolean state) {
+        MenuItem item = safeGetMenuItem(id);
+        if (item != null) {
+            item.setEnabled(state);
         }
     }
 
