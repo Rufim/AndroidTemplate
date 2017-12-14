@@ -7,7 +7,7 @@
         android:visibility="gone"
         style="?android:attr/progressBarStyleHorizontal"
         android:background="#00ffffff"
-        android:indeterminateOnly="true"
+        android:indeterminate="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
