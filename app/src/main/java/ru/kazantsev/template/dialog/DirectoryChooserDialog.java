@@ -47,8 +47,12 @@ public class DirectoryChooserDialog extends AlertDialog {
     private LinearLayout contentView;
     private ArrayList<File> createdNewDirectories = new ArrayList<File>();
     private boolean allowRootDir = false;
-    private boolean chooseFile;
     private String createTitle;
+    private NeutralButtonAction neutralButtonAction = NeutralButtonAction.NONE;
+
+    public enum NeutralButtonAction {
+        CREATE_FILE, CREATE_DIR, NONE;
+    }
 
     public interface OnChooseFileListener {
         void onChosenFile(File chosenFile);
@@ -80,19 +84,19 @@ public class DirectoryChooserDialog extends AlertDialog {
         setSourceDirectory(sourceDirectory);
     }
 
-    public DirectoryChooserDialog(Context context, boolean chooseFile,  String sourceDirectory, boolean withPathTextView) {
-        this(context, chooseFile, withPathTextView);
+    public DirectoryChooserDialog(Context context, NeutralButtonAction action,  String sourceDirectory, boolean withPathTextView) {
+        this(context, action, withPathTextView);
         setSourceDirectory(sourceDirectory);
     }
 
     public DirectoryChooserDialog(final Context context, boolean withPathTextView) {
-        this(context, false, withPathTextView);
+        this(context, NeutralButtonAction.NONE, withPathTextView);
     }
 
-    public DirectoryChooserDialog(final Context context, boolean chooseFile, boolean withPathTextView) {
+    public DirectoryChooserDialog(final Context context, NeutralButtonAction action, boolean withPathTextView) {
         super(context);
-        this.chooseFile = chooseFile;
-        if(!chooseFile) {
+        this.neutralButtonAction = action;
+        if(action.equals(NeutralButtonAction.CREATE_DIR)) {
             setTitle("Выберите папку");
             setButton(AlertDialog.BUTTON_POSITIVE, context.getResources().getString(android.R.string.ok), new OnClickListener() {
                 @Override
@@ -102,10 +106,11 @@ public class DirectoryChooserDialog extends AlertDialog {
                     }
                 }
             });
-        } else {
+            createTitle = "Создать папку";
+        } else if(action.equals(NeutralButtonAction.CREATE_FILE)) {
             setTitle("Выберите файл");
+            createTitle = "Создать файл";
         }
-        createTitle = chooseFile ? "Создать файл" : "Создать папку";
         contentView = new LinearLayout(getContext());
 
         contentView.setOrientation(LinearLayout.VERTICAL);
@@ -155,12 +160,14 @@ public class DirectoryChooserDialog extends AlertDialog {
             contentView.addView(divider);
         }
         contentView.addView(filesListView);
-        setNeutralButton(createTitle, new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        if(!neutralButtonAction.equals(NeutralButtonAction.NONE)) {
+            setNeutralButton(createTitle, new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     public void setOnChooseFileListener(OnChooseFileListener onChooseFileListener) {
@@ -218,11 +225,11 @@ public class DirectoryChooserDialog extends AlertDialog {
                     checkPath(currentDir.getAbsolutePath());
                 } else {
                     File chosen = new File(currentDir.getAbsolutePath(), mFileList[i]);
-                    if(chooseFile && chosen.exists() && !chosen.isDirectory()) {
+                    if(chosen.exists() && !chosen.isDirectory()) {
                         if(onChooseFileListener != null) {
                             onChooseFileListener.onChosenFile(chosen);
                         }
-                    }  else {
+                    } else {
                         setSourceDirectory(new File(currentDir.getAbsolutePath(), mFileList[i]));
                         changePath();
                         checkPath(currentDir.getAbsolutePath());
@@ -241,7 +248,7 @@ public class DirectoryChooserDialog extends AlertDialog {
         if(pathTextView != null) {
             pathTextView.setText(currentDir.getAbsolutePath());
         }
-        if(neutralButton != null) {
+        if(neutralButton != null && !neutralButtonAction.equals(NeutralButtonAction.NONE)) {
             neutralButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -256,11 +263,17 @@ public class DirectoryChooserDialog extends AlertDialog {
                         public void onClick(DialogInterface dialog, int which) {
                             File newFile = new File(currentDir.getAbsolutePath(), editText.getText().toString());
                             try {
-                                if (chooseFile ? newFile.createNewFile() : newFile.mkdir()) {
-                                    Log.i(TAG, "Created file " + newFile);
-                                    if (!chooseFile) {
+                                boolean create = false;
+                                if(neutralButtonAction.equals(NeutralButtonAction.CREATE_FILE)) {
+                                    create = newFile.createNewFile();
+                                }
+                                if(neutralButtonAction.equals(NeutralButtonAction.CREATE_DIR)) {
+                                    if (create = newFile.mkdir()) {
                                         createdNewDirectories.add(newFile);
                                     }
+                                }
+                                if (create) {
+                                    Log.i(TAG, "Created file " + newFile);
                                     changePath();
                                 } else {
                                     Log.w(TAG, "Failed to create file " + newFile);
