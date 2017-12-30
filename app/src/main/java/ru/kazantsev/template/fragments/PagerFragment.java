@@ -138,6 +138,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         if (adapter != null) {
             adapter.getItems().clear();
             adapter.notifyDataSetChanged();
+            pager.setAdapter(adapter);
         }
     }
 
