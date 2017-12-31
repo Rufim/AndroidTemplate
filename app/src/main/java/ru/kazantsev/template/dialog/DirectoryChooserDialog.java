@@ -78,15 +78,8 @@ public class DirectoryChooserDialog extends AlertDialog {
         setButton(AlertDialog.BUTTON_NEUTRAL, neutralButtonText, listener);
     }
 
-
-    public DirectoryChooserDialog(Context context, String sourceDirectory, boolean withPathTextView) {
-        this(context, withPathTextView);
-        setSourceDirectory(sourceDirectory);
-    }
-
-    public DirectoryChooserDialog(Context context, NeutralButtonAction action,  String sourceDirectory, boolean withPathTextView) {
-        this(context, action, withPathTextView);
-        setSourceDirectory(sourceDirectory);
+    public DirectoryChooserDialog(final Context context) {
+        this(context, NeutralButtonAction.NONE, false);
     }
 
     public DirectoryChooserDialog(final Context context, boolean withPathTextView) {
@@ -94,10 +87,20 @@ public class DirectoryChooserDialog extends AlertDialog {
     }
 
     public DirectoryChooserDialog(final Context context, NeutralButtonAction action, boolean withPathTextView) {
+        this(context, action, withPathTextView, true, true);
+    }
+
+    public DirectoryChooserDialog(final Context context, NeutralButtonAction action, boolean withPathTextView, boolean showPositive, boolean showNegative) {
         super(context);
         this.neutralButtonAction = action;
         if(action.equals(NeutralButtonAction.CREATE_DIR)) {
             setTitle("Выберите папку");
+            createTitle = "Создать папку";
+        } else if(action.equals(NeutralButtonAction.CREATE_FILE)) {
+            setTitle("Выберите файл");
+            createTitle = "Создать файл";
+        }
+        if(showPositive) {
             setButton(AlertDialog.BUTTON_POSITIVE, context.getResources().getString(android.R.string.ok), new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -106,10 +109,14 @@ public class DirectoryChooserDialog extends AlertDialog {
                     }
                 }
             });
-            createTitle = "Создать папку";
-        } else if(action.equals(NeutralButtonAction.CREATE_FILE)) {
-            setTitle("Выберите файл");
-            createTitle = "Создать файл";
+        }
+        if(showNegative) {
+            setButton(AlertDialog.BUTTON_NEGATIVE, context.getResources().getString(android.R.string.cancel), new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
         }
         contentView = new LinearLayout(getContext());
 

@@ -50,7 +50,8 @@ public class DirectoryChoosePreference extends DialogPreference {
 
     protected void showDialog(Bundle state) {
 
-        chooserDialog = new DirectoryChooserDialog(this.getContext(), mText, true);
+        chooserDialog = new DirectoryChooserDialog(this.getContext(), DirectoryChooserDialog.NeutralButtonAction.NONE, true);
+        chooserDialog.setSourceDirectory(mText);
         chooserDialog.setTitle(super.getDialogTitle());
         chooserDialog.setIcon(super.getDialogIcon());
         chooserDialog.setPositiveButton(super.getPositiveButtonText(), this);
