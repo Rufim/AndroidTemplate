@@ -439,6 +439,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
                 }
             }
             if(bindRoot) {
+                itemView.setTag(ViewHolder.this);
                 itemView.setOnClickListener(clickable);
                 itemView.setOnLongClickListener(clickable);
             }
