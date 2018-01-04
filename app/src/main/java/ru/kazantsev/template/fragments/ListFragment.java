@@ -103,7 +103,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     @Override
     public boolean onQueryTextChange(String query) {
-        if (query.isEmpty() && !searchView.isIconified() && searchView.hasFocus()) {
+        if (query.isEmpty() && !searchView.isIconified()) {
             searchView.clearFocus();
             onSearchViewClose(searchView);
         }
