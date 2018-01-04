@@ -25,6 +25,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
     protected Set<ViewHolder> currentHolders = Collections.newSetFromMap(new WeakHashMap<>());
     protected final int layoutId;
     protected FilterEvent lastQuery;
+    protected boolean bindRoot = false;
     protected boolean bindViews = true;
     protected boolean bindOnlyRootViews = true;
     protected boolean bindClicks = true;
@@ -50,7 +51,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
                 .inflate(layoutId, parent, false);
         ViewHolder holder = newHolder(itemView);
         if (bindViews) {
-            holder.bindViews(ItemListAdapter.this, bindClicks, bindOnlyRootViews);
+            holder.bindViews(ItemListAdapter.this, bindClicks, bindOnlyRootViews, bindRoot);
         }
         return holder;
     }
@@ -422,7 +423,7 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
             this.tag = tag;
         }
 
-        public  <C extends View.OnClickListener & View.OnLongClickListener> ViewHolder bindViews(C clickable, boolean bindClicks, boolean onlyRoot) {
+        public  <C extends View.OnClickListener & View.OnLongClickListener> ViewHolder bindViews(C clickable, boolean bindClicks, boolean onlyRoot, boolean bindRoot) {
             for (Map.Entry<Integer, View> viewEntry : views.entrySet()) {
                 if (viewEntry != itemView) {
                     View view = viewEntry.getValue();
@@ -436,6 +437,10 @@ public abstract class ItemListAdapter<I> extends RecyclerView.Adapter<ItemListAd
                     }
                     view.setTag(ViewHolder.this);
                 }
+            }
+            if(bindRoot) {
+                itemView.setOnClickListener(clickable);
+                itemView.setOnLongClickListener(clickable);
             }
             return this;
         }

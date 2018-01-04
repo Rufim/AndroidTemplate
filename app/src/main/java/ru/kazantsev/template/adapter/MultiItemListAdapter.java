@@ -70,7 +70,7 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
         if(viewType > 0) {
             ViewHolder holder = newHolder(inflater.inflate(viewType, parent, false));
             if (bindViews) {
-                holder.bindViews(MultiItemListAdapter.this, bindClicks, bindOnlyRootViews);
+                holder.bindViews(MultiItemListAdapter.this, bindClicks, bindOnlyRootViews, bindRoot);
             }
             return holder;
         } else {
