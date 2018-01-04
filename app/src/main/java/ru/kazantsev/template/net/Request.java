@@ -134,8 +134,9 @@ public class Request implements Cloneable, Serializable {
 
     public String getParam(String name) {
         for (Pair<String, String> param : params) {
-            param.first.equals(name);
-            return param.second;
+            if(param.first.equals(name)) {
+                return param.second;
+            }
         }
         return null;
     }
