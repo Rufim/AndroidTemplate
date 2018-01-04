@@ -369,7 +369,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return getResources().getString(id);
     }
 
-    protected Fragment getCurrentFragment() {
+    public Fragment getCurrentFragment() {
         return getSupportFragmentManager().findFragmentById(R.id.container);
     }
 
