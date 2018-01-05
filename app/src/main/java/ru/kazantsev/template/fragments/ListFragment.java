@@ -2,15 +2,16 @@ package ru.kazantsev.template.fragments;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.*;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.*;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.*;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.domain.Constants;
@@ -162,6 +163,16 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                     onSearchViewClose(searchView);
                     return false;
                 });
+                LinearLayout linearLayout1 = (LinearLayout) searchView.getChildAt(0);
+                LinearLayout linearLayout2 = (LinearLayout) linearLayout1.getChildAt(2);
+                LinearLayout linearLayout3 = (LinearLayout) linearLayout2.getChildAt(1);
+                AutoCompleteTextView autoComplete = (AutoCompleteTextView) linearLayout3.getChildAt(0);
+                //Set the input text color
+                autoComplete.setTextColor(GuiUtils.getThemeColor(getContext(), android.R.attr.textColor));
+                // set the hint text color
+                autoComplete.setHintTextColor(GuiUtils.getThemeColor(getContext(), android.R.attr.textColorHint));
+                //Some drawable (e.g. from xml)
+                autoComplete.setDropDownBackgroundDrawable(new ColorDrawable(GuiUtils.getThemeColor(getContext(), R.attr.colorOverlay)));
             }
         }
         super.onCreateOptionsMenu(menu, inflater);
