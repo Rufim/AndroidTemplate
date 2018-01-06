@@ -188,6 +188,13 @@ public class AndroidSystemUtils {
     }
 
 
+    public static long getMemory(Context context) {
+        ActivityManager actManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
+        actManager.getMemoryInfo(memInfo);
+        return memInfo.availMem;
+    }
+
     public static String getInternalMemory(Context context) {
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());

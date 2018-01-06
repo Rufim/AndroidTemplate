@@ -233,9 +233,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     public void onBackPressed() {
         Fragment fr = getCurrentFragment();
         if (fr instanceof BackCallback) {
-            if (((BackCallback) fr).allowBackPress()) super.onBackPressed();
+            if (((BackCallback) fr).allowBackPress()) {
+                super.onBackPressed();
+                System.gc();
+            }
         } else {
             super.onBackPressed();
+            System.gc();
         }
     }
 
