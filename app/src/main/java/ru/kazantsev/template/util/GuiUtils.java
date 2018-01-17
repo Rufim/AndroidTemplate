@@ -835,7 +835,7 @@ public class GuiUtils {
     }
 
     public static void selectText(TextView textView, boolean erase, int start, int end, int color) {
-        if (textView == null) {
+        if (textView == null || end <= start) {
             return;
         }
         Spannable raw = new SpannableString(erase ? textView.getText().toString() : textView.getText());
