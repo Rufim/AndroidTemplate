@@ -209,7 +209,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         protected void onPostExecute(List<I> result) {
             super.onPostExecute(result);
             if (pager != null) {
-                if (result.size() == 0) {
+                if (result == null || result.size() == 0) {
                     isEnd = true;
                 } else {
                     adapter.addItems(result);
