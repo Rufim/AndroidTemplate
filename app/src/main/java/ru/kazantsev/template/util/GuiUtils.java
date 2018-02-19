@@ -835,12 +835,15 @@ public class GuiUtils {
     }
 
     public static void selectText(TextView textView, boolean erase, int start, int end, int color) {
-        if (textView == null || end <= start) {
+        if (textView == null) {
             return;
         }
         Spannable raw = new SpannableString(erase ? textView.getText().toString() : textView.getText());
         if (end > raw.length()) {
             end = raw.length();
+        }
+        if(end < start) {
+            return;
         }
         raw.setSpan(new BackgroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         textView.setText(raw, TextView.BufferType.SPANNABLE);
