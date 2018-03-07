@@ -313,7 +313,7 @@ public class ReflectionUtils {
         // Проейденные классы - используются для спуска вниз.
         Stack<ParameterizedType> genericClasses = new Stack<ParameterizedType>();
 
-        // clazz - текущий рассматриваемый класс
+        // series - текущий рассматриваемый класс
         Class clazz = actualClass;
 
         while (true) {

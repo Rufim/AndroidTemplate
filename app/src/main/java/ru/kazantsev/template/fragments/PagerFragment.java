@@ -2,6 +2,7 @@ package ru.kazantsev.template.fragments;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -32,6 +33,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     protected ViewPager pager;
     protected FragmentPagerAdapter<I, F> adapter;
     protected DataSource<I> dataSource;
+    protected TabLayout tabLayout;
     protected volatile boolean isLoading = false;
     protected volatile boolean isEnd = false;
     protected int pagesSize = 50;
@@ -40,6 +42,8 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
 
     protected int currentItem = 0;
     protected List<I> currentItems;
+
+    protected boolean tabStripMode = true;
 
     public PagerFragment() {
     }
@@ -52,10 +56,27 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         this.dataSource = dataSource;
     }
 
+    protected  DataSource<I> newDataSource() throws Exception {
+        return getDataSource();
+    }
+
+    public DataSource<I> getDataSource() {
+        return dataSource;
+    }
+
+    public void onPostLoadItems() {
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_pager, container, false);
+        View rootView;
+        if(tabStripMode) {
+           rootView = inflater.inflate(R.layout.fragment_pager, container, false);
+        } else {
+           rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
+        }
         pager = GuiUtils.getView(rootView, R.id.pager);
         pagerHeader = GuiUtils.getView(rootView, R.id.pager_header);
         loadMoreBar = GuiUtils.getView(rootView, R.id.load_more);
@@ -63,6 +84,11 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
             currentItems = new ArrayList<>();
         }
         adapter = newAdapter(currentItems);
+        try {
+            setDataSource(newDataSource());
+        } catch (Exception e) {
+            onDataTaskException(e);
+        }
         currentItems = adapter.getItems();
         pager.setAdapter(adapter);
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -81,6 +107,10 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
                 PagerFragment.this.onPageScrollStateChanged(state);
             }
         });
+        if(!tabStripMode) {
+            tabLayout = rootView.findViewById(R.id.tab_layout);
+            tabLayout.setupWithViewPager(pager);
+        }
         if (adapter != null) {
             if (dataSource != null) {
                 if (dataTask != null) {
@@ -195,10 +225,8 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         protected List<I> doInBackground(Void... params) {
             List<I> items = null;
             try {
+                isLoading = true;
                 items = dataSource.getItems(currentCount, count);
-                if (items.size() == 0) {
-                    return items;
-                }
             } catch (Exception ex) {
                 onDataTaskException(ex);
             }
@@ -208,21 +236,24 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         @Override
         protected void onPostExecute(List<I> result) {
             super.onPostExecute(result);
-            if (pager != null) {
+            isLoading = false;
+            if (pager != null && adapter != null) {
+                currentCount = adapter.getCount();
                 if (result == null || result.size() == 0) {
                     isEnd = true;
-                } else {
+                } else if(!isEnd) {
                     adapter.addItems(result);
                 }
-                stopLoading();
-                currentCount = adapter.getCount();
                 if (onElementsLoadedTask != null) {
                     onElementsLoadedTask.execute(LoadedTaskParams);
                 }
-                if (this != dataTask) {
-                    dataTask.execute();
+                stopLoading();
+                if (this == dataTask) dataTask = null;
+                if(isAdded()) {
+                    onPostLoadItems();
                 }
-                dataTask = null;
+            } else {
+                if (this == dataTask) dataTask = null;
             }
         }
     }

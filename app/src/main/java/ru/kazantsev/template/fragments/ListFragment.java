@@ -413,7 +413,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 items = dataSource.getItems(currentCount, count);
                 if (items == null || items.size() == 0) {
                     isEnd = true;
-                } else {
+                } else if(adapter != null) {
                     if(adapter.getItems().size() == 0) {
                         adapter.setItems(items);
                         needMore = count - adapter.getItems().size();
@@ -429,22 +429,25 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
         @Override
         protected void onPostExecute(List<I> result) {
+            isLoading = false;
             if (itemList != null && adapter != null) {
                 currentCount = adapter.getAbsoluteItemCount();
-                isLoading = false;
-                dataTask = null;
                 if(needMore <= 0 || isEnd) {
                     adapter.notifyChanged();
                     if (onElementsLoadedTask != null) {
                         onElementsLoadedTask.execute(LoadedTaskParams);
                     }
                     stopLoading();
+                    if (this == dataTask) dataTask = null;
                     if(isAdded()) {
                         onPostLoadItems();
                     }
                 } else {
+                    if (this == dataTask) dataTask = null;
                     loadItems(needMore, true, onElementsLoadedTask, LoadedTaskParams);
                 }
+            } else {
+                if (this == dataTask) dataTask = null;
             }
         }
     }

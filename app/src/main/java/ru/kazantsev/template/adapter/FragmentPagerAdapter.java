@@ -33,6 +33,14 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
         return items;
     }
 
+    public I getItemTag(int position) {
+        if(position >= 0 || position < items.size()) {
+            return items.get(position);
+        } else {
+            return null;
+        }
+    }
+
     public void addItems(Collection<I> newItems) {
         items.addAll(newItems);
         notifyDataSetChanged();
@@ -73,5 +81,5 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
         return registeredFragments.get(position);
     }
     @Override
-    public abstract Fragment getItem(int position);
+    public abstract F getItem(int position);
 }

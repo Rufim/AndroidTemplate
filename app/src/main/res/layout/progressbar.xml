@@ -18,4 +18,8 @@
             android:text="@string/loading"
             android:id="@+id/loading_text"
             android:layout_gravity="center_horizontal"/>
+    <FrameLayout
+        android:id="@+id/replace_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </RelativeLayout>

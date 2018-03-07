@@ -2,11 +2,13 @@ package ru.kazantsev.template.fragments;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import ru.kazantsev.template.R;
@@ -27,6 +29,7 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
 
     protected ProgressBar progressBar;
     protected TextView loadingText;
+    protected FrameLayout frameLayout;
 
     public interface OnDoBackground<Result,Params> {
         Result doBackground(Params[] params);
@@ -120,6 +123,7 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
         View rootView = inflater.inflate(ru.kazantsev.template.R.layout.progressbar, container, false);
         progressBar = GuiUtils.getView(rootView, R.id.load_progress);
         loadingText = GuiUtils.getView(rootView, R.id.loading_text);
+        frameLayout = GuiUtils.getView(rootView, R.id.replace_view);
         return rootView;
     }
 
@@ -165,6 +169,12 @@ public class LoadFragment<Params, Progress, Result> extends BaseFragment {
         } else {
             cancelTask();
         }
+    }
+
+    protected View inflateView(@LayoutRes int layoutId) {
+         View root = GuiUtils.inflate(frameLayout, layoutId);
+         frameLayout.addView(root);
+         return root;
     }
 
     public boolean eq(LoadFragment o) {
