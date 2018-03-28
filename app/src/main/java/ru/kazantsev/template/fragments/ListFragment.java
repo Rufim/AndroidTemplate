@@ -2,7 +2,6 @@ package ru.kazantsev.template.fragments;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.*;
 import android.support.v4.view.MenuItemCompat;
@@ -230,7 +229,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     }
 
-    protected abstract ItemListAdapter<I> newAdapter();
+    protected abstract ItemListAdapter newAdapter();
 
     protected  DataSource<I> newDataSource() throws Exception {
         return getDataSource();

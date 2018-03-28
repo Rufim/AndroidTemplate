@@ -19,6 +19,7 @@ import android.support.annotation.*;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v7.widget.RecyclerView;
 import android.text.*;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
@@ -646,6 +647,10 @@ public class GuiUtils {
             throw new EmptyTextException();
         }
         return text;
+    }
+
+    public static void setText(RecyclerView.ViewHolder holder, @IdRes int textViewId, CharSequence text) {
+        setText((ViewGroup) holder.itemView, textViewId, text);
     }
 
     public static void setText(ViewGroup root, @IdRes int textViewId, CharSequence text) {
