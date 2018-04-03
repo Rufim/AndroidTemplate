@@ -1,6 +1,5 @@
 package ru.kazantsev.template.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -10,19 +9,22 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -38,7 +40,6 @@ import ru.kazantsev.template.fragments.ListFragment;
 import ru.kazantsev.template.util.*;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -52,6 +53,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     protected LinearLayout rootLayout;
     protected RelativeLayout contentLayout;
+    protected CoordinatorLayout coordinatorLayout;
+    protected AppBarLayout appBarLayout;
+    protected CollapsingToolbarLayout collapsingToolbarLayout;
+    protected NestedScrollView nestedScrollView;
 
     protected FrameLayout container;
     protected DrawerLayout drawerLayout;
@@ -66,6 +71,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected boolean toolbarClassic = false;
     protected boolean enableFragmentCache = false;
     protected boolean clearBackStack = true;
+
+    protected boolean collapsingShadowState = true;
 
     ArrayList<BundleCache> fragmentBundleCache = new ArrayList<>();
     HashMap<String, List<PermissionAction>> waitingPermissionActions = new HashMap<>();
@@ -94,6 +101,32 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         navigationView = GuiUtils.getView(this, R.id.navigation_drawer);
         toolbar = GuiUtils.getView(this, R.id.toolbar);
         toolbarShadow = GuiUtils.getView(this, R.id.toolbar_shadow);
+        appBarLayout = GuiUtils.getView(this, R.id.app_bar);
+        collapsingToolbarLayout = GuiUtils.getView(this, R.id.collapsing_toolbar);
+        nestedScrollView = GuiUtils.getView(this, R.id.nested_scroll);
+        coordinatorLayout = GuiUtils.getView(this, R.id.coordinator_layout);
+
+        if(appBarLayout != null) {
+            appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+                @Override
+                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                    if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+                        // Collapsed
+                        if(toolbarShadow.getVisibility() == View.VISIBLE && collapsingShadowState) {
+                            toolbarShadow.setVisibility(View.GONE);
+                        }
+                    } else if (verticalOffset == 0) {
+                        // Expanded
+                    } else {
+                        if(toolbarShadow.getVisibility() == View.GONE && collapsingShadowState) {
+                            toolbarShadow.setVisibility(View.VISIBLE);
+                        }
+                        // Somewhere in between
+                    }
+                }
+            });
+        }
+
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
         actionBar = getSupportActionBar();
@@ -185,6 +218,16 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void hideActionBar() {
+        if(appBarLayout != null && nestedScrollView != null) {
+            appBarLayout.setVisibility(View.GONE);
+            CoordinatorLayout.LayoutParams params =
+                    (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
+            params.setBehavior(null);
+            nestedScrollView.requestLayout();
+        }
+        if(toolbarShadow != null) {
+            toolbarShadow.setVisibility(View.GONE);
+        }
         if(getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
@@ -194,6 +237,16 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void showActionBar() {
+        if(appBarLayout != null && nestedScrollView != null) {
+            appBarLayout.setVisibility(View.VISIBLE);
+            CoordinatorLayout.LayoutParams params =
+                    (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
+            params.setBehavior(new AppBarLayout.ScrollingViewBehavior());
+            nestedScrollView.requestLayout();
+        }
+        if(toolbarShadow != null) {
+            toolbarShadow.setVisibility(View.VISIBLE);
+        }
         if(getSupportActionBar() != null) {
             getSupportActionBar().show();
         }
@@ -247,6 +300,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) toolbarShadow.getLayoutParams();
         params.height = elavation;
         toolbarShadow.setLayoutParams(params);
+        toolbarShadow.requestLayout();
     }
 
     protected void onBackPressedOriginal() {
@@ -413,6 +467,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return contentLayout;
     }
 
+    public CoordinatorLayout getCoordinatorLayout() {
+        return coordinatorLayout;
+    }
+
+    public AppBarLayout getAppBarLayout() {
+        return appBarLayout;
+    }
+
     public FrameLayout getContainer() {
         return container;
     }
@@ -544,6 +606,22 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         //This method is called when the up button is pressed. Just the pop back stack.
         getSupportFragmentManager().popBackStack();
         return true;
+    }
+
+    public void enableFullCollapsingToolbar() {
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+        params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+                | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED
+                | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+        collapsingToolbarLayout.requestLayout();
+    }
+
+    public void disableFullCollapsingToolbar() {
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+        params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+                | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
+                | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+        collapsingToolbarLayout.requestLayout();
     }
 
     public static class BundleCache implements Parcelable {

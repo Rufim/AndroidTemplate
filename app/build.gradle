@@ -85,6 +85,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:design:$supportLibraryVersion"
     compile "com.android.support:support-annotations:$supportLibraryVersion"
+    compile "com.android.support:cardview-v7:$supportLibraryVersion"
     compile "xyz.danoz:recyclerviewfastscroller:0.1.3"
     compile "uk.co.chrisjenx:calligraphy:2.3.0"
     // Code sugar and annotations

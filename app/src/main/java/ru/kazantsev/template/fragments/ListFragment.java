@@ -377,6 +377,18 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         }
     }
 
+    @Override
+    public void onStart() {
+        getBaseActivity().enableFullCollapsingToolbar();
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        getBaseActivity().disableFullCollapsingToolbar();
+        super.onStop();
+    }
+
     protected void onDataTaskException(Exception ex) {
         Log.e(TAG, "Cant get new Items", ex);
         ErrorFragment.show(ListFragment.this, R.string.error_network);
