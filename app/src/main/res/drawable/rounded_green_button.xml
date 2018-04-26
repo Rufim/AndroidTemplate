@@ -6,6 +6,12 @@
             <solid android:color="@color/green"/>
         </shape>
     </item>
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="6dip"/>
+            <solid android:color="@color/gray"/>
+        </shape>
+    </item>
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="6dip"/>

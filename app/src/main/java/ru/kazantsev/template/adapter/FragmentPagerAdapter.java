@@ -11,13 +11,14 @@ import ru.kazantsev.template.fragments.BaseFragment;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.WeakHashMap;
 
 /**
  * Created by Dmitry on 26.10.2015.
  */
 public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends FragmentStatePagerAdapter {
 
-    protected SparseArray<F> registeredFragments = new SparseArray<>();
+    protected WeakHashMap<Integer, F> registeredFragments = new WeakHashMap<>();
     protected List<I> items = new ArrayList<>();
 
     public FragmentPagerAdapter(FragmentManager fm) {
@@ -41,14 +42,24 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
         }
     }
 
+
     public void addItems(Collection<I> newItems) {
+        addItems(newItems, true);
+    }
+
+
+    public void addItems(Collection<I> newItems, boolean notify) {
         items.addAll(newItems);
-        notifyDataSetChanged();
+        if(notify) notifyDataSetChanged();
     }
 
     public void addItem(I item) {
+        addItem(item, true);
+    }
+
+    public void addItem(I item, boolean notify) {
         items.add(item);
-        notifyDataSetChanged();
+        if(notify) notifyDataSetChanged();
     }
 
     @Override
@@ -71,7 +82,7 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
 
     @Override
     public void restoreState(Parcelable arg0, ClassLoader arg1) {
-        //do nothing here! no call to super.restoreState(arg0, arg1);
+         super.restoreState(arg0, arg1);
     }
 
     public F getRegisteredFragment(int position) {
@@ -80,6 +91,16 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
         }
         return registeredFragments.get(position);
     }
+
     @Override
-    public abstract F getItem(int position);
+    public F getItem(int position) {
+        F fragment = getRegisteredFragment(position);
+        if(fragment == null) {
+            return getNewItem(position);
+        }
+        return fragment;
+    }
+
+    public abstract F getNewItem(int position);
+
 }

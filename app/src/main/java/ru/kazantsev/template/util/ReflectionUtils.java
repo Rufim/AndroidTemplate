@@ -90,7 +90,22 @@ public class ReflectionUtils {
         return values;
     }
 
+    public static Field findField(String name, Object source) {
+        Map<String, Object> values = new LinkedHashMap<String, Object>();
+        for (Field field : getAllFieldsValues(source.getClass())) {
+            if(field.getName().equals(name)) {
+                return field;
+            }
+        }
+        return null;
+    }
+
+    public static Object getField(String name, Object source) {
+        return getField(findField(name, source), source);
+    }
+
     public static Object getField(Field field, Object source) {
+        if(field == null) return null;
         boolean accessible = field.isAccessible();
         field.setAccessible(true);
         Object result = null;

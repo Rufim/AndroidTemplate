@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/app_bar"
     android:animateLayoutChanges="true"
+    app:elevation="0dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -10,6 +11,7 @@
         android:id="@+id/collapsing_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:elevation="0dp"
         app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways"
         app:contentScrim="?attr/colorPrimary"
         app:expandedTitleMarginStart="?attr/actionBarSize"
@@ -18,10 +20,10 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        android:elevation="12dp"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
+        app:elevation="0dp"
         app:layout_scrollFlags="scroll|enterAlways|snap"
         app:layout_collapseMode="pin"
         app:popupTheme="@style/PopupMenuColor" />

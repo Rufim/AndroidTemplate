@@ -36,7 +36,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/error_image"
             android:layout_centerHorizontal="true"
-            android:textColor="?attr/android:textColor"
             android:text="@string/error"
             android:gravity="center"
             android:id="@+id/error_text"

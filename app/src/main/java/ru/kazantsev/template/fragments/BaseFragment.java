@@ -11,6 +11,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.arellomobile.mvp.MvpAppCompatFragment;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import org.greenrobot.eventbus.EventBus;
@@ -20,6 +23,7 @@ import ru.kazantsev.template.activity.NavigationActivity;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
+import ru.kazantsev.template.util.AndroidSystemUtils;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
 
@@ -28,7 +32,9 @@ import java.lang.reflect.Field;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class BaseFragment extends Fragment implements BaseActivity.BackCallback {
+public class BaseFragment extends MvpAppCompatFragment implements BaseActivity.BackCallback {
+
+
 
     /**
      * Returns a new instance of this fragment
@@ -241,6 +247,18 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public <T> T getArg(String key, T defValue) {
+        Bundle bundle = getArguments();
+        if(bundle == null) {
+            return defValue;
+        }
+        T result =  AndroidSystemUtils.getFromBundle(bundle, key, defValue);
+        if(result == null) {
+            result = defValue;
+        }
+        return result;
     }
 
 }

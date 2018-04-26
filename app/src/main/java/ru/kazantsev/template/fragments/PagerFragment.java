@@ -10,14 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import butterknife.BindView;
+
 import ru.kazantsev.template.R;
-import ru.kazantsev.template.R2;
 import ru.kazantsev.template.adapter.FragmentPagerAdapter;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +63,14 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     }
 
     public void onPostLoadItems() {
+    }
 
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    public boolean isEnd() {
+        return isEnd;
     }
 
     @Override
@@ -111,23 +116,26 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
             tabLayout = rootView.findViewById(R.id.tab_layout);
             tabLayout.setupWithViewPager(pager);
         }
-        if (adapter != null) {
-            if (dataSource != null) {
-                if (dataTask != null) {
-                    dataTask.cancel(true);
-                }
-                loadItems(pagesSize, true);
-            } else {
-                stopLoading();
-            }
-        }
         return rootView;
+    }
+
+    public void firstLoad(boolean scroll) {
+        if (getAdapter() != null && getDataSource() != null && !isEnd && getAdapter().getItems().isEmpty()) {
+            if (dataTask != null) {
+                dataTask.cancel(true);
+            }
+            loadItems(pagesSize, true);
+        } else {
+            stopLoading();
+        }
+        if (scroll) {
+            pager.setCurrentItem(currentItem);
+        }
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        pager.setCurrentItem(currentItem);
+        firstLoad(true);
     }
 
     public void startLoading(boolean showProgress) {
@@ -140,7 +148,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     public void stopLoading() {
         isLoading = false;
         if (loadMoreBar != null) {
-            loadMoreBar.setVisibility(View.INVISIBLE);
+            loadMoreBar.setVisibility(View.GONE);
         }
     }
 
@@ -195,25 +203,29 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
 
     }
 
-    protected void onDataTaskException(Exception ex) {
+    public void onDataTaskException(Throwable ex) {
         Log.e(TAG, "Cant get new Items: ", ex);
         ErrorFragment.show(PagerFragment.this, R.string.error);
+    }
+
+    public FragmentPagerAdapter<I,F> getAdapter() {
+        return adapter;
     }
 
     public class PagerDataTask extends AsyncTask<Void, Void, List<I>> {
 
         private int count = 0;
         private AsyncTask onElementsLoadedTask;
-        private Object[] LoadedTaskParams;
+        private Object[] loadedTaskParams;
 
         public PagerDataTask(int count) {
             this.count = count;
         }
 
-        public PagerDataTask(int count, AsyncTask onElementsLoadedTask, Object[] LoadedTaskParams) {
+        public PagerDataTask(int count, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
             this.count = count;
             this.onElementsLoadedTask = onElementsLoadedTask;
-            this.LoadedTaskParams = LoadedTaskParams;
+            this.loadedTaskParams = loadedTaskParams;
         }
 
         @Override
@@ -245,7 +257,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
                     adapter.addItems(result);
                 }
                 if (onElementsLoadedTask != null) {
-                    onElementsLoadedTask.execute(LoadedTaskParams);
+                    onElementsLoadedTask.execute(loadedTaskParams);
                 }
                 stopLoading();
                 if (this == dataTask) dataTask = null;

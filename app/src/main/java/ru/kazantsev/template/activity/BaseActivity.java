@@ -21,22 +21,25 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import com.arellomobile.mvp.MvpAppCompatActivity;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
-import ru.kazantsev.template.fragments.ListFragment;
+import ru.kazantsev.template.fragments.mvp.MvpListFragment;
 import ru.kazantsev.template.util.*;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -45,7 +48,9 @@ import java.util.*;
 /**
  * Created by 0shad on 11.07.2015.
  */
-public abstract class BaseActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+public abstract class BaseActivity extends MvpAppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+
+
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -105,27 +110,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         collapsingToolbarLayout = GuiUtils.getView(this, R.id.collapsing_toolbar);
         nestedScrollView = GuiUtils.getView(this, R.id.nested_scroll);
         coordinatorLayout = GuiUtils.getView(this, R.id.coordinator_layout);
-
-        if(appBarLayout != null) {
-            appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-                @Override
-                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                    if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
-                        // Collapsed
-                        if(toolbarShadow.getVisibility() == View.VISIBLE && collapsingShadowState) {
-                            toolbarShadow.setVisibility(View.GONE);
-                        }
-                    } else if (verticalOffset == 0) {
-                        // Expanded
-                    } else {
-                        if(toolbarShadow.getVisibility() == View.GONE && collapsingShadowState) {
-                            toolbarShadow.setVisibility(View.VISIBLE);
-                        }
-                        // Somewhere in between
-                    }
-                }
-            });
-        }
 
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
@@ -220,9 +204,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     public void hideActionBar() {
         if(appBarLayout != null && nestedScrollView != null) {
             appBarLayout.setVisibility(View.GONE);
-            CoordinatorLayout.LayoutParams params =
-                    (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
-            params.setBehavior(null);
+            ViewGroup.LayoutParams layoutParams = nestedScrollView.getLayoutParams();
+            if(layoutParams instanceof CoordinatorLayout.LayoutParams) {
+                CoordinatorLayout.LayoutParams params =
+                        (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
+
+                params.setBehavior(null);
+            }
             nestedScrollView.requestLayout();
         }
         if(toolbarShadow != null) {
@@ -239,10 +227,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     public void showActionBar() {
         if(appBarLayout != null && nestedScrollView != null) {
             appBarLayout.setVisibility(View.VISIBLE);
-            CoordinatorLayout.LayoutParams params =
-                    (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
-            params.setBehavior(new AppBarLayout.ScrollingViewBehavior());
-            nestedScrollView.requestLayout();
+            ViewGroup.LayoutParams layoutParams = nestedScrollView.getLayoutParams();
+            if(layoutParams instanceof CoordinatorLayout.LayoutParams) {
+                CoordinatorLayout.LayoutParams params =
+                        (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
+
+                params.setBehavior(new AppBarLayout.ScrollingViewBehavior());
+                nestedScrollView.requestLayout();
+            }
         }
         if(toolbarShadow != null) {
             toolbarShadow.setVisibility(View.VISIBLE);
@@ -260,8 +252,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         // fix for earlier android  versions that send intent even if onQueryTextSubmit returns true
         if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
             Fragment fragment = getCurrentFragment();
-          if(getCurrentFragment() instanceof ListFragment) {
-              ListFragment list= (ListFragment) fragment;
+          if(getCurrentFragment() instanceof MvpListFragment) {
+              MvpListFragment list= (MvpListFragment) fragment;
               if(list.isEnableFiltering()) {
                   return;
               }
@@ -271,7 +263,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     @Override
-    public void onStart() {
+    protected void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
     }

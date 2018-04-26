@@ -28,11 +28,11 @@ public enum ClassType {
     BUNDLE(Bundle.class),
     CHARSEQUENCE(CharSequence.class),
     PARCELABLE(Parcelable.class),
-    SERIALIZABLE(Serializable.class),
     SET(Set.class),
     LIST(List.class),
     MAP(Map.class),
     ENUM(Enum.class),
+    SERIALIZABLE(Serializable.class),
     UNSUPPORTED(Void.class);
 
     private Class<?> clazz;

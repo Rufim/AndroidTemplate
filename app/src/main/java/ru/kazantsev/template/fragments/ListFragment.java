@@ -4,6 +4,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.*;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
@@ -14,6 +16,7 @@ import android.widget.*;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.domain.Constants;
+import ru.kazantsev.template.fragments.mvp.MvpListFragment;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.view.AdvancedRecyclerView;
@@ -71,11 +74,31 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         return enableScrollbar;
     }
 
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    public boolean isEnd() {
+        return isEnd;
+    }
+
+    public int getCurrentCount() {
+        return currentCount;
+    }
+
+    public void setCurrentCount(int currentCount) {
+        this.currentCount = currentCount;
+    }
+
+    public ItemListAdapter<I> getAdapter() {
+        return adapter;
+    }
+
     public ListFragment() {
     }
 
     public ListFragment(DataSource<I> dataSource) {
-        this.dataSource = dataSource;
+        setDataSource(dataSource);
     }
 
     public void setDataSource(DataSource<I> dataSource) {
@@ -88,7 +111,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     public boolean restoreLister() {
         if (savedDataSource != null) {
-            dataSource = savedDataSource;
+            setDataSource(savedDataSource);
             savedDataSource = null;
             refreshData(true);
             return true;
@@ -205,14 +228,14 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         if (isLoading || isEnd) {
             return;
         }
-        if (dataSource != null && dataTask == null) {
+        if (getDataSource() != null && dataTask == null) {
             startLoading(showProgress);
             dataTask = new DataTask(count, onElementsLoadedTask, params);
             dataTask.executeOnExecutor(executor);
         }
     }
 
-    protected void loadItems(boolean showProgress) {
+    public void loadItems(boolean showProgress) {
         loadItems(pageSize, showProgress, null, null);
     }
 
@@ -221,7 +244,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     }
 
 
-    protected void loadItems(int count, boolean showProgress) {
+    public void loadItems(int count, boolean showProgress) {
         loadItems(count, showProgress, null, null);
     }
 
@@ -239,7 +262,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         return dataSource;
     }
 
-    protected void clearData() {
+    public void clearData() {
         currentCount = 0;
         pastVisibleItems = 0;
         isEnd = false;
@@ -252,10 +275,10 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     public void refreshData(boolean showProgress) {
         try {
-            if(dataSource == null) {
-                dataSource = newDataSource();
+            if(getDataSource() == null) {
+                setDataSource(newDataSource());
             }
-            if (dataSource != null) {
+            if (getDataSource() != null) {
                 clearData();
                 loadItems(showProgress);
             }
@@ -299,6 +322,14 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         }
     }
 
+    public void onSwipeRefresh() {
+        if (!isLoading) {
+            refreshData(false);
+        } else {
+            swipeRefresh.setRefreshing(false);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -309,13 +340,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         loadMoreBar = GuiUtils.getView(rootView, R.id.load_more);
         itemList = GuiUtils.getView(rootView, R.id.items);
         swipeRefresh = GuiUtils.getView(rootView, R.id.refresh);
-        swipeRefresh.setOnRefreshListener(() -> {
-            if (!isLoading) {
-                refreshData(false);
-            } else {
-                swipeRefresh.setRefreshing(false);
-            }
-        });
+        swipeRefresh.setOnRefreshListener(this::onSwipeRefresh);
         if (adapter == null) {
             adapter = newAdapter();
         }
@@ -359,14 +384,19 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         } else {
             ((RelativeLayout) rootView).removeView(rootView.findViewById(R.id.fast_scroller));
         }
-        if (adapter != null) {
-            firstLoad(true);
-        }
         return rootView;
     }
 
-    protected void firstLoad(boolean scroll) {
-        if (dataSource != null && !isEnd && adapter.getItems().isEmpty()) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        firstLoad(true);
+    }
+
+    public void firstLoad(boolean scroll) {
+        if (getAdapter() != null && getDataSource() != null && !isEnd && getAdapter().getItems().isEmpty()) {
+            if (dataTask != null) {
+                dataTask.cancel(true);
+            }
             loadMoreBar.setVisibility(View.GONE);
             loadItems(false);
         } else {
@@ -379,17 +409,29 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     @Override
     public void onStart() {
-        getBaseActivity().enableFullCollapsingToolbar();
+        onStartList();
         super.onStart();
     }
 
     @Override
     public void onStop() {
-        getBaseActivity().disableFullCollapsingToolbar();
+        onStopList();
         super.onStop();
     }
 
-    protected void onDataTaskException(Exception ex) {
+    protected void onStopList() {
+        if(retainInstance) {
+            getBaseActivity().disableFullCollapsingToolbar();
+        }
+    }
+
+    protected void onStartList() {
+        if(retainInstance) {
+            getBaseActivity().enableFullCollapsingToolbar();
+        }
+    }
+
+    public void onDataTaskException(Throwable ex) {
         Log.e(TAG, "Cant get new Items", ex);
         ErrorFragment.show(ListFragment.this, R.string.error_network);
     }
@@ -421,7 +463,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             List<I> items = null;
             try {
                 isLoading = true;
-                items = dataSource.getItems(currentCount, count);
+                items = getDataSource().getItems(currentCount, count);
                 if (items == null || items.size() == 0) {
                     isEnd = true;
                 } else if(adapter != null) {

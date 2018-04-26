@@ -2,6 +2,7 @@ package ru.kazantsev.template.view;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
@@ -109,4 +110,13 @@ public class AdvancedRecyclerView extends RecyclerView {
         getLayoutManager().startSmoothScroll(linearSmoothScroller);
     }
 
+    @Override
+    public Parcelable onSaveInstanceState() {
+        return super.onSaveInstanceState();
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        super.onRestoreInstanceState(state);
+    }
 }

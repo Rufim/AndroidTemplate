@@ -1,5 +1,6 @@
 package ru.kazantsev.template.util;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -11,7 +12,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -19,10 +22,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import net.vrallev.android.cat.Cat;
+
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -335,6 +343,7 @@ public class AndroidSystemUtils {
         return false;
     }
 
+    @SuppressLint("MissingPermission")
     public static String getDeviceId(Context context) {
         final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -393,6 +402,108 @@ public class AndroidSystemUtils {
         } catch(Exception e) {
             //Default to return 1 core
             return 1;
+        }
+    }
+
+    public static void putToBundle(Bundle bundle, String key, Object value) {
+        if(bundle == null || key == null) throw new NullPointerException("bundle or key is null");
+        ClassType type = ClassType.cast(value);
+        ClassType baseType = type;
+        boolean arrayFlag = false;
+        boolean listFlag = false;
+        if (type == ClassType.ARRAY) {
+            arrayFlag = true;
+            type = getArrayType((Object[]) value);
+        }
+        if (type == ClassType.ARRAYLIST) {
+            listFlag = true;
+            ArrayList list = (ArrayList) value;
+            Object[] array = list.toArray();
+            type = getArrayType(list.toArray());
+            if (type != ClassType.STRING && type != ClassType.CHARSEQUENCE && type != ClassType.PARCELABLE) {
+                type = ClassType.UNSUPPORTED;
+            }
+        }
+        switch (type) {
+            case PARCELABLE:
+                if (arrayFlag) bundle.putParcelableArray(key, (Parcelable[]) value);
+                else if (listFlag) bundle.putParcelableArrayList(key, (ArrayList<? extends Parcelable>) value);
+                else bundle.putParcelable(key, (Parcelable) value);
+                return;
+            case CHARSEQUENCE:
+                if (arrayFlag) bundle.putCharSequenceArray(key, (CharSequence[]) value);
+                else if (listFlag) bundle.putCharSequenceArrayList(key, (ArrayList<CharSequence>) value);
+                else bundle.putCharSequence(key, (CharSequence) value);
+                return;
+            case BUNDLE:
+                if (arrayFlag) break;
+                bundle.putBundle(key, (Bundle) value);
+                return;
+            case STRING:
+                if (arrayFlag) bundle.putStringArray(key, (String[]) value);
+                else if (listFlag) bundle.putStringArrayList(key, (ArrayList<String>) value);
+                else bundle.putString(key, (String) value);
+                return;
+            case CHAR:
+                if (arrayFlag) bundle.putCharArray(key, (char[]) value);
+                else bundle.putChar(key, (char) value);
+                return;
+            case BYTE:
+                if (arrayFlag) bundle.putByteArray(key, (byte[]) value);
+                else bundle.putByte(key, (byte) value);
+                return;
+            case BOOLEAN:
+                if (arrayFlag) bundle.putBooleanArray(key, (boolean[]) value);
+                else bundle.putBoolean(key, (boolean) value);
+                return;
+            case SHORT:
+                if (arrayFlag) bundle.putShortArray(key, (short[]) value);
+                else bundle.putShort(key, (short) value);
+                return;
+            case INTEGER:
+                if (arrayFlag) bundle.putIntArray(key, (int[]) value);
+                else bundle.putInt(key, (int) value);
+                return;
+            case LONG:
+                if (arrayFlag) bundle.putLongArray(key, (long[]) value);
+                else bundle.putLong(key, (long) value);
+                return;
+            case FLOAT:
+                if (arrayFlag) bundle.putFloatArray(key, (float[]) value);
+                else bundle.putFloat(key, (float) value);
+                return;
+            case DOUBLE:
+                if (arrayFlag) bundle.putDoubleArray(key, (double[]) value);
+                else bundle.putDouble(key, (double) value);
+                return;
+            case SERIALIZABLE: case ENUM:
+                bundle.putSerializable(key, (Serializable) value);
+                return;
+            default:
+                throw new IllegalArgumentException("Unsupported type " + value.getClass().getSimpleName());
+        }
+    }
+
+    public static <T> T getFromBundle(Bundle bundle, String key, T defValue) {
+        if(bundle == null || key == null) throw new NullPointerException("bundle or key is null");
+        try {
+            if(!bundle.isEmpty()) {
+                Map<String, Object> args = (Map<String, Object>) ReflectionUtils.getField("mMap", bundle);
+                Object val = args.get(key);
+                return (T) val;
+            }
+        } catch (Throwable e) {
+            Cat.e(e);
+        }
+        return defValue;
+    }
+
+
+    public static ClassType getArrayType(Object[] array) {
+        if(array.length == 0) {
+            return ClassType.cast(array.getClass().getComponentType());
+        } else {
+            return ClassType.cast(array[0].getClass());
         }
     }
 }

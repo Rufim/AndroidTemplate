@@ -7,5 +7,5 @@ import java.util.List;
  * Created by Rufim on 01.07.2015.
  */
 public interface DataSource<I> {
-    public abstract List<I> getItems(int skip, int size) throws Exception;
+    List<I> getItems(int skip, int size) throws Exception;
 }

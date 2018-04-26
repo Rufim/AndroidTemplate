@@ -2,12 +2,9 @@ package ru.kazantsev.template.dialog;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.BuildConfig;
 import android.support.v4.app.DialogFragment;
-import android.view.Window;
 import org.greenrobot.eventbus.EventBus;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.event.Event;
