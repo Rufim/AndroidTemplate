@@ -18,6 +18,8 @@ import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.fragments.mvp.MvpListFragment;
 import ru.kazantsev.template.lister.DataSource;
+import ru.kazantsev.template.lister.SafeAddItems;
+import ru.kazantsev.template.lister.SafeDataTask;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.view.AdvancedRecyclerView;
 import ru.kazantsev.template.view.scroller.FastScroller;
@@ -29,7 +31,7 @@ import java.util.concurrent.*;
 /**
  * Created by Rufim on 17.01.2015.
  */
-public abstract class ListFragment<I> extends BaseFragment implements SearchView.OnQueryTextListener {
+public abstract class ListFragment<I> extends BaseFragment implements SearchView.OnQueryTextListener, SafeAddItems<I> {
 
     private static final String TAG = ListFragment.class.getSimpleName();
 
@@ -52,7 +54,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected volatile boolean isEnd = false;
     protected int currentCount = 0;
     protected int pastVisibleItems = 0;
-    protected DataTask dataTask;
+    protected int needMore = 0;
+    protected SafeDataTask<I> dataTask;
     protected FilterTask filterTask;
     protected MoveTask moveToIndex;
     protected boolean enableFiltering = false;
@@ -230,7 +233,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         }
         if (getDataSource() != null && dataTask == null) {
             startLoading(showProgress);
-            dataTask = new DataTask(count, onElementsLoadedTask, params);
+            dataTask = new SafeDataTask<I>(getDataSource(), this, currentCount, count, onElementsLoadedTask, params);
             dataTask.executeOnExecutor(executor);
         }
     }
@@ -246,6 +249,41 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     public void loadItems(int count, boolean showProgress) {
         loadItems(count, showProgress, null, null);
+    }
+
+    @Override
+    public void addItems(List<I> items, int awaitedCount) {
+        if (items == null || items.size() == 0 || isEnd) {
+            isEnd = true;
+        } else if(adapter != null) {
+            if(adapter.getItems().size() == 0) {
+                adapter.setItems(items);
+                needMore = awaitedCount - adapter.getItems().size();
+            } else {
+                needMore = awaitedCount - adapter.addItems(items, false).size();
+            }
+        }
+        needMore = 0;
+    }
+
+    @Override
+    public void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
+        isLoading = false;
+        if (needMore > 0 && !isEnd) {
+            loadItems(needMore, true);
+        } else {
+            currentCount = adapter.getAbsoluteItemCount();
+            if (onElementsLoadedTask != null) {
+                onElementsLoadedTask.execute(loadedTaskParams);
+            }
+            if (itemList != null && adapter != null) {
+                adapter.notifyChanged();
+                stopLoading();
+                if (isAdded()) {
+                    onPostLoadItems();
+                }
+            }
+        }
     }
 
     public void onPostLoadItems() {
@@ -436,74 +474,6 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         ErrorFragment.show(ListFragment.this, R.string.error_network);
     }
 
-    public class DataTask extends AsyncTask<Void, Void, List<I>> {
-
-        protected int count = 0;
-        protected AsyncTask onElementsLoadedTask;
-        protected Object[] LoadedTaskParams;
-        protected int needMore = 0;
-
-        public DataTask(int count) {
-            this.count = count;
-        }
-
-        public DataTask(int count, AsyncTask onElementsLoadedTask, Object[] LoadedTaskParams) {
-            this.count = count;
-            this.onElementsLoadedTask = onElementsLoadedTask;
-            this.LoadedTaskParams = LoadedTaskParams;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected List<I> doInBackground(Void... params) {
-            List<I> items = null;
-            try {
-                isLoading = true;
-                items = getDataSource().getItems(currentCount, count);
-                if (items == null || items.size() == 0) {
-                    isEnd = true;
-                } else if(adapter != null) {
-                    if(adapter.getItems().size() == 0) {
-                        adapter.setItems(items);
-                        needMore = count - adapter.getItems().size();
-                    } else {
-                        needMore = count - adapter.addItems(items, false).size();
-                    }
-                }
-            } catch (Exception ex) {
-                onDataTaskException(ex);
-            }
-            return items;
-        }
-
-        @Override
-        protected void onPostExecute(List<I> result) {
-            isLoading = false;
-            if (itemList != null && adapter != null) {
-                currentCount = adapter.getAbsoluteItemCount();
-                if(needMore <= 0 || isEnd) {
-                    adapter.notifyChanged();
-                    if (onElementsLoadedTask != null) {
-                        onElementsLoadedTask.execute(LoadedTaskParams);
-                    }
-                    stopLoading();
-                    if (this == dataTask) dataTask = null;
-                    if(isAdded()) {
-                        onPostLoadItems();
-                    }
-                } else {
-                    if (this == dataTask) dataTask = null;
-                    loadItems(needMore, true, onElementsLoadedTask, LoadedTaskParams);
-                }
-            } else {
-                if (this == dataTask) dataTask = null;
-            }
-        }
-    }
 
     public class MoveTask extends AsyncTask<Object, Void, Void> {
         protected int index = 0;

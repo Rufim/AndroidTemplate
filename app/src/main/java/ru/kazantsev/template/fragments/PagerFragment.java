@@ -14,15 +14,18 @@ import android.widget.ProgressBar;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.FragmentPagerAdapter;
 import ru.kazantsev.template.lister.DataSource;
+import ru.kazantsev.template.lister.SafeAddItems;
+import ru.kazantsev.template.lister.SafeDataTask;
 import ru.kazantsev.template.util.GuiUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by 0shad on 26.10.2015.
  */
-public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragment {
+public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragment implements SafeAddItems<I> {
 
     private static final String TAG = PagerFragment.class.getSimpleName();
 
@@ -36,8 +39,9 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     protected volatile boolean isEnd = false;
     protected int pagesSize = 50;
     protected int currentCount = 0;
-    protected PagerDataTask dataTask;
+    protected SafeDataTask<I> dataTask;
 
+    protected int needMore = 0;
     protected int currentItem = 0;
     protected List<I> currentItems;
 
@@ -158,8 +162,9 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         }
         startLoading(showProgress);
         if (dataSource != null) {
-            PagerDataTask dataTask = new PagerDataTask(count, onElementsLoadedTask, params);
+            SafeDataTask<I> dataTask = new SafeDataTask<>(getDataSource(), this, currentCount, count, onElementsLoadedTask, params);
             if (this.dataTask == null) {
+                isLoading = true;
                 dataTask.execute();
             }
             this.dataTask = dataTask;
@@ -168,6 +173,37 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
 
     protected void loadItems(int count, boolean showProgress) {
         loadItems(count, showProgress, null, null);
+    }
+
+    @Override
+    public void addItems(List<I> items, int awaitedCount) {
+        if (items == null || items.size() == 0) {
+            isEnd = true;
+        } else if(adapter != null) {
+            adapter.addItems(items, false);
+            needMore = awaitedCount - items.size();
+        }
+        needMore = 0;
+    }
+
+    @Override
+    public void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
+        isLoading = false;
+        if (needMore > 0 && !isEnd) {
+            loadItems(needMore, true);
+        } else {
+            currentCount = adapter.getCount();
+            if (onElementsLoadedTask != null) {
+                onElementsLoadedTask.execute(loadedTaskParams);
+            }
+            if (pager != null && adapter != null) {
+                adapter.notifyDataSetChanged();
+                stopLoading();
+                if (isAdded()) {
+                    onPostLoadItems();
+                }
+            }
+        }
     }
 
     protected void clearData() {
@@ -212,63 +248,16 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         return adapter;
     }
 
-    public class PagerDataTask extends AsyncTask<Void, Void, List<I>> {
-
-        private int count = 0;
-        private AsyncTask onElementsLoadedTask;
-        private Object[] loadedTaskParams;
-
-        public PagerDataTask(int count) {
-            this.count = count;
-        }
-
-        public PagerDataTask(int count, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
-            this.count = count;
-            this.onElementsLoadedTask = onElementsLoadedTask;
-            this.loadedTaskParams = loadedTaskParams;
+    public class SetAfterFirstLoad extends AsyncTask<Integer, Void, Integer> {
+        @Override
+        protected Integer doInBackground(Integer... integers) {
+            return integers[0];
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected List<I> doInBackground(Void... params) {
-            List<I> items = null;
-            try {
-                isLoading = true;
-                items = dataSource.getItems(currentCount, count);
-            } catch (Exception ex) {
-                onDataTaskException(ex);
-            }
-            return items;
-        }
-
-        @Override
-        protected void onPostExecute(List<I> result) {
-            super.onPostExecute(result);
-            isLoading = false;
-            if (pager != null && adapter != null) {
-                currentCount = adapter.getCount();
-                if (result == null || result.size() == 0) {
-                    isEnd = true;
-                } else if(!isEnd) {
-                    adapter.addItems(result);
-                }
-                if (onElementsLoadedTask != null) {
-                    onElementsLoadedTask.execute(loadedTaskParams);
-                }
-                stopLoading();
-                if (this == dataTask) dataTask = null;
-                if(isAdded()) {
-                    onPostLoadItems();
-                }
-            } else {
-                if (this == dataTask) dataTask = null;
-            }
+        protected void onPostExecute(Integer item) {
+            pager.setCurrentItem(item);
         }
     }
-
 
 }

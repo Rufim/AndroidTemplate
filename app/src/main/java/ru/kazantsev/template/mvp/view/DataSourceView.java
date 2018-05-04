@@ -1,7 +1,6 @@
 package ru.kazantsev.template.mvp.view;
 
 import android.os.AsyncTask;
-import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
@@ -12,11 +11,11 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.util.List;
 
-import ru.kazantsev.template.adapter.ItemListAdapter;
+import ru.kazantsev.template.lister.SafeAddItems;
 
 
 @StateStrategyType(AddToEndSingleStrategy.class)
-public interface DataSourceView<I> extends MvpView {
+public interface DataSourceView<I> extends MvpView, SafeAddItems<I> {
 
     void startLoading(boolean showProgress);
 
@@ -25,7 +24,7 @@ public interface DataSourceView<I> extends MvpView {
     @StateStrategyType(AddToEndStrategy.class)
     void addItems(List<I> items, int awaitedCount);
 
-    void finishLoad(AsyncTask onElementsLoadedTask, Object[] loadedTaskParams);
+    void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams);
 
     @StateStrategyType(SingleStateStrategy.class)
     void refresh(boolean showProgress);

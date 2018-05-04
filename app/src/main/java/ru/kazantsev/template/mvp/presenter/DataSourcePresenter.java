@@ -4,13 +4,8 @@ import android.os.AsyncTask;
 
 import net.vrallev.android.cat.Cat;
 
-import java.util.List;
-
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
-import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.lister.ObservableDataSource;
 import ru.kazantsev.template.mvp.view.DataSourceView;
@@ -86,7 +81,7 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
                 })
                 .subscribe(items -> {
                     isLoading = false;
-                    getViewState().finishLoad(onElementsLoadedTask, loadedTaskParams);
+                    getViewState().finishLoad(items, onElementsLoadedTask, loadedTaskParams);
                 }, error -> {
                     isLoading = false;
                     getViewState().onDataTaskException(error);

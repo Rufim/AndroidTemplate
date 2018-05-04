@@ -3,6 +3,7 @@ package ru.kazantsev.template.fragments;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -66,13 +67,24 @@ public class ErrorFragment extends BaseFragment {
 
     public static void show(BaseFragment fragment, @StringRes Integer message,  @DrawableRes Integer iconId, Exception exception) {
         if (fragment != null && fragment.isAdded()) {
-            FragmentBuilder builder = new FragmentBuilder(fragment.getFragmentManager())
+            FragmentManager manager;
+            if (fragment.getParentFragment() == null) {
+                manager = fragment.getFragmentManager();
+            } else {
+                manager = fragment.getParentFragment().getChildFragmentManager();
+            }
+            FragmentBuilder builder = new FragmentBuilder(manager)
                     .putArg(Constants.ArgsName.FRAGMENT_CLASS, fragment.getClass())
                     .putArg(Constants.ArgsName.FRAGMENT_ARGS, fragment.getArguments());
             if (message != null) builder.putArg(Constants.ArgsName.MESSAGE, fragment.getString(message));
             if (exception != null) builder.putArg(Constants.ArgsName.FRAGMENT_EXCEPTION, exception);
             if (iconId != null) builder.putArg(Constants.ArgsName.RESOURCE_ID, iconId);
-            builder.replaceFragment(fragment, ErrorFragment.class);
+            if (fragment.getParentFragment() == null) {
+                builder.replaceFragment(fragment, ErrorFragment.class);
+            } else {
+                builder.replaceFragment(fragment, ErrorFragment.class);
+            }
+
         }
     }
 
