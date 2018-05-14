@@ -53,8 +53,7 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
                 observable = ((ObservableDataSource<I>) dataSource).getObservableItems(skip, size);
             } catch (Exception e) {
                 Cat.e(e);
-                getViewState().onDataTaskException(e);
-                getViewState().stopLoading();
+                onException(e);
                 return;
             }
         } else {
@@ -62,8 +61,7 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
                 observable = Observable.fromCallable(() -> dataSource.getItems(skip, size)).flatMap(Observable::fromIterable);
             } catch (Exception e) {
                 Cat.e(e);
-                getViewState().onDataTaskException(e);
-                getViewState().stopLoading();
+                onException(e);
                 return;
             }
         }
@@ -71,6 +69,11 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
         dispouseOnDestroy(disposable);
     }
 
+    protected void onException(Throwable ex) {
+        isLoading = false;
+        getViewState().onDataTaskException(ex);
+        getViewState().stopLoading();
+    }
 
     protected Disposable rxSequence(Observable<I> observable, int size, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
         return observable.compose(RxUtils.applySchedulers())
@@ -82,11 +85,7 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
                 .subscribe(items -> {
                     isLoading = false;
                     getViewState().finishLoad(items, onElementsLoadedTask, loadedTaskParams);
-                }, error -> {
-                    isLoading = false;
-                    getViewState().onDataTaskException(error);
-                    getViewState().stopLoading();
-                });
+                }, this::onException);
     }
 
 }
