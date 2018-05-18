@@ -1,5 +1,6 @@
 package ru.kazantsev.template.fragments;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
@@ -10,7 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
@@ -39,7 +42,13 @@ public class ErrorFragment extends BaseFragment {
         swipeRefresh = GuiUtils.getView(rootView, R.id.refresh);
         fragmentClass = (Class<BaseFragment>) getArguments().getSerializable(Constants.ArgsName.FRAGMENT_CLASS);
         fragmentArgs = getArguments().getParcelable(Constants.ArgsName.FRAGMENT_ARGS);
-        int icon_id = getArguments().getInt(Constants.ArgsName.RESOURCE_ID, R.drawable.ic_action_report_problem);
+        int icon_id = getArguments().getInt(Constants.ArgsName.RESOURCE_ID,0);
+        if(icon_id == 0) {
+           icon_id = GuiUtils.getThemeResource(getContext(), R.attr.iconErrorFragment);
+           if(icon_id == 0) {
+             icon_id = R.drawable.ic_action_report_problem;
+           }
+        }
         errorImage.setImageResource(icon_id);
         exception = (Exception) getArguments().getSerializable(Constants.ArgsName.FRAGMENT_EXCEPTION);
         swipeRefresh.setOnRefreshListener(() -> {
@@ -52,6 +61,8 @@ public class ErrorFragment extends BaseFragment {
         if (message == null) {
             message = getString(R.string.error);
         }
+        int color = GuiUtils.getThemeColor(getContext(), R.attr.textColorErrorFragment);
+        if(color != 0) errorMessage.setTextColor(color);
         errorMessage.setText(message);
         Log.e(fragmentClass.getSimpleName(), message, exception);
         return rootView;

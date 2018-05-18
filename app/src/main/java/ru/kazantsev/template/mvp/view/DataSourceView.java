@@ -12,6 +12,7 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import java.util.List;
 
 import ru.kazantsev.template.lister.SafeAddItems;
+import ru.kazantsev.template.mvp.strategy.SingleStateOneExecutionStrategy;
 
 
 @StateStrategyType(AddToEndSingleStrategy.class)
@@ -26,7 +27,7 @@ public interface DataSourceView<I> extends MvpView, SafeAddItems<I> {
 
     void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams);
 
-    @StateStrategyType(SingleStateStrategy.class)
+    @StateStrategyType(SingleStateOneExecutionStrategy.class)
     void refresh(boolean showProgress);
 
     @StateStrategyType(OneExecutionStateStrategy.class)

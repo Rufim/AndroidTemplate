@@ -1,11 +1,13 @@
 package ru.kazantsev.template.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.*;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.*;
@@ -40,6 +42,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected ProgressBar loadMoreBar;
     protected AdvancedRecyclerView itemList;
     protected SwipeRefreshLayout swipeRefresh;
+    protected TextView emptyView;
 
     protected SearchView searchView;
     protected ItemListAdapter<I> adapter;
@@ -277,6 +280,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 onElementsLoadedTask.execute(loadedTaskParams);
             }
             if (itemList != null && adapter != null) {
+                hideEmptyView();
                 adapter.notifyChanged();
                 stopLoading();
                 if (isAdded()) {
@@ -284,6 +288,42 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 }
             }
         }
+    }
+
+    public void addFinalItems(List<I> items) {
+        addItems(items, items.size());
+        finishLoad(items, null, null);
+    }
+
+    public void hideEmptyView() {
+        emptyView.setVisibility(View.GONE);
+    }
+
+
+    public void showEmptyView() {
+        emptyView.setVisibility(View.VISIBLE);
+    }
+
+    public void setEmptyViewText(String message) {
+        if(message != null) {
+            emptyView.setText(message);
+        }
+    }
+
+    public void setEmptyViewText(@StringRes int message) {
+        if(message != 0) {
+            emptyView.setText(message);
+        }
+    }
+
+    public void showEmptyView(@StringRes int message) {
+        setEmptyViewText(message);
+        showEmptyView();
+    }
+
+    public void showEmptyView(String message) {
+        setEmptyViewText(message);
+        showEmptyView();
     }
 
     public void onPostLoadItems() {
@@ -378,6 +418,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         loadMoreBar = GuiUtils.getView(rootView, R.id.load_more);
         itemList = GuiUtils.getView(rootView, R.id.items);
         swipeRefresh = GuiUtils.getView(rootView, R.id.refresh);
+        emptyView = GuiUtils.getView(rootView, R.id.empty_view);
         swipeRefresh.setOnRefreshListener(this::onSwipeRefresh);
         if (adapter == null) {
             adapter = newAdapter();

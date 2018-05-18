@@ -24,6 +24,7 @@ import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
 import android.util.ArrayMap;
 import android.util.Log;
+import android.util.SparseArray;
 import android.widget.ProgressBar;
 
 import net.vrallev.android.cat.Cat;
@@ -31,7 +32,10 @@ import net.vrallev.android.cat.Cat;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -505,5 +509,23 @@ public class AndroidSystemUtils {
         } else {
             return ClassType.cast(array[0].getClass());
         }
+    }
+
+    public static <C> SparseArray<C> asSparseArray(Collection<C> collection) {
+        if(collection == null) return null;
+        Iterator<C> iterator = collection.iterator();
+        SparseArray<C> sparseArray = new SparseArray<>(collection.size());
+        while (iterator.hasNext()) {
+            sparseArray.put(sparseArray.size() - 1, iterator.next());
+        }
+        return sparseArray;
+    }
+
+    public static <C> List<C> asList(SparseArray<C> sparseArray) {
+        if (sparseArray == null) return null;
+        List<C> arrayList = new ArrayList<C>(sparseArray.size());
+        for (int i = 0; i < sparseArray.size(); i++)
+            arrayList.add(sparseArray.valueAt(i));
+        return arrayList;
     }
 }

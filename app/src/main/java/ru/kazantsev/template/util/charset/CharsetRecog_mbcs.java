@@ -124,7 +124,7 @@ abstract class CharsetRecog_mbcs extends CharsetRecognizer {
                 confidence = (int)(Math.log(commonCharCount+1) * scaleFactor + 10);
                 confidence = Math.min(confidence, 100);
             }
-        }   // end of detectBlock:
+        }   // finishDateTime of detectBlock:
 
         return confidence;
     }
@@ -173,7 +173,7 @@ abstract class CharsetRecog_mbcs extends CharsetRecognizer {
       * @param it  The iteratedChar "struct" into which the returned char is placed.
       * @param det The charset detector, which is needed to get at the input byte data
       *            being iterated over.
-      * @return    True if a character was returned, false at end of input.
+      * @return    True if a character was returned, false at finishDateTime of input.
       */
      abstract boolean nextChar(iteratedChar it, CharsetDetector det);
 
@@ -336,7 +336,7 @@ abstract class CharsetRecog_mbcs extends CharsetRecognizer {
              buildChar: {
                  firstByte = it.charValue = it.nextByte(det);
                  if (firstByte < 0) {
-                     // Ran off the end of the input data
+                     // Ran off the finishDateTime of the input data
                      it.done = true;
                      break buildChar;
                  }
@@ -483,7 +483,7 @@ abstract class CharsetRecog_mbcs extends CharsetRecognizer {
                  firstByte = it.charValue = it.nextByte(det);
 
                  if (firstByte < 0) {
-                     // Ran off the end of the input data
+                     // Ran off the finishDateTime of the input data
                      it.done = true;
                      break buildChar;
                  }

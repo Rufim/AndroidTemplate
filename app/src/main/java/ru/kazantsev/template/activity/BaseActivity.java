@@ -3,6 +3,7 @@ package ru.kazantsev.template.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -35,6 +36,7 @@ import com.arellomobile.mvp.MvpAppCompatActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
@@ -45,11 +47,12 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import java.util.*;
 
+import static android.R.attr.textColor;
+
 /**
  * Created by 0shad on 11.07.2015.
  */
 public abstract class BaseActivity extends MvpAppCompatActivity implements FragmentManager.OnBackStackChangedListener {
-
 
 
     static {
@@ -94,7 +97,7 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(toolbarClassic) {
+        if (toolbarClassic) {
             setContentView(R.layout.activity_main_classic);
         } else {
             setContentView(R.layout.activity_main);
@@ -141,15 +144,15 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         //Handle when activity is recreated like on orientation Change
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
-        if(disableNavigationBar) {
+        if (disableNavigationBar) {
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
         shouldDisplayHomeUp();
-        if(savedInstanceState != null && savedInstanceState.containsKey(Constants.ArgsName.FRAGMENT_CACHE)) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(Constants.ArgsName.FRAGMENT_CACHE)) {
             fragmentBundleCache = savedInstanceState.getParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE);
         }
         float elev = GuiUtils.getThemeDimen(this, R.attr.toolbarElevationSize);
-        if(elev > 0) {
+        if (elev > 0) {
             setToolbarElevation((int) elev);
         }
     }
@@ -171,10 +174,10 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if(getCurrentFragment() != null)
-        outState.putString(Constants.ArgsName.LAST_FRAGMENT_TAG, getCurrentFragment().getTag());
+        if (getCurrentFragment() != null)
+            outState.putString(Constants.ArgsName.LAST_FRAGMENT_TAG, getCurrentFragment().getTag());
         outState.putBoolean(Constants.ArgsName.CONFIG_CHANGE, true);
-        if(enableFragmentCache) {
+        if (enableFragmentCache) {
             outState.putParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE, fragmentBundleCache);
         }
         super.onSaveInstanceState(outState);
@@ -185,11 +188,11 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    public void openDrawer(){
+    public void openDrawer() {
         drawerLayout.openDrawer(GravityCompat.START);
     }
 
-    public void closeDrawer(){
+    public void closeDrawer() {
         drawerLayout.closeDrawer(GravityCompat.START);
     }
 
@@ -202,10 +205,10 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     }
 
     public void hideActionBar() {
-        if(appBarLayout != null && nestedScrollView != null) {
+        if (appBarLayout != null && nestedScrollView != null) {
             appBarLayout.setVisibility(View.GONE);
             ViewGroup.LayoutParams layoutParams = nestedScrollView.getLayoutParams();
-            if(layoutParams instanceof CoordinatorLayout.LayoutParams) {
+            if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
                 CoordinatorLayout.LayoutParams params =
                         (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
 
@@ -213,22 +216,22 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
             }
             nestedScrollView.requestLayout();
         }
-        if(toolbarShadow != null) {
+        if (toolbarShadow != null) {
             toolbarShadow.setVisibility(View.GONE);
         }
-        if(getSupportActionBar() != null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-        if(getActionBar() != null) {
+        if (getActionBar() != null) {
             getActionBar().hide();
         }
     }
 
     public void showActionBar() {
-        if(appBarLayout != null && nestedScrollView != null) {
+        if (appBarLayout != null && nestedScrollView != null) {
             appBarLayout.setVisibility(View.VISIBLE);
             ViewGroup.LayoutParams layoutParams = nestedScrollView.getLayoutParams();
-            if(layoutParams instanceof CoordinatorLayout.LayoutParams) {
+            if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
                 CoordinatorLayout.LayoutParams params =
                         (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
 
@@ -236,13 +239,13 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
                 nestedScrollView.requestLayout();
             }
         }
-        if(toolbarShadow != null) {
+        if (toolbarShadow != null) {
             toolbarShadow.setVisibility(View.VISIBLE);
         }
-        if(getSupportActionBar() != null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().show();
         }
-        if(getActionBar() != null) {
+        if (getActionBar() != null) {
             getActionBar().show();
         }
     }
@@ -250,14 +253,14 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     @Override
     protected void onNewIntent(Intent intent) {
         // fix for earlier android  versions that send intent even if onQueryTextSubmit returns true
-        if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             Fragment fragment = getCurrentFragment();
-          if(getCurrentFragment() instanceof MvpListFragment) {
-              MvpListFragment list= (MvpListFragment) fragment;
-              if(list.isEnableFiltering()) {
-                  return;
-              }
-          }
+            if (getCurrentFragment() instanceof MvpListFragment) {
+                MvpListFragment list = (MvpListFragment) fragment;
+                if (list.isEnableFiltering()) {
+                    return;
+                }
+            }
         }
         handleIntent(intent);
     }
@@ -305,13 +308,18 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         return savedInstanceState != null && savedInstanceState.getBoolean(Constants.ArgsName.CONFIG_CHANGE, false);
     }
 
-    protected  boolean onNavigationItemSelected(MenuItem item){return false;}
+    protected boolean onNavigationItemSelected(MenuItem item) {
+        return false;
+    }
 
-    protected void onDrawerClosed(View drawerView){}
+    protected void onDrawerClosed(View drawerView) {
+    }
 
-    protected  void onDrawerOpened(View drawerView){}
+    protected void onDrawerOpened(View drawerView) {
+    }
 
-    protected void onFragmentAttached(Fragment fragment) {}
+    protected void onFragmentAttached(Fragment fragment) {
+    }
 
     @Subscribe
     public void onEvent(FragmentAttachedEvent fragmentAttached) {
@@ -321,8 +329,8 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
 
     public int getCheckedNavigationItem() {
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
-           MenuItem item  = navigationView.getMenu().getItem(i);
-           if(item.isChecked()) return item.getItemId();
+            MenuItem item = navigationView.getMenu().getItem(i);
+            if (item.isChecked()) return item.getItemId();
         }
         return -1;
     }
@@ -352,13 +360,13 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         try {
             List<String> unhandledPermissions = PermissionUtils.getUnhandledPermissions(requestCode, permissions, grantResults);
-            if(unhandledPermissions.size() > 0) {
+            if (unhandledPermissions.size() > 0) {
                 for (String unhandledPermission : unhandledPermissions) {
                     onDenyPermission(unhandledPermission);
                 }
             }
             for (String permission : permissions) {
-                if(!unhandledPermissions.contains(permission)) {
+                if (!unhandledPermissions.contains(permission)) {
                     onGainPermission(permission);
                 }
             }
@@ -377,13 +385,13 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     }
 
     private void addWaitingPermissionAction(String permission, PermissionAction action) {
-          if(waitingPermissionActions.containsKey(permission)) {
-              waitingPermissionActions.get(permission).add(action);
-          } else {
-              ArrayList<PermissionAction> actions = new ArrayList<>();
-              actions.add(action);
-              waitingPermissionActions.put(permission, actions);
-          }
+        if (waitingPermissionActions.containsKey(permission)) {
+            waitingPermissionActions.get(permission).add(action);
+        } else {
+            ArrayList<PermissionAction> actions = new ArrayList<>();
+            actions.add(action);
+            waitingPermissionActions.put(permission, actions);
+        }
     }
 
     public void onGainPermission(String gainedPermission) {
@@ -504,10 +512,10 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         if (clearBackStack && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             builder.clearBackStack();
         }
-        if(enableFragmentCache) {
+        if (enableFragmentCache) {
             cacheBundle(getCurrentFragment());
         }
-        if(name == null) {
+        if (name == null) {
             builder.replaceFragment(R.id.container, fragmentClass);
         } else {
             builder.replaceFragment(R.id.container, fragmentClass, name);
@@ -528,10 +536,10 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         if (clearBackStack && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             builder.clearBackStack();
         }
-        if(enableFragmentCache) {
+        if (enableFragmentCache) {
             cacheBundle(getCurrentFragment());
         }
-        if(name == null) {
+        if (name == null) {
             builder.replaceFragment(R.id.container, fragment);
         } else {
             builder.replaceFragment(R.id.container, fragment, name);
@@ -544,7 +552,7 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     }
 
     public void cacheBundle(Fragment fragment, String tag) {
-        if(fragment != null && fragment.getArguments() != null && fragment.getArguments().size() > 0) {
+        if (fragment != null && fragment.getArguments() != null && fragment.getArguments().size() > 0) {
             tag = tag != null ? tag : fragment.getTag();
             if (TextUtils.isEmpty(tag)) {
                 tag = fragment.getClass().getSimpleName();
@@ -555,7 +563,7 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
 
     public Bundle getCachedBoundle(String tag) {
         for (BundleCache bundleCache : fragmentBundleCache) {
-            if((tag == null && bundleCache.tag == null) || (tag != null && tag.equals(bundleCache.tag))) {
+            if ((tag == null && bundleCache.tag == null) || (tag != null && tag.equals(bundleCache.tag))) {
                 return bundleCache.bundle;
             }
         }
@@ -563,7 +571,25 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     }
 
     public void showSnackbar(@StringRes int message) {
-        GuiUtils.showSnackbar(container, message);
+        showSnackbar(getResString(message));
+    }
+
+    public void showSnackbar(String message) {
+        int defaultBackgroundResource = android.R.attr.windowBackground;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            defaultBackgroundResource = android.R.attr.colorPrimary;
+        }
+        int textColorSnackbar = GuiUtils.getThemeResource(this, R.attr.textColorSnackbar);
+        if (textColorSnackbar == 0) {
+            textColorSnackbar = textColor;
+        } else {
+            textColorSnackbar = R.attr.textColorSnackbar;
+        }
+        GuiUtils.makeCustomSnackbar(getContainer(),
+                message,
+                GuiUtils.getThemeColor(this, textColorSnackbar),
+                GuiUtils.getThemeColor(this, defaultBackgroundResource)).show();
+
     }
 
     @Override
@@ -577,17 +603,17 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
             boolean canback = isHomeBack();
             if (canback) {
                 actionBar.setHomeAsUpIndicator(ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material));
-                if(disableNavigationBar) {
+                if (disableNavigationBar) {
                     actionBar.setDisplayHomeAsUpEnabled(true);
                 }
             } else {
                 actionBar.setHomeAsUpIndicator(null);
-                if(disableNavigationBar) {
+                if (disableNavigationBar) {
                     actionBar.setDisplayHomeAsUpEnabled(false);
                 }
                 actionBarDrawerToggle.syncState();
             }
-            if(!disableNavigationBar) {
+            if (!disableNavigationBar) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
         }
@@ -620,7 +646,7 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         final String tag;
         final Bundle bundle;
 
-        private BundleCache(String tag, Bundle bundle){
+        private BundleCache(String tag, Bundle bundle) {
             this.tag = tag;
             this.bundle = bundle;
         }

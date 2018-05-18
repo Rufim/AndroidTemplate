@@ -47,6 +47,9 @@ public abstract class MvpPagerFragment<I, F extends BaseFragment> extends PagerF
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        if(!adapter.getItems().isEmpty()) {
+            stopLoading();
+        }
     }
 
     @Override

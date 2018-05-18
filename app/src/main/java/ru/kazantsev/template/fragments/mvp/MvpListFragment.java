@@ -45,6 +45,9 @@ public abstract class MvpListFragment<I> extends ListFragment<I> implements Data
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        if(!adapter.getItems().isEmpty()) {
+            stopLoading();
+        }
     }
 
     @Override

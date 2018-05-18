@@ -261,4 +261,12 @@ public class BaseFragment extends MvpAppCompatFragment implements BaseActivity.B
         return result;
     }
 
+    public boolean containsArg(String key) {
+        Bundle bundle = getArguments();
+        if(bundle == null) {
+            return false;
+        }
+        return bundle.containsKey(key);
+    }
+
 }

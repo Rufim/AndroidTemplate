@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 
 import net.vrallev.android.cat.Cat;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import ru.kazantsev.template.lister.DataSource;
@@ -58,7 +60,7 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
             }
         } else {
             try {
-                observable = Observable.fromCallable(() -> dataSource.getItems(skip, size)).flatMap(Observable::fromIterable);
+                observable = Observable.fromCallable(() -> dataSource.getItems(skip, size)).compose(RxUtils.applySchedulers()).flatMap(Observable::fromIterable);
             } catch (Exception e) {
                 Cat.e(e);
                 onException(e);
@@ -75,6 +77,11 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
         getViewState().stopLoading();
     }
 
+    protected void onSuccess(List<I> items,  AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
+        isLoading = false;
+        getViewState().finishLoad(items, onElementsLoadedTask, loadedTaskParams);
+    }
+
     protected Disposable rxSequence(Observable<I> observable, int size, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
         return observable.compose(RxUtils.applySchedulers())
                 .toList()
@@ -82,10 +89,7 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
                     getViewState().addItems(items, size);
                     return items;
                 })
-                .subscribe(items -> {
-                    isLoading = false;
-                    getViewState().finishLoad(items, onElementsLoadedTask, loadedTaskParams);
-                }, this::onException);
+                .subscribe(items -> this.onSuccess(items, onElementsLoadedTask, loadedTaskParams), this::onException);
     }
 
 }

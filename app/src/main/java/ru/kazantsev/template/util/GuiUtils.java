@@ -626,11 +626,7 @@ public class GuiUtils {
     }
 
     public static void showSnackbar(View viewContainer, CharSequence message) {
-        int defaultBackgroundResource = android.R.attr.windowBackground;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            defaultBackgroundResource = android.R.attr.colorPrimary;
-        }
-        showSnackbar(viewContainer, message, GuiUtils.getThemeColor(viewContainer.getContext(), textColor), GuiUtils.getThemeColor(viewContainer.getContext(), defaultBackgroundResource));
+        makeThemeSnackbar(viewContainer, message).show();
     }
 
     public static Snackbar makeThemeSnackbar(View viewContainer, CharSequence message) {
@@ -896,20 +892,26 @@ public class GuiUtils {
         textView.setText(raw);
     }
 
-    public static int getThemeColor(Context context, int id) {
+    public static int getThemeColor(Context context, @AttrRes int id) {
         TypedArray a = getAttr(context, id);
         int result = a.getColor(0, 0);
         a.recycle();
         return result;
     }
 
-    public static Drawable getThemeDrawable(Context context, int id) {
+    public static Drawable getThemeDrawable(Context context, @AttrRes int id) {
         TypedArray a = getAttr(context, id);
         Drawable result = a.getDrawable(0);
         a.recycle();
         return result;
     }
 
+    public static @IdRes int getThemeResource(Context context, @AttrRes int id) {
+        TypedArray a = getAttr(context, id);
+        int result = a.getResourceId(0, 0);
+        a.recycle();
+        return result;
+    }
 
     public static float getThemeDimen(Context context, int id) {
         TypedArray a = getAttr(context, id);

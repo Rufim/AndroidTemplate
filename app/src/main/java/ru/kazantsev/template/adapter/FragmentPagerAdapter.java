@@ -86,7 +86,7 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
     }
 
     public F getRegisteredFragment(int position) {
-        if(position < 0 || position >= registeredFragments.size()) {
+        if(position < 0) {
             return null;
         }
         return registeredFragments.get(position);
@@ -95,8 +95,9 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
     @Override
     public F getItem(int position) {
         F fragment = getRegisteredFragment(position);
-        if(fragment == null) {
-            return getNewItem(position);
+        if (fragment == null) {
+            fragment = getNewItem(position);
+            registeredFragments.put(position, fragment);
         }
         return fragment;
     }

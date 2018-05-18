@@ -206,6 +206,12 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         }
     }
 
+    @Override
+    public void addFinalItems(List<I> items) {
+        addItems(items, items.size());
+        finishLoad(items, null, null);
+    }
+
     protected void clearData() {
         currentCount = 0;
         isEnd = false;

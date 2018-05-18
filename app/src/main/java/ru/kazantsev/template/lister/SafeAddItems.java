@@ -12,4 +12,6 @@ public interface SafeAddItems<I> {
 
     void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams);
 
+    void addFinalItems(List<I> items);
+
 }
