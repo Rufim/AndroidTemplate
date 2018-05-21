@@ -7,6 +7,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -579,17 +583,24 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             defaultBackgroundResource = android.R.attr.colorPrimary;
         }
+        showSnackbar(message, GuiUtils.getThemeColor(this, defaultBackgroundResource));
+    }
+
+    protected void showSnackbar(String message, @ColorInt int backgroundColor) {
         int textColorSnackbar = GuiUtils.getThemeResource(this, R.attr.textColorSnackbar);
         if (textColorSnackbar == 0) {
             textColorSnackbar = textColor;
         } else {
             textColorSnackbar = R.attr.textColorSnackbar;
         }
+        showSnackbar(message, GuiUtils.getThemeColor(this, textColorSnackbar), backgroundColor);
+    }
+
+    protected void showSnackbar(String message, @ColorInt int textColor, @ColorInt int backgroundColor) {
         GuiUtils.makeCustomSnackbar(getContainer(),
                 message,
-                GuiUtils.getThemeColor(this, textColorSnackbar),
-                GuiUtils.getThemeColor(this, defaultBackgroundResource)).show();
-
+                textColor,
+                backgroundColor).show();
     }
 
     @Override

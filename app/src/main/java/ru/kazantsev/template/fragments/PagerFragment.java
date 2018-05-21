@@ -89,16 +89,21 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         pager = GuiUtils.getView(rootView, R.id.pager);
         pagerHeader = GuiUtils.getView(rootView, R.id.pager_header);
         loadMoreBar = GuiUtils.getView(rootView, R.id.load_more);
-        if (currentItems == null) {
-            currentItems = new ArrayList<>();
+        if(adapter == null) {
+            adapter = newAdapter(currentItems);
         }
-        adapter = newAdapter(currentItems);
         try {
             setDataSource(newDataSource());
         } catch (Exception e) {
             onDataTaskException(e);
         }
-        currentItems = adapter.getItems();
+        if (currentItems == null) {
+            if(adapter != null && adapter.getItems() != null) {
+                currentItems = adapter.getItems();
+            } else {
+                currentItems = new ArrayList<>();
+            }
+        }
         pager.setAdapter(adapter);
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
