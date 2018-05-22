@@ -36,7 +36,7 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
     }
 
     public I getItemTag(int position) {
-        if(position >= 0 || position < items.size()) {
+        if(position >= 0 && position < items.size()) {
             return items.get(position);
         } else {
             return null;
