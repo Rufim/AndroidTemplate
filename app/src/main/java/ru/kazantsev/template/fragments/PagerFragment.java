@@ -45,6 +45,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     protected int currentItem = 0;
     protected List<I> currentItems;
 
+    protected boolean autoLoadMore = true;
     protected boolean tabStripMode = true;
 
     public PagerFragment() {
@@ -194,7 +195,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     @Override
     public void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
         isLoading = false;
-        if (needMore > 0 && !isEnd) {
+        if (needMore > 0 && !isEnd && autoLoadMore) {
             loadItems(needMore, true);
         } else {
             currentCount = adapter.getCount();
