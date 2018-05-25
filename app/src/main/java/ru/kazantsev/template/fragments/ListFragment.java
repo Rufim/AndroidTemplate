@@ -1,6 +1,5 @@
 package ru.kazantsev.template.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -18,7 +17,6 @@ import android.widget.*;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.domain.Constants;
-import ru.kazantsev.template.fragments.mvp.MvpListFragment;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.lister.SafeAddItems;
 import ru.kazantsev.template.lister.SafeDataTask;
@@ -64,7 +62,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected boolean enableFiltering = false;
     protected boolean enableSearch = false;
     protected boolean enableScrollbar = false;
-    protected boolean autoLoadMore = true;
+    protected boolean autoLoadMoreOnFinish = true;
+    protected boolean autoLoadMoreOnScroll = true;
     protected final static BlockingQueue<Runnable> tasks = new LinkedBlockingQueue<>();
     protected final static ThreadPoolExecutor executor = new ThreadPoolExecutor(Constants.App.CORES, Constants.App.CORES, 30L, TimeUnit.SECONDS, tasks);
 
@@ -273,7 +272,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     @Override
     public void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
         isLoading = false;
-        if (needMore > 0 && !isEnd && autoLoadMore) {
+        if (needMore > 0 && !isEnd && autoLoadMoreOnFinish) {
             loadItems(needMore, true);
         } else {
             currentCount = adapter.getAbsoluteItemCount();
@@ -447,7 +446,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 visibleItemCount = mLayoutManager.getChildCount();
                 totalItemCount = mLayoutManager.getItemCount();
                 pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
-                if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                if (autoLoadMoreOnScroll && (visibleItemCount + pastVisibleItems) >= totalItemCount) {
                     loadItems(true);
                 }
             }
