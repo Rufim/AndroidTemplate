@@ -73,7 +73,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected CoordinatorLayout coordinatorLayout;
     protected AppBarLayout appBarLayout;
     protected CollapsingToolbarLayout collapsingToolbarLayout;
-    protected NestedScrollView nestedScrollView;
+    //protected NestedScrollView nestedScrollView;
 
     protected FrameLayout container;
     protected DrawerLayout drawerLayout;
@@ -130,7 +130,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         toolbarShadow = GuiUtils.getView(this, R.id.toolbar_shadow);
         appBarLayout = GuiUtils.getView(this, R.id.app_bar);
         collapsingToolbarLayout = GuiUtils.getView(this, R.id.collapsing_toolbar);
-        nestedScrollView = GuiUtils.getView(this, R.id.nested_scroll);
+       // nestedScrollView = GuiUtils.getView(this, R.id.nested_scroll);
         coordinatorLayout = GuiUtils.getView(this, R.id.coordinator_layout);
 
         setSupportActionBar(toolbar);
@@ -243,7 +243,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void hideActionBar() {
-        if (appBarLayout != null && nestedScrollView != null) {
+        /*if (appBarLayout != null && nestedScrollView != null) {
             appBarLayout.setVisibility(View.GONE);
             ViewGroup.LayoutParams layoutParams = nestedScrollView.getLayoutParams();
             if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
@@ -253,7 +253,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
                 params.setBehavior(null);
             }
             nestedScrollView.requestLayout();
-        }
+        }*/
         if (toolbarShadow != null) {
             toolbarShadow.setVisibility(View.GONE);
         }
@@ -266,7 +266,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void showActionBar() {
-        if (appBarLayout != null && nestedScrollView != null) {
+        /*if (appBarLayout != null && nestedScrollView != null) {
             appBarLayout.setVisibility(View.VISIBLE);
             ViewGroup.LayoutParams layoutParams = nestedScrollView.getLayoutParams();
             if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
@@ -276,7 +276,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
                 params.setBehavior(new AppBarLayout.ScrollingViewBehavior());
                 nestedScrollView.requestLayout();
             }
-        }
+        }*/
         if (toolbarShadow != null) {
             toolbarShadow.setVisibility(View.VISIBLE);
         }
@@ -680,19 +680,19 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void enableFullCollapsingToolbar() {
-        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-        params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
-                | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED
-                | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
-        collapsingToolbarLayout.requestLayout();
+       AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+       params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+               | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED
+               | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+       collapsingToolbarLayout.requestLayout();
     }
 
     public void disableFullCollapsingToolbar() {
-        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-        params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
-                | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
-                | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
-        collapsingToolbarLayout.requestLayout();
+       AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+       params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+               | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
+               | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+       collapsingToolbarLayout.requestLayout();
     }
 
     public static class BundleCache implements Parcelable {
