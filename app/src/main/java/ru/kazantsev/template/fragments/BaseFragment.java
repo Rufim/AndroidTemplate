@@ -1,9 +1,9 @@
 package ru.kazantsev.template.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,8 +11,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.arellomobile.mvp.MvpAppCompatFragment;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -23,6 +21,8 @@ import ru.kazantsev.template.activity.NavigationActivity;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
+import ru.kazantsev.template.mvp.compact.MvpCompactFragmentImpl;
+import ru.kazantsev.template.mvp.compact.MvpConpactFactory;
 import ru.kazantsev.template.util.AndroidSystemUtils;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
@@ -32,9 +32,7 @@ import java.lang.reflect.Field;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class BaseFragment extends MvpAppCompatFragment implements BaseActivity.BackCallback {
-
-
+public class BaseFragment extends Fragment implements BaseActivity.BackCallback {
 
     /**
      * Returns a new instance of this fragment
@@ -91,9 +89,13 @@ public class BaseFragment extends MvpAppCompatFragment implements BaseActivity.B
 
     protected boolean retainInstance = true;
     private Unbinder unbinder;
+    private MvpCompactFragmentImpl mvpCompact = null;
 
 
     public BaseFragment() {
+        if(Constants.App.USE_MOXY) {
+              mvpCompact = MvpConpactFactory.buildMvpCompactFragment(this);
+        }
     }
 
     /**
@@ -105,9 +107,11 @@ public class BaseFragment extends MvpAppCompatFragment implements BaseActivity.B
         super.onCreate(savedInstanceState);
         // Retain this fragment across configuration changes.
         setRetainInstance(retainInstance);
+        if(mvpCompact != null) {
+            mvpCompact.onCreate(savedInstanceState);
+        }
     }
 
-    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_base, container, false);
@@ -228,15 +232,24 @@ public class BaseFragment extends MvpAppCompatFragment implements BaseActivity.B
         return (BaseActivity) getActivity();
     }
 
+
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if(mvpCompact != null) {
+            mvpCompact.onDestroyView();
+        }
         unbind();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        if(mvpCompact != null) {
+            mvpCompact.onDestroy();
+        }
         // Android support bug https://code.google.com/p/android/issues/detail?id=42601
         try {
             Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
@@ -267,6 +280,38 @@ public class BaseFragment extends MvpAppCompatFragment implements BaseActivity.B
             return false;
         }
         return bundle.containsKey(key);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(mvpCompact != null) {
+            mvpCompact.onStart();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mvpCompact != null) {
+            mvpCompact.onResume();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(mvpCompact != null) {
+            mvpCompact.onSaveInstanceState(outState);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mvpCompact != null) {
+            mvpCompact.onStop();
+        }
     }
 
 }

@@ -4,17 +4,29 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatDialogFragment;
+
 import org.greenrobot.eventbus.EventBus;
 import ru.kazantsev.template.R;
+import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
+import ru.kazantsev.template.mvp.compact.MvpCompactDialogImpl;
+import ru.kazantsev.template.mvp.compact.MvpConpactFactory;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
 
 /**
  * Created by Dmitry on 20.10.2015.
  */
-public  class BaseDialog extends DialogFragment implements DialogInterface.OnClickListener {
+public  class BaseDialog extends AppCompatDialogFragment implements DialogInterface.OnClickListener {
+
+    MvpCompactDialogImpl mvpCompact = null;
+
+    public BaseDialog() {
+        if(Constants.App.USE_MOXY) {
+            mvpCompact = MvpConpactFactory.buildMvpCompactDialog(this);
+        }
+    }
 
     public static <F extends BaseDialog> F newInstance(Class<F> fragmentClass, Bundle args) {
         return FragmentBuilder.newInstance(fragmentClass, args);
@@ -27,6 +39,9 @@ public  class BaseDialog extends DialogFragment implements DialogInterface.OnCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(mvpCompact != null) {
+            mvpCompact.onCreate(savedInstanceState);
+        }
         setRetainInstance(true);
     }
 
@@ -35,6 +50,38 @@ public  class BaseDialog extends DialogFragment implements DialogInterface.OnCli
         super.onStart();
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && GuiUtils.getThemeColor(getContext(), R.attr.colorOverlay) != 0) {
             getDialog().getWindow().setBackgroundDrawableResource(R.drawable.base_dialog_background);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(mvpCompact != null) {
+            mvpCompact.onSaveInstanceState(outState);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mvpCompact != null) {
+            mvpCompact.onStop();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mvpCompact != null) {
+            mvpCompact.onResume();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(mvpCompact != null) {
+            mvpCompact.onDestroy();
         }
     }
 
@@ -75,6 +122,9 @@ public  class BaseDialog extends DialogFragment implements DialogInterface.OnCli
         if (getDialog() != null && getRetainInstance())
             getDialog().setDismissMessage(null);
         super.onDestroyView();
+        if(mvpCompact != null) {
+            mvpCompact.onDestroyView();
+        }
     }
 
 }

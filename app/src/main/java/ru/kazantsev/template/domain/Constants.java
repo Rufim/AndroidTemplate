@@ -10,6 +10,7 @@ public class Constants {
 
     public static class App {
         public static final int CORES = AndroidSystemUtils.getNumberOfCores();
+        public static boolean USE_MOXY = false;
     }
 
     public static class Assets {

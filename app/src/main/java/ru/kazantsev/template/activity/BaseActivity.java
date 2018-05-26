@@ -26,6 +26,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -46,17 +47,21 @@ import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
 import ru.kazantsev.template.fragments.mvp.MvpListFragment;
+import ru.kazantsev.template.mvp.compact.MvpCompactActivityImpl;
+import ru.kazantsev.template.mvp.compact.MvpCompactFragmentImpl;
+import ru.kazantsev.template.mvp.compact.MvpConpactFactory;
 import ru.kazantsev.template.util.*;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import java.util.*;
 
 import static android.R.attr.textColor;
+import static android.R.attr.theme;
 
 /**
  * Created by 0shad on 11.07.2015.
  */
-public abstract class BaseActivity extends MvpAppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+public abstract class BaseActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
 
     static {
@@ -89,6 +94,8 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     ArrayList<BundleCache> fragmentBundleCache = new ArrayList<>();
     HashMap<String, List<PermissionAction>> waitingPermissionActions = new HashMap<>();
 
+    private MvpCompactActivityImpl mvpCompact = null;
+
     public interface BackCallback {
         boolean allowBackPress();
     }
@@ -97,10 +104,18 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
         void doAction(boolean permissionGained);
     }
 
+    public BaseActivity() {
+        if(Constants.App.USE_MOXY) {
+            mvpCompact = MvpConpactFactory.buildMvpCompactActivity(this);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(mvpCompact != null) {
+            mvpCompact.onCreate(savedInstanceState);
+        }
         if (toolbarClassic) {
             setContentView(R.layout.activity_main_classic);
         } else {
@@ -162,6 +177,22 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mvpCompact != null) {
+            mvpCompact.onResume();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mvpCompact != null) {
+            mvpCompact.onDestroy();
+        }
+    }
+
+    @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         if (!isConfigChange(savedInstanceState)) {
@@ -185,6 +216,9 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
             outState.putParcelableArrayList(Constants.ArgsName.FRAGMENT_CACHE, fragmentBundleCache);
         }
         super.onSaveInstanceState(outState);
+        if(mvpCompact != null) {
+            mvpCompact.onSaveInstanceState(outState);
+        }
     }
 
     @Override
@@ -272,6 +306,9 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     @Override
     protected void onStart() {
         super.onStart();
+        if(mvpCompact != null) {
+            mvpCompact.onStart();
+        }
         EventBus.getDefault().register(this);
     }
 
@@ -279,7 +316,12 @@ public abstract class BaseActivity extends MvpAppCompatActivity implements Fragm
     protected void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
+        if(mvpCompact != null) {
+            mvpCompact.onStop();
+        }
     }
+
+
 
     @Override
     public void onBackPressed() {
