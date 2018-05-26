@@ -32,7 +32,7 @@ public class ErrorFragment extends BaseFragment {
     SwipeRefreshLayout swipeRefresh;
     Class<BaseFragment> fragmentClass;
     Bundle fragmentArgs;
-    Exception exception;
+    Throwable exception;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,7 +50,7 @@ public class ErrorFragment extends BaseFragment {
            }
         }
         errorImage.setImageResource(icon_id);
-        exception = (Exception) getArguments().getSerializable(Constants.ArgsName.FRAGMENT_EXCEPTION);
+        exception = (Throwable) getArguments().getSerializable(Constants.ArgsName.FRAGMENT_EXCEPTION);
         swipeRefresh.setOnRefreshListener(() -> {
             getFragmentManager().executePendingTransactions();
             new FragmentBuilder(getFragmentManager())
@@ -76,7 +76,7 @@ public class ErrorFragment extends BaseFragment {
         return super.allowBackPress();
     }
 
-    public static void show(BaseFragment fragment, @StringRes Integer message,  @DrawableRes Integer iconId, Exception exception) {
+    public static void show(BaseFragment fragment, @StringRes Integer message,  @DrawableRes Integer iconId, Throwable exception) {
         if (fragment != null && fragment.isAdded()) {
             FragmentManager manager;
             if (fragment.getParentFragment() == null) {
@@ -112,11 +112,11 @@ public class ErrorFragment extends BaseFragment {
         show(fragment, (Integer)null, (Integer)null, null);
     }
 
-    public static void show(BaseFragment fragment, @StringRes int message, Exception exception) {
+    public static void show(BaseFragment fragment, @StringRes int message, Throwable exception) {
         show(fragment, message, (Integer)null, exception);
     }
 
-    public static void show(BaseFragment fragment, Exception exception) {
+    public static void show(BaseFragment fragment, Throwable exception) {
         show(fragment, (Integer)null, (Integer) null, exception);
     }
 }

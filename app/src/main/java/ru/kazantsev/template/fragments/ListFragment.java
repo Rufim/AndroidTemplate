@@ -14,6 +14,9 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+
+import net.vrallev.android.cat.Cat;
+
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.ItemListAdapter;
 import ru.kazantsev.template.domain.Constants;
@@ -234,7 +237,10 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
         if (isLoading || isEnd) {
             return;
         }
-        if (getDataSource() != null && dataTask == null) {
+        if (getDataSource() != null) {
+            if(dataTask != null && !dataTask.getStatus().equals(AsyncTask.Status.FINISHED)) {
+                Cat.e("Warning!!! You already have some tasks in thread pool!");
+            }
             startLoading(showProgress);
             dataTask = new SafeDataTask<I>(getDataSource(), this, currentCount, count, onElementsLoadedTask, params);
             dataTask.executeOnExecutor(executor);
