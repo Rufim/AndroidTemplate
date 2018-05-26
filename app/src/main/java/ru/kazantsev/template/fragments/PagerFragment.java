@@ -47,6 +47,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
 
     protected boolean autoLoadMore = true;
     protected boolean tabStripMode = true;
+    protected boolean isEndOnEmptyResult = true;
 
     public PagerFragment() {
     }
@@ -90,16 +91,16 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         pager = GuiUtils.getView(rootView, R.id.pager);
         pagerHeader = GuiUtils.getView(rootView, R.id.pager_header);
         loadMoreBar = GuiUtils.getView(rootView, R.id.load_more);
-
+        if (currentItems == null) {
+            currentItems = new ArrayList<>();
+        }
         if(adapter == null) {
             adapter = newAdapter(currentItems);
         } else {
-            if(adapter.getItems() != null) {
-                currentItems = adapter.getItems();
+            if(adapter.getItems() != currentItems) {
+                adapter.getItems().clear();
+                adapter.getItems().addAll(currentItems);
             }
-        }
-        if (currentItems == null) {
-            currentItems = new ArrayList<>();
         }
         try {
             setDataSource(newDataSource());
@@ -184,13 +185,12 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
 
     @Override
     public void addItems(List<I> items, int awaitedCount) {
-        if (items == null || items.size() == 0) {
+        if((items == null || items.size() == 0) && isEndOnEmptyResult) {
             isEnd = true;
-        } else if(adapter != null) {
+        } else if(adapter != null && items != null) {
             adapter.addItems(items, false);
             needMore = awaitedCount - items.size();
         }
-        needMore = 0;
     }
 
     @Override

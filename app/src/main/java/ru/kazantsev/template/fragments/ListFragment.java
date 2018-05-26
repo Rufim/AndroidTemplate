@@ -67,6 +67,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected boolean enableScrollbar = false;
     protected boolean autoLoadMoreOnFinish = true;
     protected boolean autoLoadMoreOnScroll = true;
+    protected boolean isEndOnEmptyResult = true;
     protected final static BlockingQueue<Runnable> tasks = new LinkedBlockingQueue<>();
     protected final static ThreadPoolExecutor executor = new ThreadPoolExecutor(Constants.App.CORES, Constants.App.CORES, 30L, TimeUnit.SECONDS, tasks);
 
@@ -262,9 +263,9 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     @Override
     public void addItems(List<I> items, int awaitedCount) {
-        if (items == null || items.size() == 0 || isEnd) {
+        if((items == null || items.size() == 0) && isEndOnEmptyResult) {
             isEnd = true;
-        } else if(adapter != null) {
+        } else if(adapter != null && items != null) {
             if(adapter.getItems().size() == 0) {
                 adapter.setItems(items);
                 needMore = awaitedCount - adapter.getItems().size();
@@ -272,7 +273,6 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 needMore = awaitedCount - adapter.addItems(items, false).size();
             }
         }
-        needMore = 0;
     }
 
     @Override
