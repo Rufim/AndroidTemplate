@@ -509,13 +509,13 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     }
 
     protected void onStopList() {
-        if(retainInstance) {
+        if(retainInstance && Constants.App.HIDE_TOOLBAR_BY_DEFAULT) {
             getBaseActivity().disableFullCollapsingToolbar();
         }
     }
 
     protected void onStartList() {
-        if(retainInstance) {
+        if(retainInstance && Constants.App.HIDE_TOOLBAR_BY_DEFAULT) {
             getBaseActivity().enableFullCollapsingToolbar();
         }
     }

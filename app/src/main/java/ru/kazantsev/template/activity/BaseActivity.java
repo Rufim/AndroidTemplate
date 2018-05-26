@@ -243,17 +243,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void hideActionBar() {
-        /*if (appBarLayout != null && nestedScrollView != null) {
+        if (appBarLayout != null) {
             appBarLayout.setVisibility(View.GONE);
-            ViewGroup.LayoutParams layoutParams = nestedScrollView.getLayoutParams();
-            if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
-                CoordinatorLayout.LayoutParams params =
-                        (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
-
-                params.setBehavior(null);
-            }
-            nestedScrollView.requestLayout();
-        }*/
+        }
         if (toolbarShadow != null) {
             toolbarShadow.setVisibility(View.GONE);
         }
@@ -266,17 +258,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void showActionBar() {
-        /*if (appBarLayout != null && nestedScrollView != null) {
+        if (appBarLayout != null) {
             appBarLayout.setVisibility(View.VISIBLE);
-            ViewGroup.LayoutParams layoutParams = nestedScrollView.getLayoutParams();
-            if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
-                CoordinatorLayout.LayoutParams params =
-                        (CoordinatorLayout.LayoutParams) nestedScrollView.getLayoutParams();
-
-                params.setBehavior(new AppBarLayout.ScrollingViewBehavior());
-                nestedScrollView.requestLayout();
-            }
-        }*/
+        }
         if (toolbarShadow != null) {
             toolbarShadow.setVisibility(View.VISIBLE);
         }
