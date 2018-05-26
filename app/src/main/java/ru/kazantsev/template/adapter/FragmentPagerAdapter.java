@@ -65,7 +65,7 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
 
     @Override
     public int getCount() {
-        return items.size();
+        return items == null ? 0 : items.size();
     }
 
     @Override
