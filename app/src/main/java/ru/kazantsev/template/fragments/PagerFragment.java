@@ -196,10 +196,10 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     @Override
     public void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
         isLoading = false;
+        currentCount = adapter.getCount();
         if (needMore > 0 && !isEnd && autoLoadMore) {
             loadItems(needMore, true);
         } else {
-            currentCount = adapter.getCount();
             if (onElementsLoadedTask != null) {
                 onElementsLoadedTask.execute(loadedTaskParams);
             }

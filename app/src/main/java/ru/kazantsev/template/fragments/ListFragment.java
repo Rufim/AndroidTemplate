@@ -278,10 +278,10 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     @Override
     public void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
         isLoading = false;
+        currentCount = adapter.getAbsoluteItemCount();
         if (needMore > 0 && !isEnd && autoLoadMoreOnFinish) {
             loadItems(needMore, true);
         } else {
-            currentCount = adapter.getAbsoluteItemCount();
             if (onElementsLoadedTask != null) {
                 onElementsLoadedTask.execute(loadedTaskParams);
             }
