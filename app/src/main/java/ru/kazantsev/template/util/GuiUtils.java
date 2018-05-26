@@ -839,7 +839,15 @@ public class GuiUtils {
         if (textView == null) {
             return;
         }
-        Spannable raw = new SpannableString(erase ? textView.getText().toString() : textView.getText());
+        Spannable raw = new SpannableString(textView.getText());
+        if(erase) {
+            BackgroundColorSpan[] spans = raw.getSpans(0, raw.length(), BackgroundColorSpan.class);
+            if (spans != null && spans.length > 0) {
+                for (BackgroundColorSpan span : spans) {
+                    raw.removeSpan(span);
+                }
+            }
+        }
         if (end > raw.length()) {
             end = raw.length();
         }
@@ -865,7 +873,7 @@ public class GuiUtils {
                     raw.length(),
                     BackgroundColorSpan.class);
 
-            if (spans.length > 0) {
+            if (spans != null && spans.length > 0) {
                 for (BackgroundColorSpan span : spans) {
                     raw.removeSpan(span);
                 }
