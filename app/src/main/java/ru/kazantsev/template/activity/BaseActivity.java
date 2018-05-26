@@ -706,7 +706,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
         protected BundleCache(Parcel in) {
             tag = in.readString();
-            bundle = in.readBundle();
+            bundle = in.readBundle(getClass().getClassLoader());
         }
 
         public static final Creator<BundleCache> CREATOR = new Creator<BundleCache>() {
