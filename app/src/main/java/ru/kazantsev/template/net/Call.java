@@ -1,10 +1,10 @@
 package ru.kazantsev.template.net;
 
+import java.io.IOException;
+
 import okhttp3.Request;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import java.io.IOException;
 
 /**
  * Created by 0shad on 28.02.2016.

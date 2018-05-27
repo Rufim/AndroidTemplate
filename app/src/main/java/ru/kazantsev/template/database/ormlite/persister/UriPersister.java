@@ -1,6 +1,7 @@
 package ru.kazantsev.template.database.ormlite.persister;
 
 import android.net.Uri;
+
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.field.types.BaseDataType;

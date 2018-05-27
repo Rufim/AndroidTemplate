@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
+
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;

@@ -4,10 +4,22 @@ import android.support.annotation.LayoutRes;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
-import ru.kazantsev.template.util.GuiUtils;
+import android.widget.AdapterView;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
+import ru.kazantsev.template.util.GuiUtils;
 
 /**
  * Created by 0shad on 08.03.2016.

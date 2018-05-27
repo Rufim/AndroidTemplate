@@ -14,9 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.*;
-import ru.kazantsev.template.R;
-import ru.kazantsev.template.util.GuiUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -24,6 +29,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import ru.kazantsev.template.R;
+import ru.kazantsev.template.util.GuiUtils;
 
 /**
  * Created with IntelliJ IDEA.

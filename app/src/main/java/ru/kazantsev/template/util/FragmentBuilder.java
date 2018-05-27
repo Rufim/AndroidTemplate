@@ -1,19 +1,17 @@
 package ru.kazantsev.template.util;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
-import ru.kazantsev.template.fragments.ErrorFragment;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import ru.kazantsev.template.fragments.ErrorFragment;
 
 /**
  * Created by 0shad on 13.07.2015.

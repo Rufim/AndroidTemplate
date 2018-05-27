@@ -7,12 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 import ru.kazantsev.template.domain.Findable;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.util.TextUtils;
-
-import java.util.*;
 
 /**
  * Created by Dmitry on 23.06.2015.

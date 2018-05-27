@@ -1,13 +1,13 @@
 package ru.kazantsev.template.net;
 
 
-import retrofit2.CallAdapter;
-import retrofit2.Retrofit;
-import ru.kazantsev.template.util.ReflectionUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+
+import retrofit2.CallAdapter;
+import retrofit2.Retrofit;
+import ru.kazantsev.template.util.ReflectionUtils;
 
 /**
  * Created by 0shad on 28.02.2016.

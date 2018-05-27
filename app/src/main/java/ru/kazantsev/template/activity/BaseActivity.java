@@ -7,10 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -23,7 +20,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -32,32 +28,32 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.arellomobile.mvp.MvpAppCompatActivity;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
 import ru.kazantsev.template.fragments.ListFragment;
-import ru.kazantsev.template.fragments.mvp.MvpListFragment;
 import ru.kazantsev.template.mvp.compact.MvpCompactActivityImpl;
-import ru.kazantsev.template.mvp.compact.MvpCompactFragmentImpl;
 import ru.kazantsev.template.mvp.compact.MvpConpactFactory;
-import ru.kazantsev.template.util.*;
+import ru.kazantsev.template.util.FragmentBuilder;
+import ru.kazantsev.template.util.GuiUtils;
+import ru.kazantsev.template.util.PermissionUtils;
+import ru.kazantsev.template.util.TextUtils;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import java.util.*;
-
 import static android.R.attr.textColor;
-import static android.R.attr.theme;
 
 /**
  * Created by 0shad on 11.07.2015.

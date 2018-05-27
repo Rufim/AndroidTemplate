@@ -1,7 +1,6 @@
 package ru.kazantsev.template.mvp.compact;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 
 import com.arellomobile.mvp.MvpDelegate;
 

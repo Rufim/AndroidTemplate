@@ -13,9 +13,6 @@ package ru.kazantsev.template.view;
  */
 
 import android.annotation.TargetApi;
-import android.util.Log;
-
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;

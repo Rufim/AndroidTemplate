@@ -5,7 +5,6 @@ import android.content.Context;
 import java.io.IOException;
 import java.util.HashSet;
 
-
 import okhttp3.Interceptor;
 import okhttp3.Response;
 import ru.kazantsev.template.domain.Constants;

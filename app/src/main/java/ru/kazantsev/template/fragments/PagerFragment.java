@@ -13,6 +13,13 @@ import android.widget.ProgressBar;
 
 import net.vrallev.android.cat.Cat;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.FragmentPagerAdapter;
 import ru.kazantsev.template.domain.Constants;
@@ -20,14 +27,6 @@ import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.lister.SafeAddItems;
 import ru.kazantsev.template.lister.SafeDataTask;
 import ru.kazantsev.template.util.GuiUtils;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by 0shad on 26.10.2015.

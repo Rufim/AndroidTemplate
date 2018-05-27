@@ -1,15 +1,15 @@
 package ru.kazantsev.template.net;
 
-import com.google.gson.Gson;
 import net.vrallev.android.cat.Cat;
+
 import org.greenrobot.eventbus.EventBus;
+
+import java.net.HttpURLConnection;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.kazantsev.template.domain.event.NetworkEvent;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
 
 /**
  * Created by 0shad on 28.02.2016.

@@ -2,7 +2,6 @@ package ru.kazantsev.template.lister;
 
 import net.vrallev.android.cat.Cat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;

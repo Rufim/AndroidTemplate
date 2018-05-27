@@ -1,19 +1,15 @@
 package ru.kazantsev.template.util;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-
-import ru.kazantsev.template.fragments.ErrorFragment;
 
 /**
  * Created by Admin on 28.02.2018.

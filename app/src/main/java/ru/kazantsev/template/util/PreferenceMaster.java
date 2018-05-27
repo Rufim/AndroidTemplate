@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.StringRes;
 
-import java.util.Iterator;
 import java.util.Set;
 
 public class PreferenceMaster {

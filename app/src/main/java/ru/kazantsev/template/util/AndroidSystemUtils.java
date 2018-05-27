@@ -18,19 +18,23 @@ import android.os.Parcelable;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.ProgressBar;
 
 import net.vrallev.android.cat.Cat;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Pattern;
 
 /**

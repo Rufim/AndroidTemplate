@@ -1,6 +1,10 @@
 package ru.kazantsev.template.util.charset;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * Created by 0shad on 29.05.2017.

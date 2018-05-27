@@ -2,14 +2,16 @@ package ru.kazantsev.template.database.snappy;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
-import ru.kazantsev.template.util.SystemUtils;
 
 import java.io.Closeable;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import ru.kazantsev.template.util.SystemUtils;
 
 /**
  * Created by 0shad on 27.12.2015.

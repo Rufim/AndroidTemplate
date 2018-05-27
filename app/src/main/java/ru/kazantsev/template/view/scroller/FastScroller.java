@@ -5,17 +5,14 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.View;
+
 import ru.kazantsev.template.R;
-import ru.kazantsev.template.view.AdvancedRecyclerView;
 import xyz.danoz.recyclerviewfastscroller.AbsRecyclerViewFastScroller;
 import xyz.danoz.recyclerviewfastscroller.RecyclerViewScroller;
 import xyz.danoz.recyclerviewfastscroller.calculation.VerticalScrollBoundsProvider;
 import xyz.danoz.recyclerviewfastscroller.calculation.position.VerticalScreenPositionCalculator;
 import xyz.danoz.recyclerviewfastscroller.calculation.progress.TouchableScrollProgressCalculator;
-import xyz.danoz.recyclerviewfastscroller.calculation.progress.VerticalLinearLayoutManagerScrollProgressCalculator;
 import xyz.danoz.recyclerviewfastscroller.calculation.progress.VerticalScrollProgressCalculator;
-import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 /**
  * Created by 0shad on 14.05.2017.

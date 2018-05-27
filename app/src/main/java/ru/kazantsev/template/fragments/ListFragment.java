@@ -3,19 +3,38 @@ package ru.kazantsev.template.fragments;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
-import android.os.*;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.*;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import net.vrallev.android.cat.Cat;
+
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.ItemListAdapter;
@@ -26,10 +45,6 @@ import ru.kazantsev.template.lister.SafeDataTask;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.view.AdvancedRecyclerView;
 import ru.kazantsev.template.view.scroller.FastScroller;
-
-
-import java.util.List;
-import java.util.concurrent.*;
 
 /**
  * Created by Rufim on 17.01.2015.

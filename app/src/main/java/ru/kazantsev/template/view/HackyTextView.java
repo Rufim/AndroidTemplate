@@ -6,7 +6,6 @@ import android.text.Selection;
 import android.text.Spannable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.TextView;
 
 // Use this TestView if you use SpannableText with custom LinkMovementMethod and want use select text all in one textView
 public class HackyTextView extends android.support.v7.widget.AppCompatTextView {

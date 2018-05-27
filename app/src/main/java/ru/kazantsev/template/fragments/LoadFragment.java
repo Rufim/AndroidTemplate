@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.util.Arrays;
+
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
-
-import java.util.Arrays;
 
 /**
  * Created by 0shad on 13.07.2015.

@@ -4,11 +4,12 @@ import android.support.annotation.LayoutRes;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import ru.kazantsev.template.util.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import ru.kazantsev.template.util.SystemUtils;
 
 /**
  * Created by 0shad on 13.07.2015.

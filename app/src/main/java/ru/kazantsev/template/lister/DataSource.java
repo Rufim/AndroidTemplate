@@ -1,6 +1,5 @@
 package ru.kazantsev.template.lister;
 
-import java.io.IOException;
 import java.util.List;
 
 /**

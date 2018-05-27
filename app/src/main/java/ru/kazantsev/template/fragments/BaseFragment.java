@@ -12,9 +12,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.lang.reflect.Field;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import org.greenrobot.eventbus.EventBus;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.activity.BaseActivity;
 import ru.kazantsev.template.activity.NavigationActivity;
@@ -26,8 +29,6 @@ import ru.kazantsev.template.mvp.compact.MvpConpactFactory;
 import ru.kazantsev.template.util.AndroidSystemUtils;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
-
-import java.lang.reflect.Field;
 
 /**
  * A placeholder fragment containing a simple view.
