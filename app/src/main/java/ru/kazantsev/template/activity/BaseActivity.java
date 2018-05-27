@@ -28,6 +28,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -242,6 +243,15 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     public void hideActionBar() {
         if (appBarLayout != null) {
             appBarLayout.setVisibility(View.GONE);
+            View behaviorLayout = toolbarClassic ? contentLayout : drawerLayout;
+            ViewGroup.LayoutParams layoutParams = behaviorLayout.getLayoutParams();
+            if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
+                CoordinatorLayout.LayoutParams params =
+                        (CoordinatorLayout.LayoutParams) behaviorLayout.getLayoutParams();
+
+                params.setBehavior(null);
+            }
+            behaviorLayout.requestLayout();
         }
         if (toolbarShadow != null) {
             toolbarShadow.setVisibility(View.GONE);
@@ -257,6 +267,15 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     public void showActionBar() {
         if (appBarLayout != null) {
             appBarLayout.setVisibility(View.VISIBLE);
+            View behaviorLayout = toolbarClassic ? contentLayout : drawerLayout;
+            ViewGroup.LayoutParams layoutParams = behaviorLayout.getLayoutParams();
+            if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
+                CoordinatorLayout.LayoutParams params =
+                        (CoordinatorLayout.LayoutParams) behaviorLayout.getLayoutParams();
+
+                params.setBehavior(new AppBarLayout.ScrollingViewBehavior());
+            }
+            behaviorLayout.requestLayout();
         }
         if (toolbarShadow != null) {
             toolbarShadow.setVisibility(View.VISIBLE);
