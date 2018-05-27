@@ -537,6 +537,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     public void onDataTaskException(Throwable ex) {
         Log.e(TAG, "Cant get new Items", ex);
+        stopLoading();
         ErrorFragment.show(ListFragment.this, R.string.error_network);
     }
 

@@ -3,7 +3,7 @@
 
     <string name="search">Поиск…</string>
     <string name="filter_hint">Фильтр…</string>
-    <string name="error_network">Проврьте соединение с\nинтернетом…</string>
+    <string name="error_network">Проверьте соединение с\nинтернетом…</string>
     <string name="error">Произошла ошибка!</string>
     <string name="loading">Загрузка…</string>
     <string name="empty_view_no_data">Нет данных!</string>

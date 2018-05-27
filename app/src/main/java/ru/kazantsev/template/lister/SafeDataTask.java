@@ -15,6 +15,7 @@ public class SafeDataTask<I> extends AsyncTask<Void, Void, List<I>> {
     private Object[] loadedTaskParams;
     private WeakReference<SafeAddItems<I>> weekInterface;
     private DataSource<I> dataSource;
+    private Throwable exception = null;
 
     public SafeDataTask(DataSource<I> dataSource, SafeAddItems<I> safeAddItems, int skip ,int count) {
         this.dataSource = dataSource;
@@ -38,11 +39,8 @@ public class SafeDataTask<I> extends AsyncTask<Void, Void, List<I>> {
             if(safeAddItems != null) {
                 safeAddItems.addItems(items, count);
             }
-        } catch (Exception ex) {
-            SafeAddItems safeAddItems = weekInterface.get();
-            if(safeAddItems != null) {
-                safeAddItems.onDataTaskException(ex);
-            }
+        } catch (Throwable ex) {
+            exception = ex;
         }
         return items;
     }
@@ -51,7 +49,11 @@ public class SafeDataTask<I> extends AsyncTask<Void, Void, List<I>> {
     protected void onPostExecute(List<I> is) {
         SafeAddItems<I> safeAddItems = weekInterface.get();
         if(safeAddItems != null) {
-            safeAddItems.finishLoad(is, onElementsLoadedTask, loadedTaskParams);
+            if(exception == null) {
+                safeAddItems.finishLoad(is, onElementsLoadedTask, loadedTaskParams);
+            } else {
+                safeAddItems.onDataTaskException(exception);
+            }
         }
     }
 }

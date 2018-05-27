@@ -74,7 +74,6 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
     protected void onException(Throwable ex) {
         isLoading = false;
         getViewState().onDataTaskException(ex);
-        getViewState().stopLoading();
     }
 
     protected void onSuccess(List<I> items,  AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {

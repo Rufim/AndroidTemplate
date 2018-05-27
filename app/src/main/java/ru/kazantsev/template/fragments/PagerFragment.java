@@ -262,6 +262,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
 
     public void onDataTaskException(Throwable ex) {
         Log.e(TAG, "Cant get new Items: ", ex);
+        stopLoading();
         ErrorFragment.show(PagerFragment.this, R.string.error);
     }
 

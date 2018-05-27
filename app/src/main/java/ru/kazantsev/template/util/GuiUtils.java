@@ -3,6 +3,8 @@ package ru.kazantsev.template.util;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -97,47 +99,6 @@ public class GuiUtils {
 
     public static void setDecimalSeparator(String decimalSeparator) {
         GuiUtils.decimalSeparator = decimalSeparator;
-    }
-
-    public static void sendNotification(@NonNull Context context, int id, int icon, CharSequence title, CharSequence text, Intent intent) {
-        NotificationManagerCompat manager =  NotificationManagerCompat.from(context);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
-        PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, 0);
-        notificationBuilder
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(icon)
-                .setContentIntent(pIntent)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setDefaults(Notification.DEFAULT_SOUND)
-                // ставим флаг, чтобы уведомление пропало после нажатия
-                .setAutoCancel(true);
-        // отправляем
-        manager.notify(id, notificationBuilder.build());
-    }
-
-    public static void sendBigNotification(@NonNull Context context, int id, int icon, CharSequence title, CharSequence bigContentTitle, CharSequence text, Intent intent, List<CharSequence> lines) {
-        NotificationManagerCompat manager = NotificationManagerCompat.from(context);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
-        PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, 0);
-        NotificationCompat.InboxStyle inboxStyle =
-                new NotificationCompat.InboxStyle();
-        for (CharSequence line : lines) {
-            inboxStyle.addLine(line);
-        }
-        inboxStyle.setBigContentTitle(bigContentTitle);
-        notificationBuilder
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(icon)
-                .setContentIntent(pIntent)
-                .setStyle(inboxStyle)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setDefaults(Notification.DEFAULT_SOUND)
-                // ставим флаг, чтобы уведомление пропало после нажатия
-                .setAutoCancel(true);
-        // отправляем
-        manager.notify(id, notificationBuilder.build());
     }
 
 

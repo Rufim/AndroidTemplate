@@ -59,7 +59,7 @@ public class HTTPExecutor implements Callable<Response> {
     @Override
     public Response call() throws IOException {
         HttpURLConnection connection = null;
-        response = null;
+        Response response = null;
         IOException exception;
         do {
             exception = null;
@@ -162,7 +162,7 @@ public class HTTPExecutor implements Callable<Response> {
         if(response == null) {
             exception = new IOException("Cant obtain response");
         }
-        if(exception != null) return new ExceptionResponse(exception);
+        if(exception != null) response = new ExceptionResponse(exception);
         Log.i(TAG, "Request completed using url: " + request.getUrl() + (!request.isPutOrPost() ? " bytes received " + response.length() : ""));
         return response;
     }
@@ -219,11 +219,11 @@ public class HTTPExecutor implements Callable<Response> {
     }
 
     public Response execute(long minBytes) throws IOException, ExecutionException, InterruptedException {
-        Future future = executeAsync();
+        Future<Response> future = executeAsync();
         if(getResponse() == null || (getResponse().length() < minBytes && !getResponse().isDownloadOver())) {
             while (getResponse() == null || getResponse().length() < minBytes){
                 try {
-                    future.get(300, TimeUnit.MILLISECONDS);
+                    response = future.get(300, TimeUnit.MILLISECONDS);
                     break;
                 } catch (TimeoutException e) {
                     //ignore and try again
