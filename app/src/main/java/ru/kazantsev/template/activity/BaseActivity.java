@@ -46,6 +46,7 @@ import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
+import ru.kazantsev.template.fragments.ListFragment;
 import ru.kazantsev.template.fragments.mvp.MvpListFragment;
 import ru.kazantsev.template.mvp.compact.MvpCompactActivityImpl;
 import ru.kazantsev.template.mvp.compact.MvpCompactFragmentImpl;
@@ -277,8 +278,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         // fix for earlier android  versions that send intent even if onQueryTextSubmit returns true
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             Fragment fragment = getCurrentFragment();
-            if (getCurrentFragment() instanceof MvpListFragment) {
-                MvpListFragment list = (MvpListFragment) fragment;
+            if (getCurrentFragment() instanceof ListFragment) {
+                ListFragment list = (ListFragment) fragment;
                 if (list.isEnableFiltering()) {
                     return;
                 }
