@@ -11,8 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import net.vrallev.android.cat.Cat;
+
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.adapter.FragmentPagerAdapter;
+import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.lister.SafeAddItems;
 import ru.kazantsev.template.lister.SafeDataTask;
@@ -21,6 +24,10 @@ import ru.kazantsev.template.util.GuiUtils;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by 0shad on 26.10.2015.
@@ -48,6 +55,8 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
     protected boolean autoLoadMore = true;
     protected boolean tabStripMode = true;
     protected boolean isEndOnEmptyResult = true;
+    protected final static BlockingQueue<Runnable> tasks = new LinkedBlockingQueue<>();
+    protected final static ThreadPoolExecutor executor = new ThreadPoolExecutor(Constants.App.CORES, Constants.App.CORES, 30L, TimeUnit.SECONDS, tasks);
 
     public PagerFragment() {
     }
@@ -169,13 +178,13 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
             return;
         }
         startLoading(showProgress);
-        if (dataSource != null) {
-            SafeDataTask<I> dataTask = new SafeDataTask<>(getDataSource(), this, currentCount, count, onElementsLoadedTask, params);
-            if (this.dataTask == null) {
-                isLoading = true;
-                dataTask.execute();
+        if (getDataSource() != null) {
+            if(dataTask != null && !dataTask.getStatus().equals(AsyncTask.Status.FINISHED)) {
+                Cat.e("Warning!!! You already have some tasks in thread pool!");
             }
-            this.dataTask = dataTask;
+            startLoading(showProgress);
+            dataTask = new SafeDataTask<I>(getDataSource(), this, currentCount, count, onElementsLoadedTask, params);
+            dataTask.executeOnExecutor(executor);
         }
     }
 
