@@ -42,7 +42,9 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.DynamicDrawableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -811,6 +813,36 @@ public class GuiUtils {
     public static void colorText(TextView textView, int from, int to, @ColorRes int colorRes) {
         int color = textView.getContext().getResources().getColor(colorRes);
         textView.setText(spannableText(textView.getText().toString(), new ForegroundColorSpan(color), from, to));
+    }
+
+    public static SpannableStringBuilder appendSpannableText(SpannableStringBuilder stringBuilder, CharSequence text, ParcelableSpan ... spans) {
+        if (text != null) {
+            int start = stringBuilder.length();
+            stringBuilder.append(text);
+            if(spans != null && spans.length > 0) {
+                for (ParcelableSpan span : spans) {
+                    stringBuilder.setSpan(span, start, stringBuilder.length(), 0);
+                }
+            }
+        }
+        return stringBuilder;
+    }
+
+
+    /**
+     * @param stringBuilder builder
+     * @param drawable image
+     * @param verticalAlignment one of {@link DynamicDrawableSpan#ALIGN_BOTTOM} or
+     * {@link DynamicDrawableSpan#ALIGN_BASELINE}.
+     * @return
+     */
+    public static SpannableStringBuilder appendDrawableSpan(SpannableStringBuilder stringBuilder, Drawable drawable, int verticalAlignment) {
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        ImageSpan span = new ImageSpan(drawable, verticalAlignment);
+        int start = stringBuilder.length();
+        stringBuilder.append("\uFFFC");
+        stringBuilder.setSpan(span, start, stringBuilder.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        return stringBuilder;
     }
 
     public static SpannableStringBuilder spannableText(CharSequence text, ParcelableSpan span, int from, int to) {
