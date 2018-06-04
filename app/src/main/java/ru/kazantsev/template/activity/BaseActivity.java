@@ -86,6 +86,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected boolean toolbarClassic = false;
     protected boolean enableFragmentCache = false;
     protected boolean clearBackStack = true;
+    protected boolean useCalligraphy = true;
 
     protected boolean collapsingShadowState = true;
 
@@ -221,7 +222,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        if(useCalligraphy) {
+            super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        } else {
+            super.attachBaseContext(newBase);
+        }
     }
 
     public void openDrawer() {
