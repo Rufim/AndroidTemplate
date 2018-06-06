@@ -25,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.ArrayRes;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
@@ -969,6 +970,16 @@ public class GuiUtils {
                 android.R.attr.orientation,
                 android.R.attr.text};
         return context.obtainStyledAttributes(attrs);
+    }
+
+    public static List<Integer> getTypedArray(Context context, @ArrayRes int arrayId) {
+        ArrayList<Integer> array = new ArrayList<Integer>();
+        TypedArray typedArray = context.getResources().obtainTypedArray(arrayId);
+        for (int i = 0; i < typedArray.length(); i++) {
+            array.add(typedArray.getResourceId(i, 0));
+        }
+        typedArray.recycle();
+        return array;
     }
 
     public static int getDarkerColor(int color) {
