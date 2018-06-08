@@ -1,12 +1,11 @@
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.jakewharton.butterknife'
 apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'idea'
 
 ext {
     compileSdkProjectVersion = 27
-    buildToolsProjectVersion = '27.0.2'
+    buildToolsProjectVersion = '27.0.3'
     supportLibraryVersion = '27.1.1'
     retrofitVersion = '2.1.0'
     butterknifeVersion = '8.5.1'
@@ -25,7 +24,7 @@ idea {
 
 android {
     compileSdkVersion compileSdkProjectVersion
-
+    buildToolsVersion buildToolsProjectVersion
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
@@ -80,10 +79,6 @@ android {
         }
     }
 
-    buildToolsVersion '27.0.3'
-}
-retrolambda {
-    defaultMethods = true
 }
 
 dependencies {
