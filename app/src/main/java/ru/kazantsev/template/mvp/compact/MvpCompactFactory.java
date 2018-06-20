@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatDialogFragment;
  * Created by 0shad on 26.05.2018.
  */
 
-public class MvpConpactFactory {
+public class MvpCompactFactory {
 
 
     public static <F extends Fragment> MvpCompactFragmentImpl<F> buildMvpCompactFragment(F fragment) {

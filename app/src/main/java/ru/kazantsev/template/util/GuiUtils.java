@@ -358,30 +358,39 @@ public class GuiUtils {
         return (V) view.findViewById(id);
     }
 
-    public static ArrayList<View> getAllChildren(View v) {
+    public static <V> ArrayList<V> getAllChildren(View v) {
+        return getAllChildren(v, null);
+    }
+
+    public static <V> ArrayList<V> getAllChildren(View v, Class<V> viewClass) {
         if (v == null) {
-            return new ArrayList<View>();
+            return new ArrayList<V>();
         }
 
         if (!(v instanceof ViewGroup)) {
-            ArrayList<View> viewArrayList = new ArrayList<View>();
-            viewArrayList.add(v);
+            ArrayList<V> viewArrayList = new ArrayList<V>(1);
+            if(viewClass == null || v.getClass().isAssignableFrom(viewClass)) {
+                viewArrayList.add((V) v);
+            }
             return viewArrayList;
         }
 
-        ArrayList<View> result = new ArrayList<View>();
+        ArrayList<V> result = new ArrayList<V>();
 
         ViewGroup viewGroup = (ViewGroup) v;
-        result.add(viewGroup);
+        if(viewClass == null || viewGroup.getClass().isAssignableFrom(viewClass)) {
+            result.add((V) viewGroup);
+        }
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
-
             View child = viewGroup.getChildAt(i);
+            if(child instanceof ViewGroup) {
+                result.addAll(getAllChildren(child, viewClass));
+            } else {
+                if(viewClass == null || child.getClass().isAssignableFrom(viewClass)) {
+                    result.add((V) child);
+                }
+            }
 
-            ArrayList<View> viewArrayList = new ArrayList<View>();
-            viewArrayList.add(v);
-            viewArrayList.addAll(getAllChildren(child));
-
-            result.addAll(viewArrayList);
         }
         return result;
     }

@@ -38,6 +38,13 @@
 
             </android.support.v4.widget.DrawerLayout>
 
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/navigation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_gravity="bottom"/>
 
     </android.support.design.widget.CoordinatorLayout>
 </LinearLayout>
