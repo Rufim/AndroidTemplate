@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -27,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,6 +100,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     public interface BackCallback {
         boolean allowBackPress();
+    }
+
+    public interface MenuAction {
+        void doAction(MenuItem item);
     }
 
     public interface PermissionAction {
@@ -270,11 +276,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     }
 
     public void hideBottomNavigation() {
-        navigationView.setVisibility(View.GONE);
+        bottomNavigationView.setVisibility(View.GONE);
     }
 
     public void showBottomNavication() {
-        navigationView.setVisibility(View.VISIBLE);
+        bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
     public void unlockDrawer() {

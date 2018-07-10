@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import ru.kazantsev.template.R;
 import ru.kazantsev.template.fragments.ListFragment;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.mvp.presenter.DataSourcePresenter;
@@ -43,8 +44,11 @@ public abstract class MvpListFragment<I> extends ListFragment<I> implements Data
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        if(!adapter.getItems().isEmpty()) {
+        if(!getPresenter().isLoading()) {
             stopLoading();
+            if(adapter.getItems().isEmpty()) {
+               setEmptyViewText(R.string.empty_view_no_data);
+            }
         }
     }
 

@@ -38,6 +38,10 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
         getViewState().firstLoad(true);
     }
 
+    public boolean isLoading() {
+        return isLoading;
+    }
+
     public void refreshData(boolean progress) {
         getViewState().refresh(progress);
     }

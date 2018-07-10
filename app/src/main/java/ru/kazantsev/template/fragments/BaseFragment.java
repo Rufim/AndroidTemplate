@@ -233,9 +233,6 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
         return (BaseActivity) getActivity();
     }
 
-
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();

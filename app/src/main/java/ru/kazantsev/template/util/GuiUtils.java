@@ -20,6 +20,7 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
@@ -358,7 +359,7 @@ public class GuiUtils {
         return (V) view.findViewById(id);
     }
 
-    public static <V> ArrayList<V> getAllChildren(View v) {
+    public static ArrayList<View> getAllChildren(View v) {
         return getAllChildren(v, null);
     }
 
@@ -369,7 +370,7 @@ public class GuiUtils {
 
         if (!(v instanceof ViewGroup)) {
             ArrayList<V> viewArrayList = new ArrayList<V>(1);
-            if(viewClass == null || v.getClass().isAssignableFrom(viewClass)) {
+            if(viewClass == null || v.getClass() == viewClass) {
                 viewArrayList.add((V) v);
             }
             return viewArrayList;
@@ -378,7 +379,7 @@ public class GuiUtils {
         ArrayList<V> result = new ArrayList<V>();
 
         ViewGroup viewGroup = (ViewGroup) v;
-        if(viewClass == null || viewGroup.getClass().isAssignableFrom(viewClass)) {
+        if(viewClass == null || viewGroup.getClass() == viewClass) {
             result.add((V) viewGroup);
         }
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
@@ -386,7 +387,7 @@ public class GuiUtils {
             if(child instanceof ViewGroup) {
                 result.addAll(getAllChildren(child, viewClass));
             } else {
-                if(viewClass == null || child.getClass().isAssignableFrom(viewClass)) {
+                if(viewClass == null || child.getClass() == viewClass) {
                     result.add((V) child);
                 }
             }
@@ -524,6 +525,15 @@ public class GuiUtils {
         removeView(newView);
         parent.addView(newView, index);
         parent.invalidate();
+    }
+
+    public static Point calculateTextWith(CharSequence text, TextView textView) {
+        Rect bounds = new Rect();
+        Paint textPaint = textView.getPaint();
+        textPaint.getTextBounds(text.toString(), 0, text.length(), bounds);
+        int height = bounds.height();
+        int width = bounds.width();
+        return new Point(width, height);
     }
 
     public static Point getScreenSize(Context context) {
