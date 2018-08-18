@@ -293,7 +293,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         // fix for earlier android  versions that send intent even if onQueryTextSubmit returns true
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             Fragment fragment = getCurrentFragment();
-            if (getCurrentFragment() instanceof ListFragment) {
+            if (fragment instanceof ListFragment) {
                 ListFragment list = (ListFragment) fragment;
                 if (list.isEnableFiltering()) {
                     return;
