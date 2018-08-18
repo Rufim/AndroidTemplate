@@ -25,7 +25,7 @@ import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
 import ru.kazantsev.template.mvp.compact.MvpCompactFragmentImpl;
-import ru.kazantsev.template.mvp.compact.MvpConpactFactory;
+import ru.kazantsev.template.mvp.compact.MvpCompactFactory;
 import ru.kazantsev.template.util.AndroidSystemUtils;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
@@ -95,7 +95,7 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
 
     public BaseFragment() {
         if(Constants.App.USE_MOXY) {
-              mvpCompact = MvpConpactFactory.buildMvpCompactFragment(this);
+              mvpCompact = MvpCompactFactory.buildMvpCompactFragment(this);
         }
     }
 
@@ -232,9 +232,6 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
     protected BaseActivity getBaseActivity() {
         return (BaseActivity) getActivity();
     }
-
-
-
 
     @Override
     public void onDestroyView() {

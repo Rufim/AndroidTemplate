@@ -11,7 +11,8 @@
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_weight="1"
+        android:layout_height="0dp">
 
         <!-- Toolbar instead of ActionBar so the drawer can slide on top -->
         <include layout="@layout/toolbar" />
@@ -38,6 +39,8 @@
 
             </android.support.v4.widget.DrawerLayout>
 
-
     </android.support.design.widget.CoordinatorLayout>
+
+    <include layout="@layout/bottom_navigation"/>
+
 </LinearLayout>

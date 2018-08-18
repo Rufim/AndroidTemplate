@@ -20,11 +20,13 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.ArrayRes;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
@@ -42,7 +44,9 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.DynamicDrawableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -356,29 +360,38 @@ public class GuiUtils {
     }
 
     public static ArrayList<View> getAllChildren(View v) {
+        return getAllChildren(v, null);
+    }
+
+    public static <V> ArrayList<V> getAllChildren(View v, Class<V> viewClass) {
         if (v == null) {
-            return new ArrayList<View>();
+            return new ArrayList<V>();
         }
 
         if (!(v instanceof ViewGroup)) {
-            ArrayList<View> viewArrayList = new ArrayList<View>();
-            viewArrayList.add(v);
+            ArrayList<V> viewArrayList = new ArrayList<V>(1);
+            if(viewClass == null || v.getClass() == viewClass) {
+                viewArrayList.add((V) v);
+            }
             return viewArrayList;
         }
 
-        ArrayList<View> result = new ArrayList<View>();
+        ArrayList<V> result = new ArrayList<V>();
 
         ViewGroup viewGroup = (ViewGroup) v;
-        result.add(viewGroup);
+        if(viewClass == null || viewGroup.getClass() == viewClass) {
+            result.add((V) viewGroup);
+        }
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
-
             View child = viewGroup.getChildAt(i);
+            if(child instanceof ViewGroup) {
+                result.addAll(getAllChildren(child, viewClass));
+            } else {
+                if(viewClass == null || child.getClass() == viewClass) {
+                    result.add((V) child);
+                }
+            }
 
-            ArrayList<View> viewArrayList = new ArrayList<View>();
-            viewArrayList.add(v);
-            viewArrayList.addAll(getAllChildren(child));
-
-            result.addAll(viewArrayList);
         }
         return result;
     }
@@ -512,6 +525,15 @@ public class GuiUtils {
         removeView(newView);
         parent.addView(newView, index);
         parent.invalidate();
+    }
+
+    public static Point calculateTextWith(CharSequence text, TextView textView) {
+        Rect bounds = new Rect();
+        Paint textPaint = textView.getPaint();
+        textPaint.getTextBounds(text.toString(), 0, text.length(), bounds);
+        int height = bounds.height();
+        int width = bounds.width();
+        return new Point(width, height);
     }
 
     public static Point getScreenSize(Context context) {
@@ -813,6 +835,36 @@ public class GuiUtils {
         textView.setText(spannableText(textView.getText().toString(), new ForegroundColorSpan(color), from, to));
     }
 
+    public static SpannableStringBuilder appendSpannableText(SpannableStringBuilder stringBuilder, CharSequence text, ParcelableSpan ... spans) {
+        if (text != null) {
+            int start = stringBuilder.length();
+            stringBuilder.append(text);
+            if(spans != null && spans.length > 0) {
+                for (ParcelableSpan span : spans) {
+                    stringBuilder.setSpan(span, start, stringBuilder.length(), 0);
+                }
+            }
+        }
+        return stringBuilder;
+    }
+
+
+    /**
+     * @param stringBuilder builder
+     * @param drawable image
+     * @param verticalAlignment one of {@link DynamicDrawableSpan#ALIGN_BOTTOM} or
+     * {@link DynamicDrawableSpan#ALIGN_BASELINE}.
+     * @return
+     */
+    public static SpannableStringBuilder appendDrawableSpan(SpannableStringBuilder stringBuilder, Drawable drawable, int verticalAlignment) {
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        ImageSpan span = new ImageSpan(drawable, verticalAlignment);
+        int start = stringBuilder.length();
+        stringBuilder.append("\uFFFC");
+        stringBuilder.setSpan(span, start, stringBuilder.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        return stringBuilder;
+    }
+
     public static SpannableStringBuilder spannableText(CharSequence text, ParcelableSpan span, int from, int to) {
         SpannableStringBuilder sb = new SpannableStringBuilder(text);
         if (span != null) {
@@ -937,6 +989,16 @@ public class GuiUtils {
                 android.R.attr.orientation,
                 android.R.attr.text};
         return context.obtainStyledAttributes(attrs);
+    }
+
+    public static List<Integer> getTypedArray(Context context, @ArrayRes int arrayId) {
+        ArrayList<Integer> array = new ArrayList<Integer>();
+        TypedArray typedArray = context.getResources().obtainTypedArray(arrayId);
+        for (int i = 0; i < typedArray.length(); i++) {
+            array.add(typedArray.getResourceId(i, 0));
+        }
+        typedArray.recycle();
+        return array;
     }
 
     public static int getDarkerColor(int color) {

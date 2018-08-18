@@ -93,11 +93,11 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
         View rootView;
         if(tabStripMode) {
            rootView = inflater.inflate(R.layout.fragment_pager, container, false);
+           pagerHeader = GuiUtils.getView(rootView, R.id.pager_header);
         } else {
            rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
         }
         pager = GuiUtils.getView(rootView, R.id.pager);
-        pagerHeader = GuiUtils.getView(rootView, R.id.pager_header);
         loadMoreBar = GuiUtils.getView(rootView, R.id.load_more);
         if (currentItems == null) {
             currentItems = new ArrayList<>();
@@ -149,7 +149,7 @@ public abstract class PagerFragment<I, F extends BaseFragment> extends BaseFragm
             stopLoading();
         }
         if (scroll) {
-            pager.setCurrentItem(currentItem);
+            pager.setCurrentItem(currentItem, false);
         }
     }
 

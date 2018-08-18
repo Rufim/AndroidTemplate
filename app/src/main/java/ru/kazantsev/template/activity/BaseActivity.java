@@ -8,10 +8,12 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -26,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +38,7 @@ import android.widget.RelativeLayout;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +51,7 @@ import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.domain.event.FragmentAttachedEvent;
 import ru.kazantsev.template.fragments.ListFragment;
 import ru.kazantsev.template.mvp.compact.MvpCompactActivityImpl;
-import ru.kazantsev.template.mvp.compact.MvpConpactFactory;
+import ru.kazantsev.template.mvp.compact.MvpCompactFactory;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.util.PermissionUtils;
@@ -61,12 +65,12 @@ import static android.R.attr.textColor;
  */
 public abstract class BaseActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
-
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
     protected LinearLayout rootLayout;
+    protected BottomNavigationView bottomNavigationView;
     protected RelativeLayout contentLayout;
     protected CoordinatorLayout coordinatorLayout;
     protected AppBarLayout appBarLayout;
@@ -86,8 +90,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected boolean toolbarClassic = false;
     protected boolean enableFragmentCache = false;
     protected boolean clearBackStack = true;
-
-    protected boolean collapsingShadowState = true;
+    protected boolean useCalligraphy = true;
+    protected boolean enableBottomNavigation = false;
 
     ArrayList<BundleCache> fragmentBundleCache = new ArrayList<>();
     HashMap<String, List<PermissionAction>> waitingPermissionActions = new HashMap<>();
@@ -98,14 +102,28 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         boolean allowBackPress();
     }
 
+    public interface MenuAction {
+        void doAction(MenuItem item);
+    }
+
     public interface PermissionAction {
         void doAction(boolean permissionGained);
     }
 
     public BaseActivity() {
         if(Constants.App.USE_MOXY) {
-            mvpCompact = MvpConpactFactory.buildMvpCompactActivity(this);
+            mvpCompact = MvpCompactFactory.buildMvpCompactActivity(this);
         }
+    }
+
+    public BaseActivity(boolean disableNavigationBar, boolean toolbarClassic, boolean enableFragmentCache, boolean clearBackStack, boolean useCalligraphy, boolean enableBottomNavigation) {
+        this();
+        this.disableNavigationBar = disableNavigationBar;
+        this.toolbarClassic = toolbarClassic;
+        this.enableFragmentCache = enableFragmentCache;
+        this.clearBackStack = clearBackStack;
+        this.useCalligraphy = useCalligraphy;
+        this.enableBottomNavigation = enableBottomNavigation;
     }
 
     @Override
@@ -130,7 +148,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         collapsingToolbarLayout = GuiUtils.getView(this, R.id.collapsing_toolbar);
        // nestedScrollView = GuiUtils.getView(this, R.id.nested_scroll);
         coordinatorLayout = GuiUtils.getView(this, R.id.coordinator_layout);
-
+        bottomNavigationView = GuiUtils.getView(this, R.id.navigation);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
         actionBar = getSupportActionBar();
@@ -160,9 +178,16 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         //Handle when activity is recreated like on orientation Change
         //Setting the actionbarToggle to drawer layout
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
-        if (disableNavigationBar) {
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        if(enableBottomNavigation) {
+            onCreateBottomNavigation(bottomNavigationView);
+        } else {
+            bottomNavigationView.setVisibility(View.GONE);
+        }
+        if(!disableNavigationBar) {
+            onCreateNavigation(navigationView);
+        } else {
+            lockDrawerClosed();
         }
         shouldDisplayHomeUp();
         if (savedInstanceState != null && savedInstanceState.containsKey(Constants.ArgsName.FRAGMENT_CACHE)) {
@@ -194,7 +219,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         if (!isConfigChange(savedInstanceState)) {
-            handleIntent(getIntent());
+            if(getIntent() != null) {
+                handleIntent(getIntent());
+            }
         }
     }
 
@@ -221,7 +248,19 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        if(useCalligraphy) {
+            super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        } else {
+            super.attachBaseContext(newBase);
+        }
+    }
+
+    protected void onCreateBottomNavigation(BottomNavigationView bottomNavigationView) {
+
+    }
+
+    protected void onCreateNavigation(NavigationView navigationView) {
+
     }
 
     public void openDrawer() {
@@ -234,6 +273,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     public void lockDrawerClosed() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    public void hideBottomNavigation() {
+        bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void showBottomNavication() {
+        bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
     public void unlockDrawer() {
@@ -290,17 +337,19 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
 
     @Override
     protected void onNewIntent(Intent intent) {
-        // fix for earlier android  versions that send intent even if onQueryTextSubmit returns true
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            Fragment fragment = getCurrentFragment();
-            if (fragment instanceof ListFragment) {
-                ListFragment list = (ListFragment) fragment;
-                if (list.isEnableFiltering()) {
-                    return;
+        if(intent != null) {
+            // fix for earlier android  versions that send intent even if onQueryTextSubmit returns true
+            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                Fragment fragment = getCurrentFragment();
+                if (fragment instanceof ListFragment) {
+                    ListFragment list = (ListFragment) fragment;
+                    if (list.isEnableFiltering()) {
+                        return;
+                    }
                 }
             }
+            handleIntent(intent);
         }
-        handleIntent(intent);
     }
 
     @Override
@@ -348,7 +397,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         super.onBackPressed();
     }
 
-    protected abstract void handleIntent(Intent intent);
+    protected abstract void handleIntent(@NonNull Intent intent);
 
     protected boolean isConfigChange(@Nullable Bundle savedInstanceState) {
         return savedInstanceState != null && savedInstanceState.getBoolean(Constants.ArgsName.CONFIG_CHANGE, false);
@@ -473,7 +522,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return getResources().getString(id);
     }
 
-    public Fragment getCurrentFragment() {
+    public @Nullable Fragment getCurrentFragment() {
         return getSupportFragmentManager().findFragmentById(R.id.container);
     }
 
@@ -488,48 +537,51 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         return null;
     }
 
-    public NavigationView getNavigationView() {
+    public @NonNull NavigationView getNavigationView() {
         return navigationView;
     }
 
-    public Toolbar getToolbar() {
+    public @NonNull Toolbar getToolbar() {
         return toolbar;
     }
 
-    public View getToolbarShadow() {
+    public @NonNull View getToolbarShadow() {
         return toolbarShadow;
     }
 
-    @Nullable
-    public ActionBar getCurrentActionBar() {
+    public @Nullable ActionBar getCurrentActionBar() {
         return actionBar;
     }
 
-    public LinearLayout getRootLayout() {
+    public @NonNull LinearLayout getRootLayout() {
         return rootLayout;
     }
 
-    public RelativeLayout getContentLayout() {
+    public @NonNull BottomNavigationView getBottomNavigationView() {
+        return bottomNavigationView;
+    }
+
+    public @NonNull RelativeLayout getContentLayout() {
         return contentLayout;
     }
 
-    public CoordinatorLayout getCoordinatorLayout() {
+    public @NonNull CoordinatorLayout getCoordinatorLayout() {
         return coordinatorLayout;
     }
 
-    public AppBarLayout getAppBarLayout() {
+    public @NonNull AppBarLayout getAppBarLayout() {
         return appBarLayout;
     }
 
-    public FrameLayout getContainer() {
+    public @NonNull FrameLayout getContainer() {
         return container;
     }
 
-    public ActionBarDrawerToggle getActionBarDrawerToggle() {
+    public @NonNull ActionBarDrawerToggle getActionBarDrawerToggle() {
         return actionBarDrawerToggle;
     }
 
-    public DrawerLayout getDrawerLayout() {
+    public @NonNull DrawerLayout getDrawerLayout() {
         return drawerLayout;
     }
 

@@ -12,7 +12,7 @@ import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
 import ru.kazantsev.template.mvp.compact.MvpCompactDialogImpl;
-import ru.kazantsev.template.mvp.compact.MvpConpactFactory;
+import ru.kazantsev.template.mvp.compact.MvpCompactFactory;
 import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
 
@@ -25,7 +25,7 @@ public  class BaseDialog extends AppCompatDialogFragment implements DialogInterf
 
     public BaseDialog() {
         if(Constants.App.USE_MOXY) {
-            mvpCompact = MvpConpactFactory.buildMvpCompactDialog(this);
+            mvpCompact = MvpCompactFactory.buildMvpCompactDialog(this);
         }
     }
 

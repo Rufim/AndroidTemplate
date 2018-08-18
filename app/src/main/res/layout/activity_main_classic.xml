@@ -25,7 +25,12 @@
             <!-- Toolbar instead of ActionBar so the drawer can slide on top -->
             <include layout="@layout/toolbar"/>
 
-            <include layout="@layout/content_layout"/>
+            <include layout="@layout/content_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+            <include layout="@layout/bottom_navigation"/>
 
         </android.support.design.widget.CoordinatorLayout>
 
