@@ -96,8 +96,8 @@ dependencies {
 
     compileOnly "com.github.Raizlabs.DBFlow:dbflow-core:$dbflowVersion"
     compileOnly "com.github.Raizlabs.DBFlow:dbflow:$dbflowVersion"
-    compileOnly "com.arello-mobile:moxy:$moxyVersion"
-    compileOnly "com.arello-mobile:moxy-app-compat:$moxyVersion"
+    api "com.arello-mobile:moxy:$moxyVersion"
+    api "com.arello-mobile:moxy-app-compat:$moxyVersion"
     compileOnly 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
     // optional
     compileOnly "com.snappydb:snappydb-lib:0.5.2"
