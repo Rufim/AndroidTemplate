@@ -3,6 +3,7 @@ package ru.kazantsev.template.util;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -420,6 +421,7 @@ public class AndroidSystemUtils {
     }
 
     public static void putToBundle(Bundle bundle, String key, Object value) {
+        if(value == null) return;
         if(bundle == null || key == null) throw new NullPointerException("bundle or key is null");
         ClassType type = ClassType.cast(value);
         ClassType baseType = type;
@@ -597,5 +599,26 @@ public class AndroidSystemUtils {
         } else {
             return null;
         }
+    }
+
+    public static long download(Context context, String url, String title, String desc, String path) {
+        Uri Download_Uri = Uri.parse(url);
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(Download_Uri);
+
+        //Restrict the types of networks over which this download may proceed.
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+        //Set whether this download may proceed over a roaming connection.
+        request.setAllowedOverRoaming(false);
+        //Set the title of this download, to be displayed in notifications (if enabled).
+        request.setTitle(title);
+        //Set a description of this download, to be displayed in notifications (if enabled)
+        request.setDescription(desc);
+        //Set the local destination for the downloaded file to a path within the application's external files directory
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, path);
+        request.allowScanningByMediaScanner();
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        //Enqueue a new download and same the referenceId
+        return downloadManager.enqueue(request);
     }
 }
