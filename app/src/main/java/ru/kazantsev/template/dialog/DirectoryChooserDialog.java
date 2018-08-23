@@ -395,18 +395,14 @@ public class DirectoryChooserDialog extends AlertDialog {
             Arrays.sort(fileList, new Comparator<String>() {
                 @Override
                 public int compare(String lf, String rf) {
-                    lf = lf.toLowerCase();
-                    rf = rf.toLowerCase();
-                    if (lf.contains(".")) {
-                        if (rf.contains(".")) {
-                            return lf.compareTo(rf);
-                        } else {
-                            return -1;
-                        }
-                    } else if (rf.contains(".")) {
+                    File lfFile = new File(currentDir, lf);
+                    File rfFile = new File(currentDir, rf);
+                    if (lfFile.isDirectory())
+                        return rfFile.isDirectory() ? lfFile.compareTo(rfFile) : -1;
+                    else if (rfFile.isDirectory())
                         return 1;
-                    }
-                    return lf.compareTo(rf);
+
+                    return lfFile.compareTo(rfFile);
                 }
             });
 
