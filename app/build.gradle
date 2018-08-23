@@ -10,7 +10,7 @@ ext {
     versionProjectCode = 1
     versionProjectName = "0.0.1"
     moxyVersion = "1.5.3"
-    dbflowVersion = "4.1.1"
+    dbflowVersion = "4.2.3"
 }
 
 android {

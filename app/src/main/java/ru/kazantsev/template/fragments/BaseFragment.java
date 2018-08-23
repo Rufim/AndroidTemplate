@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import org.greenrobot.eventbus.EventBus;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -58,6 +59,14 @@ public class BaseFragment extends Fragment implements BaseActivity.BackCallback 
     protected static <F extends BaseFragment> F show(BaseFragment fragment, Class<F> fragmentClass, String key, Object obj) {
         if (fragment.isAdded()) {
             return new FragmentBuilder(fragment.getFragmentManager()).newFragment().addToBackStack().putArg(key, obj).replaceFragment(fragment, fragmentClass);
+        } else {
+            return null;
+        }
+    }
+
+    protected static <F extends BaseFragment> F show(BaseFragment fragment, Class<F> fragmentClass, Map<String, Object> args) {
+        if (fragment.isAdded()) {
+            return new FragmentBuilder(fragment.getFragmentManager()).newFragment().addToBackStack().putArgs(args).replaceFragment(fragment, fragmentClass);
         } else {
             return null;
         }
