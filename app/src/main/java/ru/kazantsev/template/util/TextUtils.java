@@ -200,6 +200,28 @@ public class TextUtils {
         return false;
     }
 
+    public static boolean startWith(String str, boolean in, String... strs) {
+        for (String s : strs) {
+            if (in) {
+                if (s.startsWith(str)) return true;
+            } else {
+                if (str.startsWith(s)) return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean endsWith(String str, boolean in, String... strs) {
+        for (String s : strs) {
+            if (in) {
+                if (s.endsWith(str)) return true;
+            } else {
+                if (str.endsWith(s)) return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean equalsOneOf(String str, String... strs) {
         for (String s : strs) {
             if (s.equals(str)) return true;
