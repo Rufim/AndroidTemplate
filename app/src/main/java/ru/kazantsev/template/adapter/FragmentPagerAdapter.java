@@ -5,6 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
+import net.vrallev.android.cat.Cat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -81,7 +83,11 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
 
     @Override
     public void restoreState(Parcelable arg0, ClassLoader arg1) {
-         super.restoreState(arg0, arg1);
+        try {
+            super.restoreState(arg0, arg1);
+        } catch (IllegalStateException ex) {
+            Cat.e(ex);
+        }
     }
 
     public F getRegisteredFragment(int position) {

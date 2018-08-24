@@ -331,13 +331,13 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     public void setEmptyViewText(String message) {
         if(message != null) {
-            emptyView.setText(message);
+            GuiUtils.setText(emptyView, message);
         }
     }
 
     public void setEmptyViewText(@StringRes int message) {
         if(message != 0) {
-            emptyView.setText(message);
+            GuiUtils.setText(emptyView, getText(message));
         }
     }
 
