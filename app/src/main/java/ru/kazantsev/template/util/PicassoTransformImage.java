@@ -14,13 +14,14 @@ public class PicassoTransformImage implements Transformation {
     final int height;
     final int maxWidth;
     final String tag;
+    final float scale;
 
-
-    public PicassoTransformImage(int width, int height, int maxWidth, String tag) {
+    public PicassoTransformImage(int width, int height, int maxWidth, String tag, float scale) {
         this.width = width;
         this.height = height;
         this.maxWidth = maxWidth;
         this.tag = tag;
+        this.scale = scale;
     }
 
 
@@ -44,6 +45,8 @@ public class PicassoTransformImage implements Transformation {
         if (scaleX * bitmapWidth > maxWidth) {
             scaleX = scaleY = ((float) maxWidth / bitmapWidth);
         }
+        scaleX *= scale;
+        scaleY *= scale;
         Bitmap scaledBitmap;
         if (scaleX != 1 || scaleY != 1) {
             Matrix matrix = new Matrix();

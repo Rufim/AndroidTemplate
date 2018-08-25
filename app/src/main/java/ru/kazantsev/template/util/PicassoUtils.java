@@ -44,7 +44,7 @@ public class PicassoUtils {
     }
 
     public static void loadWithCache(Context context, String url, ImageView imageView, Callback callback) {
-        Picasso.with(context)
+        new Picasso.Builder(context).build()
                 .load(url)
                 .networkPolicy(NetworkPolicy.OFFLINE)
                 .into(imageView, new Callback() {
@@ -54,8 +54,8 @@ public class PicassoUtils {
                     }
 
                     @Override
-                    public void onError() {
-                        Picasso.with(context)
+                    public void onError(Exception e) {
+                        new Picasso.Builder(context).build()
                                 .load(url)
                                 .into(imageView, new Callback() {
                                     @Override
@@ -64,8 +64,8 @@ public class PicassoUtils {
                                     }
 
                                     @Override
-                                    public void onError() {
-                                        if(callback != null) callback.onError();
+                                    public void onError(Exception e) {
+                                        if(callback != null) callback.onError(e);
                                     }
                                 });
                     }
