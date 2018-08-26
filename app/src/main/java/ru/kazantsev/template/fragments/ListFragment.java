@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -193,7 +194,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if(enableSearch) {
+        if (enableSearch) {
             inflater.inflate(R.menu.search, menu);
             MenuItem searchItem = menu.findItem(R.id.search);
             if (searchItem != null) {
@@ -254,7 +255,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             return;
         }
         if (getDataSource() != null) {
-            if(dataTask != null && !dataTask.getStatus().equals(AsyncTask.Status.FINISHED)) {
+            if (dataTask != null && !dataTask.getStatus().equals(AsyncTask.Status.FINISHED)) {
                 Cat.e("Warning!!! You already have some tasks in thread pool!");
             }
             startLoading(showProgress);
@@ -278,10 +279,10 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     @Override
     public void addItems(List<I> items, int awaitedCount) {
-        if((items == null || items.size() == 0) && isEndOnEmptyResult) {
+        if ((items == null || items.size() == 0) && isEndOnEmptyResult) {
             isEnd = true;
-        } else if(adapter != null && items != null) {
-            if(adapter.getItems().size() == 0) {
+        } else if (adapter != null && items != null) {
+            if (adapter.getItems().size() == 0) {
                 adapter.setItems(items);
                 needMore = awaitedCount - adapter.getItems().size();
             } else {
@@ -302,7 +303,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             }
             if (itemList != null && adapter != null) {
                 adapter.notifyChanged();
-                if(adapter.getItems().isEmpty()) {
+                if (adapter.getItems().isEmpty()) {
                     showEmptyView();
                 } else {
                     hideEmptyView();
@@ -330,13 +331,13 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     }
 
     public void setEmptyViewText(String message) {
-        if(message != null) {
+        if (message != null) {
             GuiUtils.setText(emptyView, message);
         }
     }
 
     public void setEmptyViewText(@StringRes int message) {
-        if(message != 0) {
+        if (message != 0) {
             GuiUtils.setText(emptyView, getText(message));
         }
     }
@@ -357,7 +358,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     protected abstract ItemListAdapter newAdapter();
 
-    protected  DataSource<I> newDataSource() throws Exception {
+    protected DataSource<I> newDataSource() throws Exception {
         return getDataSource();
     }
 
@@ -378,7 +379,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
 
     public void refreshData(boolean showProgress) {
         try {
-            if(getDataSource() == null) {
+            if (getDataSource() == null) {
                 setDataSource(newDataSource());
             }
             if (getDataSource() != null) {
@@ -477,12 +478,30 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             scroller.setRecyclerView(itemList);
             GuiUtils.fadeOut(scroller, 0, 100);
             itemList.addOnScrollListener(scroller.getOnScrollListener());
+            final Handler scrollHandler = new Handler();
             itemList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+                private Runnable fadeOut;
+                private boolean visible = false;
+
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
-                    GuiUtils.fadeIn(scroller, 0, 100);
-                    GuiUtils.fadeOut(scroller, 2000, 1000);
+                    Runnable newFadeOut = new Runnable() {
+                        @Override
+                        public void run() {
+                            visible = false;
+                            GuiUtils.fadeOut(scroller, 0, 1000);
+                        }
+                    };
+                    if (fadeOut != null) {
+                        scrollHandler.removeCallbacks(fadeOut);
+                    }
+                    if (!visible || scroller.getVisibility() == View.INVISIBLE) {
+                        GuiUtils.fadeIn(scroller, 0, 100);
+                        visible = true;
+                    }
+                    scrollHandler.postDelayed(fadeOut = newFadeOut, 2000);
                 }
             });
         } else {
@@ -524,13 +543,13 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     }
 
     protected void onStopList() {
-        if(retainInstance && Constants.App.HIDE_TOOLBAR_BY_DEFAULT) {
+        if (retainInstance && Constants.App.HIDE_TOOLBAR_BY_DEFAULT) {
             getBaseActivity().disableFullCollapsingToolbar();
         }
     }
 
     protected void onStartList() {
-        if(retainInstance && Constants.App.HIDE_TOOLBAR_BY_DEFAULT) {
+        if (retainInstance && Constants.App.HIDE_TOOLBAR_BY_DEFAULT) {
             getBaseActivity().enableFullCollapsingToolbar();
         }
     }
