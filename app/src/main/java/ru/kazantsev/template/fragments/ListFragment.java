@@ -68,6 +68,8 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     protected DataSource<I> savedDataSource;
     protected DataSource<I> dataSource;
 
+    protected int listLayout = R.layout.fragment_loading_list;
+
     //
     protected int pageSize = 50;
     protected volatile boolean isLoading = false;
@@ -437,7 +439,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_loading_list, container,
+        View rootView = inflater.inflate(listLayout, container,
                 false);
         progressBar = GuiUtils.getView(rootView, R.id.load_progress);
         progressBarText = GuiUtils.getView(rootView, R.id.loading_text);
@@ -505,7 +507,7 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
                 }
             });
         } else {
-            ((RelativeLayout) rootView).removeView(rootView.findViewById(R.id.fast_scroller));
+            ((ViewGroup) rootView).removeView(rootView.findViewById(R.id.fast_scroller));
         }
         return rootView;
     }

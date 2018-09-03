@@ -21,6 +21,14 @@ public interface DataSourceView<I> extends MvpView, SafeAddItems<I> {
 
     void stopLoading();
 
+    void notifyItemChanged(int position);
+
+    void notifyItemChanged(I item);
+
+    void notifyItemChanged(int position, Object payload);
+
+    void notifyItemChanged(I item, Object payload);
+
     @StateStrategyType(AddToEndStrategy.class)
     void addItems(List<I> items, int awaitedCount);
 
@@ -31,6 +39,9 @@ public interface DataSourceView<I> extends MvpView, SafeAddItems<I> {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void firstLoad(boolean scroll);
+
+    @StateStrategyType(SingleStateOneExecutionStrategy.class)
+    void addFinalItems(List<I> items);
 
     void onDataTaskException(Throwable ex);
 

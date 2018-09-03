@@ -51,6 +51,29 @@ public abstract class MvpPagerFragment<I, F extends BaseFragment> extends PagerF
     }
 
     @Override
+    public void notifyItemChanged(int position) {
+        notifyItemChanged(position, null);
+    }
+
+    @Override
+    public void notifyItemChanged(I item) {
+        notifyItemChanged(item, null);
+    }
+
+    @Override
+    public void notifyItemChanged(int position, Object payload) {
+
+    }
+
+    @Override
+    public void notifyItemChanged(I item, Object payload) {
+        int index = adapter.getItems().indexOf(item);
+        if(index > 0) {
+            notifyItemChanged(index, payload);
+        }
+    }
+
+    @Override
     public void refreshData(boolean showProgress) {
         getPresenter().refreshData(showProgress);
     }

@@ -1,5 +1,6 @@
 package ru.kazantsev.template.adapter;
 
+import android.database.DataSetObservable;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -10,9 +11,11 @@ import net.vrallev.android.cat.Cat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import ru.kazantsev.template.fragments.BaseFragment;
+import ru.kazantsev.template.util.ReflectionUtils;
 
 /**
  * Created by Dmitry on 26.10.2015.
@@ -23,7 +26,7 @@ public abstract class FragmentPagerAdapter<I,F extends BaseFragment> extends Fra
     protected List<I> items = new ArrayList<>();
 
     public FragmentPagerAdapter(FragmentManager fm) {
-        super(fm);
+        this(fm, new ArrayList<>());
     }
 
     public FragmentPagerAdapter(FragmentManager fm, List<I> items) {

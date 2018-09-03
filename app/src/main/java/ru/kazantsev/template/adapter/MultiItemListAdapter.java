@@ -21,33 +21,48 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
 
     private final int[] layoutIds;
     protected int firstIsHeader;
+    protected int lastIsFooter;
     protected boolean useFlatList = true;
 
     public MultiItemListAdapter(@LayoutRes int... layoutIds) {
-        super(-1);
-        this.layoutIds = layoutIds;
-        this.firstIsHeader = layoutIds.length > 1 && layoutIds[0] > 0 ? 1 : 0;
+        this(true, false, layoutIds);
     }
 
     public MultiItemListAdapter(boolean useFlatList, @LayoutRes int... layoutIds) {
+        this(useFlatList, false, layoutIds);
+    }
+
+    public MultiItemListAdapter(boolean useFlatList, boolean lastIsFooter, @LayoutRes int... layoutIds) {
         super(-1);
         this.layoutIds = layoutIds;
         this.firstIsHeader = layoutIds.length > 1 && layoutIds[0] > 0 ? 1 : 0;
         this.useFlatList = useFlatList;
+        this.lastIsFooter = lastIsFooter ? 1 : 0;
     }
 
     public MultiItemListAdapter(List<I> items, @LayoutRes int... layoutIds) {
-        this(layoutIds);
-        setItems(items);
+        this(items,true, false, layoutIds);
     }
 
     public MultiItemListAdapter(List<I> items, boolean useFlatList, @LayoutRes int... layoutIds) {
-        this(useFlatList, layoutIds);
-        setItems(items);
+        this(items,useFlatList, false, layoutIds);
+    }
+
+    public MultiItemListAdapter(List<I> items, boolean useFlatList, boolean lastIsFooter, @LayoutRes int... layoutIds) {
+        this(useFlatList, lastIsFooter, layoutIds);
+        if(useFlatList) {
+            setItems(items);
+        } else {
+            replaceItems(items);
+        }
     }
 
     public int getFirstIsHeader() {
         return firstIsHeader;
+    }
+
+    public int getLastIsFooter() {
+        return lastIsFooter;
     }
 
     @Override
@@ -103,11 +118,19 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
         if (getFirstIsHeader() != 0 && position == 0) {
             return layoutIds[0];
         }
+        if(getLastIsFooter() != 0 && position == getItemCount() - 1) {
+            return layoutIds[layoutIds.length - 1];
+        }
         I item = getItem(position);
         if (item != null) {
             return getLayoutId(item);
         }
         return 0;
+    }
+
+    @Override
+    public void replaceItems(List<I> items) {
+        super.replaceItems(items);
     }
 
     @Override
@@ -172,9 +195,14 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
             if(position == 0 && getFirstIsHeader() == 1) {
                 return null;
             }
-            if (items.size() > (position - getFirstIsHeader()) && items.size() > 0)
+            if(position == getItemCount() - 1 && getLastIsFooter() == 1) {
+                return null;
+            }
+            if (items.size() > (position - getFirstIsHeader()) && items.size() > 0) {
                 return this.items.get(position - getFirstIsHeader());
-            else return null;
+            } else {
+                return null;
+            }
         }
         //return getItem(items, position - getFirstIsHeader(), new AtomicInteger(0));
     }
@@ -203,7 +231,7 @@ public abstract class MultiItemListAdapter<I> extends ItemListAdapter<I> {
 
 
     private int countItems() {
-        return super.getItemCount() + getFirstIsHeader();
+        return super.getItemCount() + getFirstIsHeader() + getLastIsFooter();
     }
 
     private int countItems(List<I> items) {

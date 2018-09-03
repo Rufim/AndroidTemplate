@@ -47,8 +47,35 @@ public abstract class MvpListFragment<I> extends ListFragment<I> implements Data
         if(!getPresenter().isLoading()) {
             stopLoading();
             if(adapter.getItems().isEmpty()) {
-               setEmptyViewText(R.string.empty_view_no_data);
+               showEmptyView();
             }
+        }
+    }
+
+    @Override
+    public void notifyItemChanged(int position) {
+        notifyItemChanged(position, null);
+    }
+
+    @Override
+    public void notifyItemChanged(I item) {
+        notifyItemChanged(item, null);
+    }
+
+    @Override
+    public void notifyItemChanged(int position, Object payload) {
+        if(payload != null) {
+            adapter.notifyItemChanged(position, payload);
+        } else {
+            adapter.notifyItemChanged(position);
+        }
+    }
+
+    @Override
+    public void notifyItemChanged(I item, Object payload) {
+        int index =adapter.getItems().indexOf(item);
+        if(index > 0) {
+            notifyItemChanged(index, payload);
         }
     }
 

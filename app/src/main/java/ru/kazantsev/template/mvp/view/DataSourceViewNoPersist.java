@@ -17,9 +17,24 @@ public interface DataSourceViewNoPersist<I> extends DataSourceView<I>, MvpView, 
 
     void stopLoading();
 
+    @Override
+    void notifyItemChanged(int position);
+
+    @Override
+    void notifyItemChanged(I item);
+
+    @Override
+    void notifyItemChanged(int position, Object payload);
+
+    @Override
+    void notifyItemChanged(I item, Object payload);
+
     void addItems(List<I> items, int awaitedCount);
 
     void finishLoad(List<I> items, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams);
+
+    @Override
+    void addFinalItems(List<I> items);
 
     void refresh(boolean showProgress);
 

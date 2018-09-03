@@ -483,6 +483,16 @@ public class TextUtils {
             return parts;
         }
 
+        public static String[] extractLines(String source, String encoding, boolean notInclude, Splitter... splitters) {
+            try {
+                if (source != null)
+                    return extractLines(new ByteArrayInputStream(source.getBytes(encoding)), encoding, notInclude, splitters);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
+            return new String[0];
+        }
+
         public static String[] extractLines(File source, String encoding, boolean notInclude, Splitter... splitters) {
             try {
                 if (source != null)
