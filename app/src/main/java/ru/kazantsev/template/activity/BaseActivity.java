@@ -1,5 +1,6 @@
 package ru.kazantsev.template.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -386,11 +387,39 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         }
     }
 
-    public void setToolbarElevation(int elavation) {
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) toolbarShadow.getLayoutParams();
-        params.height = elavation;
-        toolbarShadow.setLayoutParams(params);
-        toolbarShadow.requestLayout();
+    @SuppressLint("ResourceType")
+    public void setToolbarElevation(int elevation) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) toolbarShadow.getLayoutParams();
+            params.height = 1;
+            toolbarShadow.setBackgroundResource(GuiUtils.getThemeResource(this, R.attr.colorPrimary));
+            toolbarShadow.setElevation(elevation);
+            toolbarShadow.setLayoutParams(params);
+            toolbarShadow.requestLayout();
+            if(appBarLayout != null) {
+                appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+
+                    boolean stateHidden = false;
+
+                    @SuppressLint("ResourceType")
+                    @Override
+                    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                        if(-verticalOffset == appBarLayout.getHeight() && !stateHidden) {
+                            stateHidden = true;
+                            toolbarShadow.setBackgroundResource(GuiUtils.getThemeResource(BaseActivity.this, R.attr.colorPrimaryDark));
+                        } else if(-verticalOffset < appBarLayout.getHeight() && stateHidden) {
+                            stateHidden = false;
+                            toolbarShadow.setBackgroundResource(GuiUtils.getThemeResource(BaseActivity.this, R.attr.colorPrimary));
+                        }
+                    }
+                });
+            }
+        } else {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) toolbarShadow.getLayoutParams();
+            params.height = elevation;
+            toolbarShadow.setLayoutParams(params);
+            toolbarShadow.requestLayout();
+        }
     }
 
     protected void onBackPressedOriginal() {

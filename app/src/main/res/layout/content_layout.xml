@@ -12,8 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="4dp"
         android:layout_alignParentTop="true"
-        android:background="?attr/toolbarShadowDrawable"
-        android:translationZ="12dp" />
+        android:background="?attr/toolbarShadowDrawable" />
 
     <!-- Real content goes here -->
     <FrameLayout
