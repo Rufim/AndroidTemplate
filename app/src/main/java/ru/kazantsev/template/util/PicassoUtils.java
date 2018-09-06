@@ -27,7 +27,7 @@ public class PicassoUtils {
                 Log.e("PICASSO", uri.toString(), exception);
             }
         });
-        picassoBuilder.downloader(new OkHttp3Downloader(application, 1024 * 1024 * 50));
+        picassoBuilder.downloader(new OkHttp3Downloader(application, 1024 * 1024 * maxSize));
         // Picasso.Builder creates the Picasso object to do the actual requests
         Picasso picasso = picassoBuilder.build();
         try {
