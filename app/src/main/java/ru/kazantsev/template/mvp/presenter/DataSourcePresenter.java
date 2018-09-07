@@ -6,7 +6,9 @@ import net.vrallev.android.cat.Cat;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import ru.kazantsev.template.lister.DataSource;
 import ru.kazantsev.template.lister.ObservableDataSource;
@@ -53,10 +55,10 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
         }
         isLoading = true;
         getViewState().startLoading(showProgress);
-        final Observable<I> observable;
+        final Maybe<List<I>> single;
         if (dataSource instanceof ObservableDataSource) {
             try {
-                observable = ((ObservableDataSource<I>) dataSource).getObservableItems(skip, size);
+                single = ((ObservableDataSource<I>) dataSource).getObservableItems(skip, size);
             } catch (Exception e) {
                 Cat.e(e);
                 onException(e);
@@ -64,14 +66,14 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
             }
         } else {
             try {
-                observable = Observable.fromCallable(() -> dataSource.getItems(skip, size)).compose(RxUtils.applySchedulers()).flatMap(Observable::fromIterable);
+                single = Maybe.fromCallable(() -> dataSource.getItems(skip, size));
             } catch (Exception e) {
                 Cat.e(e);
                 onException(e);
                 return;
             }
         }
-        Disposable disposable = rxSequence(observable, size, onElementsLoadedTask, loadedTaskParams);
+        Disposable disposable = rxSequence(single, size, onElementsLoadedTask, loadedTaskParams);
         dispouseOnDestroy(disposable);
     }
 
@@ -85,14 +87,15 @@ public class DataSourcePresenter<V extends DataSourceView<I>, I> extends BasePre
         getViewState().finishLoad(items, onElementsLoadedTask, loadedTaskParams);
     }
 
-    protected Disposable rxSequence(Observable<I> observable, int size, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
-        return observable.compose(RxUtils.applySchedulers())
-                .toList()
+    protected Disposable rxSequence(Maybe<List<I>> observable, int size, AsyncTask onElementsLoadedTask, Object[] loadedTaskParams) {
+        return observable.compose(RxUtils.applySchedulersMaybe())
                 .map(items -> {
                     getViewState().addItems(items, size);
                     return items;
                 })
-                .subscribe(items -> this.onSuccess(items, onElementsLoadedTask, loadedTaskParams), this::onException);
+                .subscribe(items -> this.onSuccess(items, onElementsLoadedTask, loadedTaskParams),
+                        this::onException,
+                        () -> this.onSuccess(null, onElementsLoadedTask, loadedTaskParams));
     }
 
 }

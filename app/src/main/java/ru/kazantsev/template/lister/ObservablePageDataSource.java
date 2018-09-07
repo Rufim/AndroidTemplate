@@ -5,25 +5,27 @@ import net.vrallev.android.cat.Cat;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public abstract class ObservablePageDataSource<P> extends ObservableDataSource<P> implements PageDataSource<P> {
 
-    public abstract Observable<P> getObservablePage(int index) throws Exception;
+    public abstract Maybe<P> getObservablePage(int index) throws Exception;
 
     @Override
-    public Observable<P> getObservableItems(int skip, int size) throws Exception {
-        List<Observable<P>> pages = new ArrayList<>();
+    public Maybe<List<P>> getObservableItems(int skip, int size) throws Exception {
+        List<Maybe<P>> pages = new ArrayList<>();
         for (int i = skip; i < size; i++) {
             pages.add(getObservablePage(i));
         }
-        return Observable.merge(pages);
+        return Maybe.merge(pages).toList().toMaybe();
     }
 
     @Override
     public P getPage(int index) throws Exception {
         try {
-            return getObservablePage(index).singleElement().blockingGet();
+            return getObservablePage(index).blockingGet();
         } catch (Throwable empty) {
             Cat.e(empty);
             return null;
