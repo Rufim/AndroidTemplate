@@ -190,6 +190,11 @@ public abstract class ListFragment<I> extends BaseFragment implements SearchView
             if (enableFiltering) {
                 adapter.setLastQuery(null);
                 adapter.exitFilteringMode();
+                if(adapter.getItems().isEmpty()) {
+                    showEmptyView();
+                } else {
+                    hideEmptyView();
+                }
             }
         }
     }
