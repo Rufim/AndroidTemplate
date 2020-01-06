@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
@@ -59,7 +60,6 @@ import ru.kazantsev.template.util.FragmentBuilder;
 import ru.kazantsev.template.util.GuiUtils;
 import ru.kazantsev.template.util.PermissionUtils;
 import ru.kazantsev.template.util.TextUtils;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static android.R.attr.textColor;
 
@@ -252,7 +252,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     @Override
     protected void attachBaseContext(Context newBase) {
         if(useCalligraphy) {
-            super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+            super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
         } else {
             super.attachBaseContext(newBase);
         }
