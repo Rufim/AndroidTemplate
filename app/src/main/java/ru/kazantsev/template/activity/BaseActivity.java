@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 import ru.kazantsev.template.R;
 import ru.kazantsev.template.domain.Constants;
 import ru.kazantsev.template.domain.event.Event;
@@ -93,7 +92,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
     protected boolean toolbarClassic = false;
     protected boolean enableFragmentCache = false;
     protected boolean clearBackStack = true;
-    protected boolean useCalligraphy = true;
     protected boolean enableBottomNavigation = false;
 
     ArrayList<BundleCache> fragmentBundleCache = new ArrayList<>();
@@ -119,13 +117,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         }
     }
 
-    public BaseActivity(boolean disableNavigationBar, boolean toolbarClassic, boolean enableFragmentCache, boolean clearBackStack, boolean useCalligraphy, boolean enableBottomNavigation) {
+    public BaseActivity(boolean disableNavigationBar, boolean toolbarClassic, boolean enableFragmentCache, boolean clearBackStack, boolean enableBottomNavigation) {
         this();
         this.disableNavigationBar = disableNavigationBar;
         this.toolbarClassic = toolbarClassic;
         this.enableFragmentCache = enableFragmentCache;
         this.clearBackStack = clearBackStack;
-        this.useCalligraphy = useCalligraphy;
         this.enableBottomNavigation = enableBottomNavigation;
     }
 
@@ -246,15 +243,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Fragment
         super.onSaveInstanceState(outState);
         if(mvpCompact != null) {
             mvpCompact.onSaveInstanceState(outState);
-        }
-    }
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        if(useCalligraphy) {
-            super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
-        } else {
-            super.attachBaseContext(newBase);
         }
     }
 
